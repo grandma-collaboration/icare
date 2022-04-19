@@ -1,0 +1,200 @@
+name: API & frontend
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: skyportal
+          POSTGRES_PASSWORD: anything
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a
+        # healthcheck
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      fail-fast: false
+      matrix:
+        test_subset: ["api_and_utils", "frontend_pt1", "frontend_pt2", "flaky"]
+
+    steps:
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
+
+      - name: Checkout main
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: main
+          submodules: true
+
+      - name: Fetch submodules
+        run: |
+          git submodule update --init --recursive
+
+      - name: Install system dependencies
+        run: |
+          curl -sL https://deb.nodesource.com/setup_17.x | sudo -E bash -
+
+          sudo apt install -y wget nodejs unzip firefox nginx libcurl4-gnutls-dev libgnutls28-dev
+
+          pip install pip==21.3.1
+          pip install wheel numpy
+
+          export NPM_PACKAGES="${HOME}/.npm-packages"
+          export PATH=${NPM_PACKAGES}/bin:$PATH
+          export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
+
+          sudo npm -g install npm@latest
+
+          which python; python --version
+          echo npm $(npm --version)
+          echo node $(node --version)
+          nginx -v
+          firefox --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r skyportal/requirements.txt
+          pip install -r skyportal/baselayer/requirements.txt
+
+      - name: Apply Grandma patches
+        run: |
+          ./grandma.sh build
+
+      - name: Write SkyPortal configs
+        run: |
+          cat << EOF > config.yaml
+            database:
+              database: skyportal
+              host: localhost
+              port: 5432
+              user: skyportal
+              password: anything
+          EOF
+          
+          cat << EOF > config.default.yaml
+            database:
+              database: skyportal
+              host: localhost
+              port: 5432
+              user: skyportal
+              password: anything
+          EOF
+
+          cat << EOF > test_config.yaml
+            database:
+              database: skyportal_test
+              user: skyportal
+              host: localhost
+              port: 5432
+              password: anything
+
+            server:
+              auth:
+                debug_login: True
+          EOF
+
+      - name: Initialize SkyPortal
+        run: |
+          # Usually, we create databases on the local machine, so
+          # `createdb` just works out of the box.  However, when doing
+          # this on a server, as in our case, we need to specify extra
+          # options.
+          #
+          # db_init should not complain if the databases exist already
+          #
+          echo "localhost:5432:*:skyportal:anything" > ~/.pgpass
+          chmod 600 ~/.pgpass
+
+          createdb -h localhost -U skyportal skyportal_test
+          psql -U skyportal -h localhost -c "GRANT ALL PRIVILEGES ON DATABASE skyportal_test TO skyportal;" skyportal_test
+
+          export NPM_CONFIG_LEGACY_PEER_DEPS="true"
+          ./grandma.sh build --init
+
+          pip list --format=columns
+          npm ls --depth 0 || true
+
+      - name: Install Geckodriver / Selenium
+        run: |
+          GECKO_VER=0.30.0
+          CACHED_DOWNLOAD_DIR=~/.local/downloads
+          FILENAME=geckodriver-v${GECKO_VER}-linux64.tar.gz
+
+          if [[ ! -f ${CACHED_DOWNLOAD_DIR=}/${FILENAME} ]]; then
+            wget https://github.com/mozilla/geckodriver/releases/download/v${GECKO_VER}/${FILENAME} --directory-prefix=${CACHED_DOWNLOAD_DIR} --no-clobber
+          fi
+          sudo tar -xzf ${CACHED_DOWNLOAD_DIR}/geckodriver-v${GECKO_VER}-linux64.tar.gz -C /usr/local/bin
+          geckodriver --version
+          pip install --upgrade selenium
+          python -c "import selenium; print(f'Selenium {selenium.__version__}')"
+
+      - name: Refresh SkyPortal dependencies for tested version
+        run: |
+          cd skyportal
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          export NPM_CONFIG_LEGACY_PEER_DEPS="true"
+          make dependencies
+
+      - name: Run front-end tests part 1
+        if: ${{ matrix.test_subset == 'frontend_pt1' }}
+        run: |
+          cd skyportal
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/frontend/sources_and_followup_etc'
+
+      - name: Run front-end tests part 2
+        if: ${{ matrix.test_subset == 'frontend_pt2' }}
+        run: |
+          cd skyportal
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless '--ignore=skyportal/tests/frontend/sources_and_followup_etc skyportal/tests/frontend'
+
+      - name: Run API & utils tests
+        if: ${{ matrix.test_subset == 'api_and_utils' }}
+        run: |
+          cd skyportal
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/api skyportal/tests/tools skyportal/tests/utils skyportal/tests/rate_limiting'
+
+      - name: Run flaky tests
+        if: ${{ matrix.test_subset == 'flaky' }}
+        continue-on-error: true
+        run: |
+          cd skyportal
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/flaky'
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: logs
+          path: skyportal/log
+
+      - name: Upload test post-mortem reports
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: test-results
+          path: skyportal/test-results
+
+      - name: Upload generated plots
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: generated-plots
+          path: skyportal/skyportal/tests/data/*_expected.png

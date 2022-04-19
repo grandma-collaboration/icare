@@ -1,0 +1,134 @@
+app:
+    title: Baselayer Example App
+    secret_key: A8BF78D178EEB119DDB6C41E6BB8EA914FB3156802935315E25A2A7A81586C84  # This secret key can be any random string of
+                          # characters.
+                          #
+                          # You should re-generate this for your application
+                          # using:
+                          #
+                          # base64.b64encode(os.urandom(50)).decode('ascii')
+    factory:
+
+database:
+    database:
+    host: localhost
+    port: 5432
+    user:
+    password:
+
+paths:
+    downloads_folder: '/tmp'
+
+server:
+    # Whether the base URL is http or https
+    #
+    # If you are behind a load balancer that connects to the app via http,
+    # this should be set to False.
+    ssl: False
+
+    # According to the Tornado docs at
+    # https://www.tornadoweb.org/en/stable/guide/running.html#processes-and-ports:
+    #
+    # Due to the Python GIL (Global Interpreter Lock), it is necessary
+    # to run multiple Python processes to take full advantage of
+    # multi-CPU machines. Typically it is best to run one process per
+    # CPU.
+    processes: 4
+
+    # How many of the above processes should be dedicated to
+    # frontend only (i.e., no token authorized API requests)
+    dedicated_frontend_processes: 2
+
+    # Rate limit: number of requests per second (see https://www.nginx.com/blog/rate-limiting-nginx/)
+    rate_limit: 5
+
+    # Rate limit burst size (https://www.nginx.com/blog/rate-limiting-nginx/#bursts)
+    burst: 10
+
+    # In addition to the local network, specify any IP addresses that are to be
+    # exempt from API rate limiting
+    whitelisted_ips: []
+
+    # Specify IPs or address ranges (e.g., 130.211.0.0/22) that are associated
+    # with upstream load balancing.
+    # These trusted addresses are used to uncover the originating IP.
+    loadbalancer_ips: []
+
+    # From https://console.developers.google.com/
+    #
+    # - Create Client ID
+    # - Javascript origins: https://localhost:5000
+    # - Authorized redirect URLs: http://localhost:5000/complete/google-oauth2/
+    #
+    # You need to have Google+ API enabled; it takes a few minutes to activate.
+    auth:
+        debug_login: True
+        google_oauth2_key:
+        google_oauth2_secret:
+
+
+services:
+    paths:
+      - ./baselayer/services
+      - ./services
+
+    # By default, all services are enabled.  Use this list to add
+    # services if 'disabled' is set to '*'
+    enabled:
+
+    # A list of service names, or '*'
+    disabled:
+      - dask
+
+    # You can use disabled to disable specific services, or '*' to disable them all
+
+
+log:
+    # if true, log all API calls, including successful ones, if false,
+    # log only those that trigger a warning / error
+    api_calls: False
+
+ports:
+    websocket: 64000
+    fake_oauth: 63000
+    app: 5000
+    app_http_proxy: 5001
+    app_internal: 65000  # nginx forwards this port to ports:app
+    dask: 63500
+    websocket_path_in: 'ipc://run/message_flow_in'
+    websocket_path_out: 'ipc://run/message_flow_out'
+    status: 64500
+    migration_manager: 64501
+
+external_logging:
+    papertrail:
+       # get an account at https://papertrailapp.com
+       enabled: False
+       # change url to the correct subdomain for your account
+       # and change the port as well
+       url:
+       port:
+       # which log files, if any do you not want to send over to the 3rd party?
+       excluded_log_files: [""]
+
+security:
+  strict: true
+  slack:
+    enabled: false
+    url: null
+
+
+# You can schedule jobs to run at a certain time interval (given in minutes).
+#
+# If baselayer is not running at the time the job is supposed to run,
+# it will be run when fired up the next time.
+#
+# If a "limit" is provided, the cron job will only executed between
+# the start and end times given.
+#
+# cron:
+#   - interval: 1
+#     script: tools/1_minute.py
+#   - interval: 5
+#     script: tools/5_minute.py
+#     limit: ["01:00", "02:00"]
