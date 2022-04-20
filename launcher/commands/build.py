@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 
 from launcher.commands.update import update
+from launcher.commands.clear import clear
 from launcher.config import check_config
 from launcher.skyportal import (
     patch as patch_skyportal,
@@ -16,6 +17,7 @@ def build(
     repo: str = "origin",
     branch: str = "master",
     do_update: bool = False,
+    clear: bool = False,
 ):
     """Build grandma
     :param init: Initialize grandma
@@ -43,6 +45,9 @@ def build(
         patch_skyportal("extensions/skyportal/", "patched_skyportal/")
     else: 
         print("No changes detected, skipping patching")
+
+    if clear:
+        clear()
 
     if init:
         cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])

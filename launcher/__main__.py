@@ -7,6 +7,7 @@ from launcher.commands import (
     run,
     update,
     diff,
+    clear,
 )
 
 from tools.check_environment import dependencies_ok
@@ -65,6 +66,7 @@ if __name__ == "__main__":
             "run": run,
             "update": update,
             "diff": diff,
+            "clear": clear,
         },
         name="grandma",
     )
