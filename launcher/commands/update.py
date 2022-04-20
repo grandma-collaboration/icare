@@ -1,5 +1,6 @@
 import subprocess
 from typing import Optional
+from launcher.commands.diff import diff
 
 
 def update(
@@ -20,8 +21,8 @@ def update(
         raise RuntimeError("Failed to git pull grandma")
 
     if init:
-        # initialize/update grandma's submodules kowalski and skyportal
-        # pull skyportal and kowalski
+        # initialize/update grandma's submodules skyportal
+        # pull skyportal
         p = subprocess.run(["git", "submodule", "update", "--init", "--recursive"])
         if p.returncode != 0:
             raise RuntimeError("Failed to initialize grandma's submodules")
@@ -30,7 +31,12 @@ def update(
     if p.returncode != 0:
         raise RuntimeError("SkyPortal autostash failed")
 
-    # update submodules
-    p = subprocess.run(["git", "submodule", "update", "--recursive"])
-    if p.returncode != 0:
-        raise RuntimeError("Failed to update grandma's submodules")
+    # show diff between patched skyportal and skyportal
+    if diff():
+        # update submodules
+        p = subprocess.run(["git", "submodule", "update", "--recursive"])
+        if p.returncode != 0:
+            raise RuntimeError("Failed to update grandma's submodules")
+        return True
+    else:
+        return False

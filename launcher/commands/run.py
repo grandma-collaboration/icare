@@ -13,7 +13,7 @@ def run(
     test: bool = False,
 ):
     """🚀 Launch Grandma SkyPortal"""
-    if init:
+    if init or do_update:
         build(
             init=init,
             repo=repo,
@@ -25,12 +25,12 @@ def run(
     if test:
         cmd = subprocess.Popen(
             ["make", "run_testing"],
-            cwd="skyportal"
+            cwd="patched_skyportal"
         )
         cmd.communicate()
     else:
         cmd = subprocess.Popen(
             ["make", "run"],
-            cwd="skyportal"
+            cwd="patched_skyportal"
         )
         cmd.communicate()

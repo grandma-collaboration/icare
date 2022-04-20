@@ -5,6 +5,8 @@ import sys
 from launcher.commands import (
     build,
     run,
+    update,
+    diff,
 )
 
 from tools.check_environment import dependencies_ok
@@ -14,11 +16,7 @@ sys.path.insert(0, "skyportal")
 
 def initialize_submodules():
     """Initialize submodules if either submodule directory is empty"""
-    do_initialize = any(
-        len(list(Path(submodule).glob("*"))) == 0
-        for submodule in ("skyportal")
-    )
-    if do_initialize:
+    if len(list(Path("skyportal").glob("*"))) == 0:
         p = subprocess.run(
             ["git", "submodule", "update", "--init", "--recursive"],
             stdout=subprocess.PIPE,
@@ -48,8 +46,11 @@ if __name__ == "__main__":
 
     # No need to install whole environment if the user just
     # wants/needs some help
-    if sys.argv[-1] != "--help" and len(sys.argv) != 1:
+    if sys.argv[-1] != "--help" and len(sys.argv) != 1 and "diff" not in sys.argv:
         # check environment
+        print(
+        len(list(Path("skyportal").glob("*"))) == 0
+    )
         with status("Initializing submodules"):
             initialize_submodules()
 
@@ -62,6 +63,8 @@ if __name__ == "__main__":
         {
             "build": build,
             "run": run,
+            "update": update,
+            "diff": diff,
         },
         name="grandma",
     )

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import yaml
 
-from launcher.commands import update
+from launcher.commands.update import update
 from launcher.config import check_config
 from launcher.skyportal import (
     patch as patch_skyportal,
@@ -27,14 +27,28 @@ def build(
     :param skyportal_tag: Tag to apply to SkyPortal docker image
     :param yes: agree with all potentially asked questions
     """
-    if do_update:
-        update(init=init, repo=repo, branch=branch)
+    new_changes = False
+    if do_update and not init:
+        new_changes = update(init=init, repo=repo, branch=branch)
 
-    patch_skyportal()
+    # if patched_skyportal directory exists, patch it
+    patched_skyportal_dir = Path("patched_skyportal")
+    if not patched_skyportal_dir.exists():
+        patched_skyportal_dir.mkdir()
+
+    if new_changes:
+        # copy skyportal to patched_skyportal
+        cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])
+        cmd.wait()
+        patch_skyportal("extensions/skyportal/", "patched_skyportal/")
+    else: 
+        print("No changes detected, skipping patching")
 
     if init:
+        cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])
+        cmd.wait()
         # run the command make run in skyportal dir
-        cmd = subprocess.Popen(["make", "db_init"], cwd="skyportal")
+        cmd = subprocess.Popen(["make", "db_init"], cwd="patched_skyportal")
         cmd.wait()
     
 
