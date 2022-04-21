@@ -8,6 +8,7 @@ from launcher.commands import (
     update,
     diff,
     clear,
+    elevate,
 )
 
 from tools.check_environment import dependencies_ok
@@ -47,7 +48,7 @@ if __name__ == "__main__":
 
     # No need to install whole environment if the user just
     # wants/needs some help
-    if sys.argv[-1] != "--help" and len(sys.argv) != 1 and "diff" not in sys.argv:
+    if sys.argv[-1] != "--help" and len(sys.argv) != 1 and "diff" not in sys.argv and "elevate" not in sys.argv:
         # check environment
         print(
         len(list(Path("skyportal").glob("*"))) == 0
@@ -67,6 +68,7 @@ if __name__ == "__main__":
             "update": update,
             "diff": diff,
             "clear": clear,
+            "elevate": elevate,
         },
         name="grandma",
     )

@@ -11,6 +11,7 @@ def run(
     branch: str = "master",
     do_update: bool = False,
     test: bool = False,
+    clear: bool = False,
 ):
     """🚀 Launch Grandma SkyPortal"""
     if init or do_update:
@@ -19,6 +20,7 @@ def run(
             repo=repo,
             branch=branch,
             do_update=do_update,
+            clear=clear,
         )
 
     # create common docker network (if it does not exist yet)

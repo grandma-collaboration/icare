@@ -25,7 +25,7 @@ def build(
     :param do_update: pull <repo>/<branch>, autostash SP and update submodules
     :param clear: Clear the database
     """
-    new_changes = False
+    new_changes = True
     if do_update and not init:
         new_changes = update(init=init, repo=repo, branch=branch)
 
@@ -38,7 +38,7 @@ def build(
         # copy skyportal to patched_skyportal
         cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])
         cmd.wait()
-        cmd = subprocess.Popen(["rm", "-rf","patched_skyportal/skyportal/.git"])
+        cmd = subprocess.Popen(["rm", "-rf","patched_skyportal/.git"])
         patch_skyportal("extensions/skyportal/", "patched_skyportal/")
     else: 
         print("No changes detected, skipping patching")
@@ -47,8 +47,6 @@ def build(
         clear_db()
 
     if init:
-        cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])
-        cmd.wait()
         # run the command make run in skyportal dir
         cmd = subprocess.Popen(["make", "db_init"], cwd="patched_skyportal")
         cmd.wait()
