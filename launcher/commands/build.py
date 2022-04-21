@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 
 from launcher.commands.update import update
-from launcher.commands.clear import clear
+from launcher.commands.clear import clear as clear_db
 from launcher.config import check_config
 from launcher.skyportal import (
     patch as patch_skyportal,
@@ -22,12 +22,8 @@ def build(
     """Build grandma
     :param init: Initialize grandma
     :param repo: Remote repository to pull from
-    :param branch: Branch on the remote repository
-    :param traefik: Build grandma to run behind Traefik
-    :param no_kowalski: Do not build images for Kowalski
     :param do_update: pull <repo>/<branch>, autostash SP and update submodules
-    :param skyportal_tag: Tag to apply to SkyPortal docker image
-    :param yes: agree with all potentially asked questions
+    :param clear: Clear the database
     """
     new_changes = False
     if do_update and not init:
@@ -42,12 +38,13 @@ def build(
         # copy skyportal to patched_skyportal
         cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])
         cmd.wait()
+        cmd = subprocess.Popen(["rm", "-rf","patched_skyportal/skyportal/.git"])
         patch_skyportal("extensions/skyportal/", "patched_skyportal/")
     else: 
         print("No changes detected, skipping patching")
 
     if clear:
-        clear()
+        clear_db()
 
     if init:
         cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])
