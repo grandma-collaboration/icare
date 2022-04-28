@@ -27,7 +27,7 @@ def build(
     """
     new_changes = True
     if do_update and not init:
-        new_changes = update(init=init, repo=repo, branch=branch)
+        new_changes = update(repo=repo, branch=branch)
 
     # if patched_skyportal directory exists, patch it
     patched_skyportal_dir = Path("patched_skyportal")

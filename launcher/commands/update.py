@@ -4,7 +4,6 @@ from launcher.commands.diff import diff
 
 
 def update(
-    init: bool = False,
     repo: Optional[str] = None,
     branch: Optional[str] = None,
 ):
@@ -19,13 +18,6 @@ def update(
     p = subprocess.run(git_pull_command)
     if p.returncode != 0:
         raise RuntimeError("Failed to git pull grandma")
-
-    if init:
-        # initialize/update grandma's submodules skyportal
-        # pull skyportal
-        p = subprocess.run(["git", "submodule", "update", "--init", "--recursive"])
-        if p.returncode != 0:
-            raise RuntimeError("Failed to initialize grandma's submodules")
     # auto stash SP
     p = subprocess.run(["git", "stash"], cwd="skyportal")
     if p.returncode != 0:
@@ -34,7 +26,7 @@ def update(
     # show diff between patched skyportal and skyportal
     if diff():
         # update submodules
-        p = subprocess.run(["git", "submodule", "update", "--recursive"])
+        p = subprocess.run(["git", "checkout", "master"], cwd="skyportal")
         if p.returncode != 0:
             raise RuntimeError("Failed to update grandma's submodules")
         return True
