@@ -33,8 +33,8 @@ settings = {
     'SOCIAL_AUTH_USER_FIELDS': ['username'],
     'SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL': True,
     'SOCIAL_AUTH_SESSION_EXPIRATION': True,
-    'SOCIAL_AUTH_IAM_OAUTH2_KEY': cfg['server.auth.google_oauth2_key'],
-    'SOCIAL_AUTH_IAM_OAUTH2_SECRET': cfg['server.auth.google_oauth2_secret'],
+    'SOCIAL_AUTH_IAM_OAUTH2_KEY': cfg['server.auth.iam_oauth2_key'],
+    'SOCIAL_AUTH_IAM_OAUTH2_SECRET': cfg['server.auth.iam_oauth2_secret'],
     'SOCIAL_AUTH_REDIRECT_IS_HTTPS': cfg['server.ssl'],
 }
 
