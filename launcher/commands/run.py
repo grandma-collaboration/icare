@@ -8,7 +8,7 @@ from launcher.config import check_config_exists
 def run(
     init: bool = False,
     repo: str = "origin",
-    branch: str = "master",
+    branch: str = "main",
     do_update: bool = False,
     test: bool = False,
     clear: bool = False,

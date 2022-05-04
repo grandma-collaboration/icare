@@ -13,7 +13,7 @@ def diff(
 
     cmd = subprocess.Popen(["git", "fetch", "origin"], stdout=subprocess.PIPE, cwd="skyportal")
     output = cmd.wait()
-    cmd = subprocess.Popen(["git", "diff", "master"], stdout=subprocess.PIPE, cwd="skyportal")
+    cmd = subprocess.Popen(["git", "diff", "main"], stdout=subprocess.PIPE, cwd="skyportal")
     # get the ouput of the command
     output = cmd.stdout.read()
     output = output.decode("utf-8")

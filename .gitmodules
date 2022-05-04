@@ -1,3 +1,6 @@
+[submodule "extensions/skyportal/data/grandma_data"]
+	path = extensions/skyportal/data/grandma_data
+	url = https://github.com/grandma-collaboration/grandma_data.git
 [submodule "skyportal"]
 	path = skyportal
 	url = https://github.com/skyportal/skyportal.git

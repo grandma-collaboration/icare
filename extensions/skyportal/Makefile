@@ -63,6 +63,11 @@ load_seed_data: FLAGS := $(if $(FLAGS),$(FLAGS),--config=config.yaml)
 load_seed_data: | dependencies prepare_seed_data
 	@PYTHONPATH=. python tools/data_loader.py data/db_seed.yaml $(FLAGS)
 
+load_grandma_data: ## Seed database with data from grandma collaboration
+load_grandma_data: FLAGS := $(if $(FLAGS),$(FLAGS),--config=config.yaml)
+load_grandma_data: | dependencies prepare_seed_data
+	@PYTHONPATH=. python tools/data_loader.py data/db_grandma.yaml $(FLAGS)
+
 db_migrate: ## Migrate database to latest schema
 db_migrate: FLAGS := $(if $(FLAGS),$(FLAGS),--config=config.yaml)
 db_migrate: FLAGS := $(subst --,-x ,$(FLAGS))

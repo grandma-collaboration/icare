@@ -15,7 +15,7 @@ from launcher.skyportal import (
 def build(
     init: bool = False,
     repo: str = "origin",
-    branch: str = "master",
+    branch: str = "main",
     do_update: bool = False,
     clear: bool = False,
 ):
