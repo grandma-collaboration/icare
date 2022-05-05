@@ -27,6 +27,13 @@ def initialize_submodules():
             stderr=subprocess.STDOUT,
         )
         print(p.stdout.decode("utf-8"))
+    if len(list(Path("extensions/skyportal-fink-client").glob("*"))) == 0:
+        p = subprocess.run(
+            ["git", "submodule", "update", "--init"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        print(p.stdout.decode("utf-8"))
         if p.returncode != 0:
             raise RuntimeError("Failed to initialize grandma's submodules")
 
