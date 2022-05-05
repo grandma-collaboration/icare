@@ -9,6 +9,8 @@ from launcher.commands import (
     diff,
     clear,
     elevate,
+    poll_from_fink,
+    load_grandma_data
 )
 
 from tools.check_environment import dependencies_ok
@@ -69,6 +71,8 @@ if __name__ == "__main__":
             "diff": diff,
             "clear": clear,
             "elevate": elevate,
+            "poll_from_fink": poll_from_fink,
+            "load_grandma_data": load_grandma_data,
         },
         name="grandma",
     )

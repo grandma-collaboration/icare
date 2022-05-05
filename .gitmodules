@@ -4,3 +4,6 @@
 [submodule "skyportal"]
 	path = skyportal
 	url = https://github.com/skyportal/skyportal.git
+[submodule "extensions/skyportal-fink-client"]
+	path = extensions/skyportal-fink-client
+	url = https://github.com/skyportal-contrib/skyportal-fink-client.git

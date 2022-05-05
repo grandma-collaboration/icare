@@ -4,3 +4,6 @@ from .update import update
 from .diff import diff
 from .clear import clear
 from .elevate import elevate
+from .copy_token import copy_token
+from .poll_from_fink import poll_from_fink
+from .load_grandma_data import load_grandma_data
