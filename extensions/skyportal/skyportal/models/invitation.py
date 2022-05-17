@@ -1,4 +1,4 @@
-__all__ = ['Invitation']
+__all__ = ["Invitation"]
 
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
@@ -18,11 +18,11 @@ _, cfg = load_env()
 
 class Invitation(Base):
 
-    read = update = delete = AccessibleIfUserMatches('invited_by')
+    read = update = delete = AccessibleIfUserMatches("invited_by")
 
     token = sa.Column(sa.String(), nullable=False, unique=True)
     role_id = sa.Column(
-        sa.ForeignKey('roles.id'),
+        sa.ForeignKey("roles.id"),
         nullable=False,
     )
     role = relationship(
@@ -57,10 +57,10 @@ class Invitation(Base):
     user_expiration_date = sa.Column(sa.DateTime, nullable=True)
 
 
-@event.listens_for(Invitation, 'after_insert')
+@event.listens_for(Invitation, "after_insert")
 def send_user_invite_email(mapper, connection, target):
     app_base_url = get_app_base_url()
-    link_location = f'{app_base_url}/login/iam-oauth2/?invite_token={target.token}'
+    link_location = f"{app_base_url}/login/iam-oauth2/?invite_token={target.token}"
     send_email(
         recipients=[target.user_email],
         subject=cfg["invitations.email_subject"],
