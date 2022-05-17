@@ -10,13 +10,14 @@ from launcher.commands import (
     clear,
     elevate,
     poll_from_fink,
-    load_grandma_data
+    load_grandma_data,
 )
 
 from tools.check_environment import dependencies_ok
 from tools.status import status
 
 sys.path.insert(0, "skyportal")
+
 
 def initialize_submodules():
     """Initialize submodules if either submodule directory is empty"""
@@ -36,6 +37,7 @@ def initialize_submodules():
         print(p.stdout.decode("utf-8"))
         if p.returncode != 0:
             raise RuntimeError("Failed to initialize grandma's submodules")
+
 
 if __name__ == "__main__":
     try:
@@ -57,11 +59,14 @@ if __name__ == "__main__":
 
     # No need to install whole environment if the user just
     # wants/needs some help
-    if sys.argv[-1] != "--help" and len(sys.argv) != 1 and "diff" not in sys.argv and "elevate" not in sys.argv:
+    if (
+        sys.argv[-1] != "--help"
+        and len(sys.argv) != 1
+        and "diff" not in sys.argv
+        and "elevate" not in sys.argv
+    ):
         # check environment
-        print(
-        len(list(Path("skyportal").glob("*"))) == 0
-    )
+        print(len(list(Path("skyportal").glob("*"))) == 0)
         with status("Initializing submodules"):
             initialize_submodules()
 

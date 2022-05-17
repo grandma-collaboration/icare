@@ -3,7 +3,7 @@ import json
 from distutils.dir_util import copy_tree
 
 
-def patch(source="extensions/skyportal/", destination= "patched_skyportal/"):
+def patch(source="extensions/skyportal/", destination="patched_skyportal/"):
     """Make grandma-specific file modifications to SkyPortal."""
     print("Applying grandma-specific patches to SkyPortal")
 

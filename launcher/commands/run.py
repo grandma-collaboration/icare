@@ -25,14 +25,8 @@ def run(
 
     # create common docker network (if it does not exist yet)
     if test:
-        cmd = subprocess.Popen(
-            ["make", "run_testing"],
-            cwd="patched_skyportal"
-        )
+        cmd = subprocess.Popen(["make", "run_testing"], cwd="patched_skyportal")
         cmd.communicate()
     else:
-        cmd = subprocess.Popen(
-            ["make", "run"],
-            cwd="patched_skyportal"
-        )
+        cmd = subprocess.Popen(["make", "run"], cwd="patched_skyportal")
         cmd.communicate()
