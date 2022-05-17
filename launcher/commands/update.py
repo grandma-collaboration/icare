@@ -18,15 +18,11 @@ def update(
     p = subprocess.run(git_pull_command)
     if p.returncode != 0:
         raise RuntimeError("Failed to git pull grandma")
-    # auto stash SP
-    p = subprocess.run(["git", "stash"], cwd="skyportal")
-    if p.returncode != 0:
-        raise RuntimeError("SkyPortal autostash failed")
 
     # show diff between patched skyportal and skyportal
     if diff():
         # update submodules
-        p = subprocess.run(["git", "checkout", "master"], cwd="skyportal")
+        p = subprocess.run(["git", "checkout", branch], cwd="skyportal")
         if p.returncode != 0:
             raise RuntimeError("Failed to update grandma's submodules")
         return True

@@ -15,7 +15,7 @@ from launcher.skyportal import (
 def build(
     init: bool = False,
     repo: str = "origin",
-    branch: str = "master",
+    branch: str = "main",
     do_update: bool = False,
     clear: bool = False,
 ):
@@ -36,11 +36,11 @@ def build(
 
     if new_changes:
         # copy skyportal to patched_skyportal
-        cmd = subprocess.Popen(["cp", "-a","skyportal/.","patched_skyportal/"])
+        cmd = subprocess.Popen(["cp", "-a", "skyportal/.", "patched_skyportal/"])
         cmd.wait()
-        cmd = subprocess.Popen(["rm", "-rf","patched_skyportal/.git"])
+        cmd = subprocess.Popen(["rm", "-rf", "patched_skyportal/.git"])
         patch_skyportal("extensions/skyportal/", "patched_skyportal/")
-    else: 
+    else:
         print("No changes detected, skipping patching")
 
     if clear:
@@ -50,9 +50,3 @@ def build(
         # run the command make run in skyportal dir
         cmd = subprocess.Popen(["make", "db_init"], cwd="patched_skyportal")
         cmd.wait()
-    
-
-
-    
-
-

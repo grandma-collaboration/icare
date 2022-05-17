@@ -4,6 +4,7 @@ from pathlib import Path
 
 import yaml
 
+
 def diff(
     init: bool = False,
 ):
@@ -11,9 +12,13 @@ def diff(
     # if there are changes, we display them and ask the user if they want to apply them
     # else we just return
 
-    cmd = subprocess.Popen(["git", "fetch", "origin"], stdout=subprocess.PIPE, cwd="skyportal")
+    cmd = subprocess.Popen(
+        ["git", "fetch", "origin"], stdout=subprocess.PIPE, cwd="skyportal"
+    )
     output = cmd.wait()
-    cmd = subprocess.Popen(["git", "diff", "master"], stdout=subprocess.PIPE, cwd="skyportal")
+    cmd = subprocess.Popen(
+        ["git", "diff", "main"], stdout=subprocess.PIPE, cwd="skyportal"
+    )
     # get the ouput of the command
     output = cmd.stdout.read()
     output = output.decode("utf-8")
@@ -32,13 +37,17 @@ def diff(
     for file in set(changed_files):
         if Path("extensions/skyportal/" + file).exists():
             exist_in_extensions.append(file)
-    
+
     # if there are changes, ask the user if he wants to continue, return true or false
     if len(exist_in_extensions) > 0:
-        print("The following files from skyportal for which we have a modified version have been changed:")
+        print(
+            "The following files from skyportal for which we have a modified version have been changed:"
+        )
         for file in exist_in_extensions:
             print(file)
-        print("Do you want to continue? If you answer yes, the extensions will overwrite those changes, potentially missing on newer functionnalities. (y/n)")
+        print(
+            "Do you want to continue? If you answer yes, the extensions will overwrite those changes, potentially missing on newer functionnalities. (y/n)"
+        )
         answer = input()
         if answer == "y":
             return True
@@ -46,8 +55,3 @@ def diff(
             return False
     else:
         return True
-
-    
-
-
-    

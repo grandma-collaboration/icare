@@ -150,7 +150,7 @@ def driver(request):
     options = webdriver.firefox.options.Options()
     if "BASELAYER_TEST_HEADLESS" in os.environ:
         options.headless = True
-    options.set_preference('devtools.console.stdout.content', True)
+    options.set_preference("devtools.console.stdout.content", True)
     options.set_preference("browser.download.manager.showWhenStarting", False)
     options.set_preference("browser.download.folderList", 2)
     options.set_preference(
@@ -164,9 +164,7 @@ def driver(request):
         ),
     )
 
-    driver = MyCustomWebDriver(
-        options=options
-    )
+    driver = MyCustomWebDriver(options=options)
     driver.set_window_size(1920, 1200)
     login(driver)
 
@@ -186,9 +184,7 @@ def login(driver):
         pass
 
     try:
-        element = driver.wait_for_xpath(
-            '//a[contains(@href,"/login/iam-oauth2")]', 5
-        )
+        element = driver.wait_for_xpath('//a[contains(@href,"/login/iam-oauth2")]', 5)
         element.click()
     except TimeoutException:
         pass
