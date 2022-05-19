@@ -1,7 +1,7 @@
 # SkyPortal for Grandma
 
 ## What is it ?
-SkyPortal for Grandma is a custom "layer" of both frontend and backend, to is added on top of  [SkyPortal](https://skyportal.io/) to provide the feature required only by Grandma.
+SkyPortal for Grandma is a custom "layer" of both frontend and backend, added on top of [SkyPortal](https://skyportal.io/) to provide the features required only by Grandma.
 
 Besides from building on top of SkyPortal, it also provides 2 extensions:
 - [SkyPortal-Fink-Client](): A tool to pull alerts from Fink and add them to SkyPortal.
