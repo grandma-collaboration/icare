@@ -8,7 +8,7 @@ from launcher.commands import (
     update,
     diff,
     clear,
-    elevate,
+    set_user_role,
     poll_from_fink,
     load_grandma_data,
 )
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         sys.argv[-1] != "--help"
         and len(sys.argv) != 1
         and "diff" not in sys.argv
-        and "elevate" not in sys.argv
+        and "set_user_role" not in sys.argv
     ):
         # check environment
         print(len(list(Path("skyportal").glob("*"))) == 0)
@@ -82,7 +82,7 @@ if __name__ == "__main__":
             "update": update,
             "diff": diff,
             "clear": clear,
-            "elevate": elevate,
+            "set_user_role": set_user_role,
             "poll_from_fink": poll_from_fink,
             "load_grandma_data": load_grandma_data,
         },
