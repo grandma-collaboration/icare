@@ -9,8 +9,11 @@ Besides from building on top of SkyPortal, it also provides 2 extensions:
 
 - [Grandma data](https://github.com/grandma-collaboration/grandma_data): a set of data needed by Grandma to populate SkyPortal's database, such as telescopes data, instruments data, etc.
 
-## Authentification
-For now, users can login to SkyPortal for Grandma using either their Google account or their EduGAIN account. The service used for authentification is called IAM. Essentially, you will need to create an IAM account that will be used to login to SkyPortal. But don't worry, you won't need to really create an account from A to Z and remember a password, it will be created automatically using your Google or EduGAIN account. You only need to specify your firstname, lastname, email of choice (that will be added to your skyportal profile, and can be different than the google or edugain email), as well as your affiliation (not implemented yet).
+## Authentication
+
+##### Full Account Creation Tutorial: [User Guide](./user_guide/index.md)
+
+For now, users can login to SkyPortal for Grandma using either their Google account or their EduGAIN account. The service used for authentication is called IAM. Essentially, you will need to create an IAM account that will be used to login to SkyPortal. But don't worry, you won't need to really create an account from A to Z and remember a password, it will be created automatically using your Google or EduGAIN account. You only need to specify your firstname, lastname, email of choice (that will be added to your skyportal profile, and can be different than the google or edugain email), as well as your affiliation (not implemented yet).
 
 
 ## How to create your IAM account.
