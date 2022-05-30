@@ -11,15 +11,15 @@ IAM login             |
 
 If you choose to create your IAM Account using Slack, before being asked your to connect to your Slack account, you might be asked for your workspace name. If that's the case, use `granmagroupe` as workspace name. Then you can proceed to the next step.
 
-Step 2. A form will appear, here you are asked to give your `firstname`, `lastname`, `email`, `username` and `password`. Also, you'll notice a `note` field. You have to fill it in, admins will see it and it helps them know who you are and why they should confirm your account. Upon submitting the form, a message will appear confirming that you applied for an account.
+Step 2. A form will appear, here you are asked to give your `firstname`, `lastname`, `email`, `username` and `password`. Also, you'll notice a `note` field. We request you to put your affiliation in this note, as well as other information you may find useful. It is mandatory ! Upon submitting the form, a message will appear confirming that you applied for an account.
 
 Account Creation Form             |  Submittion message
 :-------------------------:|:-------------------------:
 ![](./img/3.png)  |  ![](./img/4.png)
 
-Step 3. Now, you will be informed that you received an email with a confirmation link. **DO NOT** click it. It is not necessary, you can just ignore it as an admin will confirm your account later.
-When your account is confirmed, you will receive and email with a link to set your password.
-This password is the password of your IAM Account. As you created your IAM Account using your Slack or EDUGain account, you will not need it later on, and you do not require to set it. You can simply ignore it.
+Step 3. Now, you will be informed that you received an email with a confirmation link. Please click the link to confirm your account's email. It is also mandatory. You're account won't be verified by an administrator until you do it.
+When your account is confirmed by an administrator, you will receive and email with a link to set your password.
+This password is the password of your IAM Account. As you created your IAM Account using your Slack or EDUGain account, it is not needed. **Do not click it, do not set a password**.
 
 Account Creation Confirmation email             |  Setting your password
 :-------------------------:|:-------------------------:
