@@ -14,7 +14,7 @@ If you choose to create your IAM Account using Slack, you might be asked for you
 If that's the case, use `granmagroupe` as workspace name. If you use eduGAIN, you need to select
 your home institution: you can enter some letters from its name to filter the long list...
 
-Step 2. A form will be displayed: enter your `firstname`, `lastname`, `email`, `username` and `password`.
+Step 2. A form will be displayed: enter your `firstname`, `lastname`, `email` and `username`.
 Also, you'll notice a `note` field. We request you to put your affiliation in this note, as well as other information
 you may find useful. It is mandatory ! Upon submitting the form, a message will appear confirming that you applied for an account.
 
