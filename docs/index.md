@@ -13,13 +13,13 @@ Besides from building on top of SkyPortal, it also provides 2 extensions:
 
 ##### Full Account Creation Tutorial: [User Guide](./user_guide/index.md)
 
-Users can login to SkyPortal for Grandma using either their Google account or their eduGAIN account. The service used for 
+Users can login to SkyPortal for Grandma using either their Slack account or their eduGAIN account. The service used for
 authentication is called IAM. One benefit of this service is that you will be able to use your
 standard account, without the need to remember a username and a password specific to Skyportal for
 Grandma.  Also you will be able to use any of the authentication methods proposed and still
 remain the same user for Skyportal for Grandma.
 
-Your IAM account will be automatically created the first time you connect to 
+Your IAM account will be automatically created the first time you connect to
 [SkyPortal for Grandma](https://grandma-v2.ijclab.in2p3.fr/) but we recommend that you follow
 the steps below to create it before attempting to connect to Skyportal for Grandma.
 
@@ -28,19 +28,19 @@ you will need to delete your cache/cookies before logging in.**
 
 ## How to create and configure your IAM account.
 
-It is recommended to create your IAM account before connecting to Skyportal for Grandma by 
+It is recommended to create your IAM account before connecting to Skyportal for Grandma by
 connecting directly to the [IAM service](https://iam-grandma.ijclab.in2p3.fr/login).
-You will have to enter some information required to create your account. Note that the that 
+You will have to enter some information required to create your account. Note that the that
 the firstname, lastname, email you enter will be used to initialize your Skyportal
 profile. The email you specifiy don't need to be the same as the email associated with the
-Google or eduGAIN account you used to authenticate and will be used as your Skyportal for Grandma
+Slack or eduGAIN account you used to authenticate and will be used as your Skyportal for Grandma
 identifier (username).
 
 **Note: one of the mandatory information to create your IAM account is the `Note` field: we request you to put your
 affiliation in this note, as well as other information you may find useful.**
 
 Once your account has been created and verified, you can login again to
-[SkyPortal for Grandma](https://grandma-v2.ijclab.in2p3.fr/) using your IAM account 
+[SkyPortal for Grandma](https://grandma-v2.ijclab.in2p3.fr/) using your IAM account
 A Skyportal for Grandma username will be automatically created. You can edit it your profile information
 by clicking on the button on the top-right corner of the Skyportal for Grandma window.
 
@@ -54,10 +54,10 @@ you can use to authenticate using the `Link certificate` button.
 ## First steps to follow after login in for the first time
 
 First, you will need to head to the `Groups` page. There, you can request to be added to the groups you are interested in.
-Exemple: You are a member of GRANDMA, you can ask to be added to the group `GRANDMA`. You are also interested 
+Exemple: You are a member of GRANDMA, you can ask to be added to the group `GRANDMA`. You are also interested
 in seeing alerts from Fink, you can ask to be added to the group `Fink`.
 
-An administrator of the group will be notified of your request. After accepting it, you will receive 
+An administrator of the group will be notified of your request. After accepting it, you will receive
 a notification (you can see it on the top right hand corner of the screen, it is a bell icon) to tell
 you that you have been added to the group.
 
@@ -65,12 +65,12 @@ Now, you can explore the rest of the platform.
 
 ## User permissions and roles
 
-As a new user of SkyPortal, you won't be able to do much at first. Users can have different roles, 
+As a new user of SkyPortal, you won't be able to do much at first. Users can have different roles,
 that come with a predeterminated set of permissions. A user can also be granted a permission without a specific role.
 To use certain (most) features of the platform, you will need certain permissions.
 Exemple: You can see the list of telescopes, but you can't add a new one. You can see the shifts, but you can't add or join one.
-To access those different features, administrators of the platform can provide it to you. You can ask 
-them, but they should take care of it for every user without having to ask them. If you need additional 
+To access those different features, administrators of the platform can provide it to you. You can ask
+them, but they should take care of it for every user without having to ask them. If you need additional
 permissions (like the permission to add a source, ...), you can always ask them.
 At first, you will be granted the `Manage shift` permission, which allows you to interact with shifts.
 
