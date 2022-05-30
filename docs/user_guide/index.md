@@ -8,7 +8,9 @@ SkyPortal login button            |
 :-------------------------:|
 ![](./img/1.png)  |
 
-Step 2. Now that you are on IAM's login page, choose the method of your choice: Google or EDUGain. Soon, you'll also be able to login with a normal IAM account, not necessarily through Google or EDUGain. That feature actually already works, but was deactivated for testing purposes. It will be reactivated if some users to not have access to either Google or EDUGain. Please contact us if that's the case !
+Step 2. Now that you are on IAM's login page, choose the method of your choice: Google or EDUGain.
+If you are not able to use one of these methods to authenticate, please contact us to discuss
+alternatives.
 
 IAM login             |
 :-------------------------:|
