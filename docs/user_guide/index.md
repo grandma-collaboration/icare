@@ -17,7 +17,7 @@ Account Creation Form             |  Submittion message
 :-------------------------:|:-------------------------:
 ![](./img/3.png)  |  ![](./img/4.png)
 
-Step 3. Now, you will be informed that you received an email with a confirmation link. Please click the link to confirm your account's email. It is also mandatory. You're account won't be verified by an administrator until you do it.
+Step 3. Now, you will be informed that you received an email with a confirmation link. Please click the link to confirm your account's email. It is also mandatory. Your account won't be verified by an administrator until you do it.
 When your account is confirmed by an administrator, you will receive and email with a link to set your password.
 This password is the password of your IAM Account. As you created your IAM Account using your Slack or EDUGain account, it is not needed. **Do not click it, do not set a password**.
 
