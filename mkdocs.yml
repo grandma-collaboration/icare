@@ -3,9 +3,12 @@ site_name: SkyPortal for GRANDMA
 nav:
   - Home : index.md
   - User Guide : ./user_guide/index.md
+  - Workshop Exercices: ./workshop/index.md
 
 theme:
     name: readthedocs
 
 plugins:
   - search
+
+extra_css: [extra.css]
