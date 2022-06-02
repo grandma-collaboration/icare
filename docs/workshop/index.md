@@ -1,7 +1,7 @@
 # WORKSHOP EXERCICES
 
 ### **Here, you will find a series of short and concise exercices to help you get started with SkyPortal for GRANDMA. Also, this will help us verify that everyone created their account and participated in the exercices, and it will help you find potential bugs so we can fix them!**
-### At the end of the exercices, you will have a short Google Form to give us feedback about your experience. This step is mandatory and will help us a lot to make the platform better for everyone.
+### At the end of the exercices, you will find a short Google Form to give us feedback about your experience. This step is mandatory and will help us a lot to make the platform better for everyone.
 ### **Thank you for your participation!**
 
 ### Exercices:
