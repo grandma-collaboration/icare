@@ -3,14 +3,14 @@ import tornado.web
 # This provides `login`, `complete`, and `disconnect` endpoints
 from social_tornado.routes import SOCIAL_AUTH_ROUTES
 
+from .env import load_env
+
 from .handlers import (
     MainPageHandler,
     SocketAuthTokenHandler,
     ProfileHandler,
     LogoutHandler,
 )
-
-from .env import load_env
 
 env, cfg = load_env()
 

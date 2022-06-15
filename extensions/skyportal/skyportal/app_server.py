@@ -7,6 +7,7 @@ from baselayer.log import make_log
 from skyportal.handlers import BecomeUserHandler, LogoutHandler
 from skyportal.handlers.api import (
     ACLHandler,
+    AnalysisServiceHandler,
     UserACLHandler,
     AllocationHandler,
     AssignmentHandler,
@@ -48,6 +49,7 @@ from skyportal.handlers.api import (
     ObservationPlanSimSurveyHandler,
     ObservationPlanGeoJSONHandler,
     ObservationPlanAirmassChartHandler,
+    ObservationPlanCreateObservingRunHandler,
     ObservationPlanFieldsHandler,
     PhotometryHandler,
     BulkDeletePhotometryHandler,
@@ -60,8 +62,10 @@ from skyportal.handlers.api import (
     ObservationTreasureMapHandler,
     ObservationASCIIFileHandler,
     ObservationExternalAPIHandler,
+    ObservationSimSurveyHandler,
     PhotometryRangeHandler,
     PhotometryRequestHandler,
+    PhotometryOriginHandler,
     RoleHandler,
     UserRoleHandler,
     SharingHandler,
@@ -141,6 +145,7 @@ skyportal_handlers = [
     # API endpoints
     (r"/api/acls", ACLHandler),
     (r"/api/allocation(/.*)?", AllocationHandler),
+    (r"/api/analysis_service(/.*)?", AnalysisServiceHandler),
     (r"/api/assignment(/.*)?", AssignmentHandler),
     (r"/api/candidates(/[0-9A-Za-z-_]+)/([0-9]+)", CandidateHandler),
     (r"/api/candidates(/.*)?", CandidateHandler),
@@ -156,20 +161,23 @@ skyportal_handlers = [
     (r"/api/followup_request(/.*)?", FollowupRequestHandler),
     (r"/api/photometry_request(/.*)", PhotometryRequestHandler),
     (r"/api/galaxy_catalog(/[0-9]+)?", GalaxyCatalogHandler),
-    (r"/api/(sources|spectra|gcn_event)/([0-9A-Za-z-_\.\+]+)/comments", CommentHandler),
     (
-        r"/api/(sources|spectra|gcn_event)/([0-9A-Za-z-_\.\+]+)/comments(/[0-9]+)?",
+        r"/api/(sources|spectra|gcn_event|shift)/([0-9A-Za-z-_\.\+]+)/comments",
         CommentHandler,
     ),
     (
-        r"/api/(sources|spectra|gcn_event)(/[0-9A-Za-z-_\.\+]+)/comments(/[0-9]+)/attachment",
+        r"/api/(sources|spectra|gcn_event|shift)/([0-9A-Za-z-_\.\+]+)/comments(/[0-9]+)?",
+        CommentHandler,
+    ),
+    (
+        r"/api/(sources|spectra|gcn_event|shift)(/[0-9A-Za-z-_\.\+]+)/comments(/[0-9]+)/attachment",
         CommentAttachmentHandler,
     ),
     # Allow the '.pdf' suffix for the attachment route, as the
     # react-file-previewer package expects URLs ending with '.pdf' to
     # load PDF files.
     (
-        r"/api/(sources|spectra|gcn_event)/([0-9A-Za-z-_\.\+]+)/comments(/[0-9]+)/attachment.pdf",
+        r"/api/(sources|spectra|gcn_event|shift)/([0-9A-Za-z-_\.\+]+)/comments(/[0-9]+)/attachment.pdf",
         CommentAttachmentHandler,
     ),
     (r"/api/gcn_event(/.*)?", GcnEventHandler),
@@ -194,6 +202,7 @@ skyportal_handlers = [
     (r"/api/observation(/[0-9]+)?", ObservationHandler),
     (r"/api/observation/ascii(/[0-9]+)?", ObservationASCIIFileHandler),
     (r"/api/observation/gcn(/[0-9]+)", ObservationGCNHandler),
+    (r"/api/observation/simsurvey(/[0-9]+)", ObservationSimSurveyHandler),
     (r"/api/observation/treasuremap(/[0-9]+)", ObservationTreasureMapHandler),
     (r"/api/observation/external_api(/[0-9]+)?", ObservationExternalAPIHandler),
     (r"/api/observing_run(/[0-9]+)?", ObservingRunHandler),
@@ -223,6 +232,10 @@ skyportal_handlers = [
         ObservationPlanGeoJSONHandler,
     ),
     (
+        r"/api/observation_plan(/[0-9A-Za-z-_\.\+]+)/observing_run",
+        ObservationPlanCreateObservingRunHandler,
+    ),
+    (
         r"/api/observation_plan(/[0-9A-Za-z-_\.\+]+)/fields",
         ObservationPlanFieldsHandler,
     ),
@@ -234,6 +247,7 @@ skyportal_handlers = [
     (r"/api/shifts(/[0-9]+)/users(/[0-9]+)?", ShiftUserHandler),
     (r"/api/photometry/bulk_delete/(.*)", BulkDeletePhotometryHandler),
     (r"/api/photometry/range(/.*)?", PhotometryRangeHandler),
+    (r"/api/photometry/origins", PhotometryOriginHandler),
     (r"/api/roles", RoleHandler),
     (r"/api/sources(/[0-9A-Za-z-_\.\+]+)/photometry", ObjPhotometryHandler),
     (r"/api/sources(/[0-9A-Za-z-_\.\+]+)/spectra", ObjSpectraHandler),
@@ -299,7 +313,7 @@ skyportal_handlers = [
     (r"/api/user(/.*)?", UserHandler),
     (r"/api/weather(/.*)?", WeatherHandler),
     (r"/api/internal/tokens(/.*)?", TokenHandler),
-    (r"/api/internal/profile", ProfileHandler),
+    (r"/api/internal/profile(/[0-9]+)?", ProfileHandler),
     (r"/api/internal/dbinfo", DBInfoHandler),
     (r"/api/internal/source_views(/.*)?", SourceViewsHandler),
     (r"/api/internal/source_counts(/.*)?", SourceCountHandler),
@@ -317,7 +331,7 @@ skyportal_handlers = [
         r"/api/internal/plot/airmass/hours_below/(.*)/([0-9]+)",
         PlotHoursBelowAirmassHandler,
     ),
-    (r"/api/internal/ephemeris/([0-9]+)", EphemerisHandler),
+    (r"/api/internal/ephemeris(/[0-9]+)?", EphemerisHandler),
     (r"/api/internal/log", LogHandler),
     (r"/api/internal/recent_sources(/.*)?", RecentSourcesHandler),
     (r"/api/internal/annotations_info", AnnotationsInfoHandler),

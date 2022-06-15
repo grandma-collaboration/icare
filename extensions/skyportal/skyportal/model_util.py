@@ -12,6 +12,8 @@ all_acl_ids = [
     "Manage groups",
     "Manage shifts",
     "Manage allocations",
+    "Manage observing runs",
+    "Manage Analysis Services",
     "Upload data",
     "System admin",
     "Post taxonomy",
@@ -27,12 +29,20 @@ role_acls = {
         "Comment",
         "Manage shifts",
         "Manage sources",
+        "Manage Analysis Services",
         "Upload data",
         "Post taxonomy",
         "Manage users",
         "Classify",
+        "Manage observing runs",
     ],
-    "Full user": ["Annotate", "Comment", "Upload data", "Classify"],
+    "Full user": [
+        "Annotate",
+        "Comment",
+        "Upload data",
+        "Classify",
+        "Manage observing runs",
+    ],
     "View only": [],
 }
 
@@ -44,7 +54,7 @@ def add_user(username, roles=[], auth=False, first_name=None, last_name=None):
     if user is None:
         user = User(username=username, first_name=first_name, last_name=last_name)
         if auth:
-            TornadoStorage.user.create_social_auth(user, user.username, "iam-auth2")
+            TornadoStorage.user.create_social_auth(user, user.username, "iam-oauth2")
 
     for rolename in roles:
         role = Role.query.get(rolename)

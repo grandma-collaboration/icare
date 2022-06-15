@@ -6,7 +6,7 @@ import MUIDataTable from "mui-datatables";
 import Paper from "@material-ui/core/Paper";
 import Chip from "@material-ui/core/Chip";
 import Typography from "@material-ui/core/Typography";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
@@ -40,6 +40,8 @@ import * as invitationsActions from "../ducks/invitations";
 import * as aclsActions from "../ducks/acls";
 import * as rolesActions from "../ducks/roles";
 import Spinner from "./Spinner";
+
+import * as ProfileActions from "../ducks/profile";
 
 dayjs.extend(utc);
 
@@ -98,6 +100,7 @@ const UserManagement = () => {
   const [addUserGroupsDialogOpen, setAddUserGroupsDialogOpen] = useState(false);
   const [addUserRolesDialogOpen, setAddUserRolesDialogOpen] = useState(false);
   const [addUserACLsDialogOpen, setAddUserACLsDialogOpen] = useState(false);
+  const [addUserAffiliationsDialogOpen, setAddUserAffiliationsDialogOpen] = useState(false);
   const [addUserStreamsDialogOpen, setAddUserStreamsDialogOpen] =
     useState(false);
   const [
@@ -108,6 +111,8 @@ const UserManagement = () => {
   const [dataFetched, setDataFetched] = useState(false);
 
   const { handleSubmit, errors, reset, control, getValues } = useForm();
+
+  const filter = createFilterOptions();
 
   useEffect(() => {
     const fetchData = () => {
@@ -225,6 +230,22 @@ const UserManagement = () => {
     }
   };
 
+  const handleAddUserAffiliations = async (formData) => {
+    const data = {
+      affiliations: formData.affiliations.map((value) => {return value['inputValue'] || value}),
+    }
+    const result = await dispatch(
+      ProfileActions.updateBasicUserInfo(data, clickedUser.id)
+    );
+    if (result.status === "success") {
+      dispatch(showNotification("Successfully updated user's affiliations."));
+      //reset({ affiliations: [data.affiliations] });
+      setAddUserAffiliationsDialogOpen(false);
+      dispatch(usersActions.fetchUsers(fetchParams));
+      setClickedUser(null);
+    }
+  };
+
   const handleAddUserRoles = async (formData) => {
     const result = await dispatch(
       rolesActions.addUserRoles({
@@ -273,6 +294,21 @@ const UserManagement = () => {
     }
   };
 
+  const handleClickDeleteUserAffiliations = async (user, affiliation) => {
+    console.log(affiliation)
+    const data = {
+      affiliations: user.affiliations.filter((value) => value !== affiliation)
+    }
+    console.log(data);
+    const result = await dispatch(
+      ProfileActions.updateBasicUserInfo(data, user.id)
+    );
+    if (result.status === "success") {
+      dispatch(showNotification("Successfully delete user's affiliation."));
+      dispatch(usersActions.fetchUsers(fetchParams));
+    }
+  };
+
   const handleClickDeleteUserRole = async (userID, role) => {
     const result = await dispatch(
       rolesActions.deleteUserRole({ userID, role })
@@ -309,6 +345,7 @@ const UserManagement = () => {
       </div>
     );
   };
+
 
   const renderRoles = (dataIndex) => {
     const user = users[dataIndex];
@@ -401,6 +438,53 @@ const UserManagement = () => {
             <p>
               These are in addition to those ACLs associated with user role(s).
               See help icon tooltip in roles column header for those ACLs.
+            </p>
+          </>
+        }
+      >
+        <HelpIcon color="disabled" size="small" className={classes.icon} />
+      </Tooltip>
+    </>
+  );
+
+  const renderAffiliations = (dataIndex) => {
+    const user = users[dataIndex];
+    return (
+      <div>
+        <IconButton
+          aria-label="add-affiliation"
+          data-testid={`addUserACLsButton${user.id}`}
+          onClick={() => {
+            setClickedUser(user);
+            setAddUserAffiliationsDialogOpen(true);
+          }}
+          size="small"
+        >
+          <AddCircleIcon color="disabled" />
+        </IconButton>
+        {user?.affiliations?.map((affiliation) => (
+          <Chip
+            label={affiliation}
+            onDelete={() => {
+              handleClickDeleteUserAffiliations(user, affiliation);
+            }}
+            key={affiliation}
+            data-testid={`deleteUserAffiliationButton_${user.id}_${affiliation}`}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const renderAffiliationsHeader = () => (
+    <>
+      Affiliations
+      <Tooltip
+        interactive
+        title={
+          <>
+            <p>
+              These are the user's affiliations. They can be used when writing papers or circulars
             </p>
           </>
         }
@@ -579,9 +663,9 @@ const UserManagement = () => {
           type: "string",
           title: "Username",
         },
-        affiliation: {
+        affiliations: {
           type: "string",
-          title: "Affiliation",
+          title: "Affiliations",
         },
         email: {
           type: "string",
@@ -652,10 +736,12 @@ const UserManagement = () => {
       },
     },
     {
-      name: "affiliation",
-      label: "Affiliation",
+      name: "affiliations",
+      label: "Affiliations",
       options: {
-        // Turn off default filtering for custom form
+        sort: false,
+        customBodyRenderLite: renderAffiliations,
+        customHeadLabelRender: renderAffiliationsHeader,
         filter: false,
       },
     },
@@ -922,6 +1008,83 @@ const UserManagement = () => {
                 type="submit"
                 name="submitAddACLsButton"
                 data-testid="submitAddACLsButton"
+              >
+                Submit
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={addUserAffiliationsDialogOpen}
+        onClose={() => {
+          setAddUserAffiliationsDialogOpen(false);
+        }}
+        style={{ position: "fixed" }}
+      >
+        <DialogTitle>
+          {`Update user ${clickedUser?.username} affiliations:`}
+        </DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit(handleAddUserAffiliations)}>
+            <Controller
+              name="affiliations"
+              render={({ onChange, value, ...props }) => (
+                <Autocomplete
+                  multiple
+                  onChange={(e, data) => onChange(data)}
+                  value={value}
+                  options={clickedUser?.affiliations?.map((aff) => aff)}
+                  filterOptions={(options, params) => {
+                    const filtered = filter(options, params);
+
+                    const { inputValue } = params;
+                    // Suggest the creation of a new value
+                    const isExisting = options.some((option) => inputValue === option);
+                    if (inputValue !== '' && !isExisting) {
+                      filtered.push(
+                        inputValue);
+                    }
+
+                    return filtered;
+                  }}
+                  getOptionLabel={(option) => {
+                    // Value selected with enter, right from the input
+                    if (typeof option === 'string') {
+                      return option;
+                    }
+                    // Add "xxx" option created dynamically
+                    if (option.inputValue) {
+                      return option.inputValue;
+                    }
+                    // Regular option
+                    return option;
+                  }}
+                  freeSolo
+                  data-testid="addUserAffiliationsSelect"
+                  renderInput={(params) => (
+                    <TextField
+                      // eslint-disable-next-line react/jsx-props-no-spreading
+                      {...params}
+                      variant="outlined"
+                      label="Select Affiliations"
+                      data-testid="addUserAffiliationsTextField"
+                    />
+                  )}
+                  // eslint-disable-next-line react/jsx-props-no-spreading
+                  {...props}
+                />
+              )}
+              control={control}
+              defaultValue={clickedUser?.affiliations}
+            />
+            <br />
+            <div>
+              <Button
+                variant="contained"
+                type="submit"
+                name="submitAddAffiliationsButton"
+                data-testid="submitAddAffilitiationsButton"
               >
                 Submit
               </Button>

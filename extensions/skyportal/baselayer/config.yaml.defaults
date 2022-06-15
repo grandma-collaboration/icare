@@ -1,6 +1,6 @@
 app:
     title: Baselayer Example App
-    secret_key: A8BF78D178EEB119DDB6C41E6BB8EA914FB3156802935315E25A2A7A81586C84  # This secret key can be any random string of
+    secret_key: abc01234  # This secret key can be any random string of
                           # characters.
                           #
                           # You should re-generate this for your application
