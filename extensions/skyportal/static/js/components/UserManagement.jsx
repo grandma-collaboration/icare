@@ -3,28 +3,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm, Controller } from "react-hook-form";
 
 import MUIDataTable from "mui-datatables";
-import Paper from "@material-ui/core/Paper";
-import Chip from "@material-ui/core/Chip";
-import Typography from "@material-ui/core/Typography";
-import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import HelpIcon from "@material-ui/icons/Help";
-import EditIcon from "@material-ui/icons/Edit";
-import IconButton from "@material-ui/core/IconButton";
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Tooltip from "@material-ui/core/Tooltip";
+import Paper from "@mui/material/Paper";
+import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import HelpIcon from "@mui/icons-material/Help";
+import EditIcon from "@mui/icons-material/Edit";
+import IconButton from "@mui/material/IconButton";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Tooltip from "@mui/material/Tooltip";
 import { DatePicker } from "@material-ui/pickers";
 import {
-  makeStyles,
   createTheme,
-  MuiThemeProvider,
+  ThemeProvider,
+  StyledEngineProvider,
   useTheme,
-} from "@material-ui/core/styles";
-import Form from "@rjsf/material-ui";
+  adaptV4Theme,
+} from "@mui/material/styles";
+import makeStyles from "@mui/styles/makeStyles";
+// eslint-disable-next-line import/no-unresolved
+import Form from "@rjsf/material-ui/v5";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -41,7 +44,7 @@ import * as aclsActions from "../ducks/acls";
 import * as rolesActions from "../ducks/roles";
 import Spinner from "./Spinner";
 
-import * as ProfileActions from "../ducks/profile";
+import * as ProfileActions from "../ducks/profile"; 
 
 dayjs.extend(utc);
 
@@ -66,16 +69,18 @@ const useStyles = makeStyles(() => ({
 }));
 
 const dataTableStyles = (theme) =>
-  createTheme({
-    overrides: {
-      MuiPaper: {
-        elevation4: {
-          boxShadow: "none !important",
+  createTheme(
+    adaptV4Theme({
+      overrides: {
+        MuiPaper: {
+          elevation4: {
+            boxShadow: "none !important",
+          },
         },
       },
-    },
-    palette: theme.palette,
-  });
+      palette: theme.palette,
+    })
+  );
 
 const defaultNumPerPage = 25;
 
@@ -100,7 +105,7 @@ const UserManagement = () => {
   const [addUserGroupsDialogOpen, setAddUserGroupsDialogOpen] = useState(false);
   const [addUserRolesDialogOpen, setAddUserRolesDialogOpen] = useState(false);
   const [addUserACLsDialogOpen, setAddUserACLsDialogOpen] = useState(false);
-  const [addUserAffiliationsDialogOpen, setAddUserAffiliationsDialogOpen] = useState(false);
+  const [addUserAffiliationsDialogOpen, setAddUserAffiliationsDialogOpen] = useState(false); 
   const [addUserStreamsDialogOpen, setAddUserStreamsDialogOpen] =
     useState(false);
   const [
@@ -245,7 +250,7 @@ const UserManagement = () => {
       setClickedUser(null);
     }
   };
-
+  
   const handleAddUserRoles = async (formData) => {
     const result = await dispatch(
       rolesActions.addUserRoles({
@@ -345,7 +350,6 @@ const UserManagement = () => {
       </div>
     );
   };
-
 
   const renderRoles = (dataIndex) => {
     const user = users[dataIndex];
@@ -827,9 +831,11 @@ const UserManagement = () => {
     <Paper className={classes.container}>
       <Typography variant="h5">Manage users</Typography>
       <Paper variant="outlined" className={classes.section}>
-        <MuiThemeProvider theme={dataTableStyles(theme)}>
-          <MUIDataTable columns={columns} data={users} options={options} />
-        </MuiThemeProvider>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={dataTableStyles(theme)}>
+            <MUIDataTable columns={columns} data={users} options={options} />
+          </ThemeProvider>
+        </StyledEngineProvider>
       </Paper>
       <br />
       {invitationsEnabled && <UserInvitations />}

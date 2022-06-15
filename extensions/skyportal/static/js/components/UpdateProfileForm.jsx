@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form"; 
 
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import InputLabel from "@material-ui/core/InputLabel";
-import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core";
-import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import InputLabel from "@mui/material/InputLabel";
+import Grid from "@mui/material/Grid";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import makeStyles from "@mui/styles/makeStyles";
 
 import { showNotification } from "baselayer/components/Notifications";
 
@@ -41,35 +41,33 @@ const UpdateProfileForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const dispatch = useDispatch();
-  const { handleSubmit, register, reset, errors, control, getValues } = useForm();
+  const { handleSubmit, register, reset, errors, control } = useForm();
 
   const isNewUser =
     new URL(window.location).searchParams.get("newUser") === "true";
 
   const [welcomeDialogOpen, setWelcomeDialogOpen] = useState(isNewUser);
 
-  const filter = createFilterOptions();
-
+  const filter = createFilterOptions(); 
 
   useEffect(() => {
     reset({
       username: profile.username,
       firstName: profile.first_name,
       lastName: profile.last_name,
-      affiliations: profile.affiliations,
+      affiliations: profile.affiliations, 
       email: profile.contact_email,
       phone: profile.contact_phone,
     });
   }, [reset, profile]);
 
   const onSubmit = async (initialValues) => {
-    console.log("onSubmit", initialValues);
     setIsSubmitting(true);
     const basicinfo = {
       username: initialValues.username,
       first_name: initialValues.firstName,
       last_name: initialValues.lastName,
-      affiliations: initialValues.affiliations,
+      affiliations: initialValues.affiliations, 
       contact_email: initialValues.email,
       contact_phone: initialValues.phone,
     };
@@ -80,18 +78,6 @@ const UpdateProfileForm = () => {
       dispatch(showNotification("Profile data saved"));
     }
     setIsSubmitting(false);
-  };
-
-  const handleAddUserAffiliations = async (formData) => {
-    const data = {
-      affiliations: formData.affiliations.map((value) => {return value['inputValue'] || value}),
-    }
-    const result = await dispatch(
-      ProfileActions.updateBasicUserInfo(data)
-    );
-    if (result.status === "success") {
-      dispatch(showNotification("Successfully updated user's affiliations."));
-    }
   };
 
   return (
