@@ -100,7 +100,7 @@ class ProfileHandler(BaseHandler):
         return self.success(data=user_info)
 
     @auth_or_token
-    def patch(self):
+    def patch(self, user_id=None):
         """
         ---
         description: Update user preferences
@@ -122,6 +122,10 @@ class ProfileHandler(BaseHandler):
                     type: string
                     description: |
                        User's preferred last name
+                  last_name:
+                    type: list
+                    description: |
+                       User's list of affiliations
                   contact_email:
                     type: string
                     description: |
@@ -144,9 +148,16 @@ class ProfileHandler(BaseHandler):
                 schema: Error
         """
         data = self.get_json()
-        user = User.get_if_accessible_by(
-            self.associated_user_object.id, self.current_user, mode="update"
-        )
+        if user_id is None:
+          user = User.get_if_accessible_by(
+              self.associated_user_object.id, self.current_user, mode="update"
+          )
+        else:
+          user = User.get_if_accessible_by(
+              user_id, self.current_user, mode="update"
+          )
+        print(user)
+        print(data)
 
         if data.get("username") is not None:
             username = data.pop("username").strip()
@@ -161,9 +172,12 @@ class ProfileHandler(BaseHandler):
 
         if data.get("last_name") is not None:
             user.last_name = data.pop("last_name")
-
-        if data.get("affiliation") is not None:
-            user.affiliation = data.pop("affiliation")
+        affiliations = data.get("affiliations", [])
+        print(affiliations)
+        if not isinstance(affiliations, list):
+            return self.error("Invalid affiliations. Affiliations must be a list of strings.")
+        else:
+            user.affiliations = affiliations
 
         if data.get("contact_phone") is not None:
             phone = data.pop("contact_phone")
@@ -211,6 +225,9 @@ class ProfileHandler(BaseHandler):
                 user_prefs["photometryButtons"] = preferences["photometryButtons"]
             user_prefs = recursive_update(user_prefs, preferences)
         user.preferences = user_prefs
+
+        print(user.affiliations)
+        print(user)
 
         try:
             self.verify_and_commit()
