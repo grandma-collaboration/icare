@@ -41,12 +41,12 @@ def diff(
     # if there are changes, ask the user if he wants to continue, return true or false
     if len(exist_in_extensions) > 0:
         print(
-            "The following files from skyportal for which we have a modified version have been changed:"
+            "The following files from skyportal for which we have a modified version have been changed:\n"
         )
         for file in exist_in_extensions:
             print(file)
         print(
-            "Do you want to continue? If you answer yes, the extensions will overwrite those changes, potentially missing on newer functionnalities. (y/n)"
+            "\nDo you want to continue? If you answer yes, the extensions will overwrite those changes, potentially missing on newer functionnalities. (y/n)"
         )
         answer = input()
         if answer == "y":
