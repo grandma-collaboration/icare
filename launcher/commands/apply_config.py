@@ -14,7 +14,7 @@ class MyDumper(yaml.SafeDumper):
 
 
 def apply_config():
-    print("applying config")
+    print("\nApplying config")
     try:
         file = "grandma.yaml"
         if not Path(file).exists():
@@ -34,11 +34,8 @@ def apply_config():
 
         # replace keys of skyportal_config with values of grandma_config
         for key in grandma_config:
-            print("key", key)
             if key in skyportal_config:
                 for subkey in grandma_config[key]:
-                    print("subkey", subkey)
-                    print(grandma_config[key][subkey])
                     skyportal_config[key][subkey] = grandma_config[key][subkey]
             else:
                 skyportal_config[key] = grandma_config[key]
@@ -53,5 +50,4 @@ def apply_config():
             except yaml.YAMLError as exc:
                 print(exc)
     except Exception as e:
-        print(e)
-        print("Failed to apply grandma patches to the config")
+        print("\nFailed to apply grandma patches to the config: {}".format(e))

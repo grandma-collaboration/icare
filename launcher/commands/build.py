@@ -41,7 +41,7 @@ def build(
         cmd = subprocess.Popen(["rm", "-rf", "patched_skyportal/.git"])
         patch_skyportal("extensions/skyportal/", "patched_skyportal/")
     else:
-        print("No changes detected, skipping patching")
+        print("\n No changes detected, skipping patching")
 
     if clear:
         clear_db()
