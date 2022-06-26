@@ -2,3 +2,5 @@ __pycache__
 node_modules
 env
 geckodriver.log
+patched_skyportal
+grandma.yaml
