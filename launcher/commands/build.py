@@ -26,7 +26,8 @@ def build(
     :param clear: Clear the database
     """
     new_changes = True
-    if do_update and not init:
+    #if do_update and not init:
+    if do_update:
         new_changes = update(repo=repo, branch=branch)
 
     # if patched_skyportal directory exists, patch it
