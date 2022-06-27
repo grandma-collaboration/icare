@@ -25,23 +25,33 @@ def build(
     :param do_update: pull <repo>/<branch>, autostash SP and update submodules
     :param clear: Clear the database
     """
-    new_changes = True
+    # if previous_skyportal directory doesnt exist, create it and copy the skyportal files in it
+    previous_skyportal_dir = Path("previous_skyportal")
+    if not previous_skyportal_dir.exists():
+        previous_skyportal_dir.mkdir()
+        cmd = subprocess.Popen(["cp", "-a", "skyportal/.", "previous_skyportal/"])
+        cmd.wait()
+
+    new_changes = False #to change
+    skyportal_start = True
     if do_update and not init:
-        new_changes = update(repo=repo, branch=branch)
+        new_changes, skyportal_start = update(repo=repo, branch=branch)
 
     # if patched_skyportal directory exists, patch it
     patched_skyportal_dir = Path("patched_skyportal")
-    if not patched_skyportal_dir.exists():
+    exists = patched_skyportal_dir.exists()
+    if not exists:
         patched_skyportal_dir.mkdir()
 
-    if new_changes:
+    if new_changes or not exists:
         # copy skyportal to patched_skyportal
         cmd = subprocess.Popen(["cp", "-a", "skyportal/.", "patched_skyportal/"])
         cmd.wait()
         cmd = subprocess.Popen(["rm", "-rf", "patched_skyportal/.git"])
-        patch_skyportal("extensions/skyportal/", "patched_skyportal/")
     else:
-        print("No changes detected, skipping patching")
+        print("No changes detected, not copying skyportal to patched_skyportal, but still patching it")
+
+    patch_skyportal("extensions/skyportal/", "patched_skyportal/")
 
     if clear:
         clear_db()
@@ -50,3 +60,5 @@ def build(
         # run the command make run in skyportal dir
         cmd = subprocess.Popen(["make", "db_init"], cwd="patched_skyportal")
         cmd.wait()
+
+    return skyportal_start

@@ -13,7 +13,7 @@ def diff(
     # else we just return
 
     cmd = subprocess.Popen(
-        ["git", "fetch", "origin"], stdout=subprocess.PIPE, cwd="skyportal"
+        ["git", "fetch"], stdout=subprocess.PIPE, cwd="skyportal"
     )
     output = cmd.wait()
     cmd = subprocess.Popen(
@@ -39,19 +39,26 @@ def diff(
             exist_in_extensions.append(file)
 
     # if there are changes, ask the user if he wants to continue, return true or false
-    if len(exist_in_extensions) > 0:
+    if len(exist_in_extensions) > 0 and len(changed_files) > 0:
         print(
             "The following files from skyportal for which we have a modified version have been changed:"
         )
         for file in exist_in_extensions:
             print(file)
         print(
-            "Do you want to continue? If you answer yes, the extensions will overwrite those changes, potentially missing on newer functionnalities. (y/n)"
+            "Do you want to update those files now ? If yes, we won't start the app but instead attempt to automatically merge the new changes in the extensions folder. If no, the update will be cancelled and skyportal with start as is (y/n)"
+        )
+        print(
+            "Otherwise, just hit enter and this will be ignored and force the update, potentially overwriting new changes\n"
         )
         answer = input()
-        if answer == "y":
-            return True
+        if answer.lower() == "y" or answer.lower() == "yes":
+            return True, True, False, exist_in_extensions
+        elif answer.lower() == "n" or answer.lower() == "no":
+            return False, False, True, None
         else:
-            return False
+            return True, False, True, None
+    elif len(changed_files) > 0:
+        return True, False, True, None
     else:
-        return True
+        return False, False, True, None
