@@ -32,9 +32,9 @@ def build(
         cmd = subprocess.Popen(["cp", "-a", "skyportal/.", "previous_skyportal/"])
         cmd.wait()
 
-    new_changes = False #to change
+    new_changes = False
     skyportal_start = True
-    if do_update and not init:
+    if do_update:
         new_changes, skyportal_start = update(repo=repo, branch=branch)
 
     # if patched_skyportal directory exists, patch it
@@ -49,14 +49,16 @@ def build(
         cmd.wait()
         cmd = subprocess.Popen(["rm", "-rf", "patched_skyportal/.git"])
     else:
-        print("No changes detected, not copying skyportal to patched_skyportal, but still patching it")
+        print(
+            "No changes detected, not copying skyportal to patched_skyportal, but still patching it"
+        )
 
     patch_skyportal("extensions/skyportal/", "patched_skyportal/")
 
-    if clear:
+    if clear and skyportal_start:
         clear_db()
 
-    if init:
+    if init and skyportal_start:
         # run the command make run in skyportal dir
         cmd = subprocess.Popen(["make", "db_init"], cwd="patched_skyportal")
         cmd.wait()

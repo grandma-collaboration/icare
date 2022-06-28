@@ -12,9 +12,7 @@ def diff(
     # if there are changes, we display them and ask the user if they want to apply them
     # else we just return
 
-    cmd = subprocess.Popen(
-        ["git", "fetch"], stdout=subprocess.PIPE, cwd="skyportal"
-    )
+    cmd = subprocess.Popen(["git", "fetch"], stdout=subprocess.PIPE, cwd="skyportal")
     output = cmd.wait()
     cmd = subprocess.Popen(
         ["git", "diff", "main"], stdout=subprocess.PIPE, cwd="skyportal"
@@ -45,19 +43,24 @@ def diff(
         )
         for file in exist_in_extensions:
             print(file)
-        print(
-            "Do you want to update those files now ? If yes, we won't start the app but instead attempt to automatically merge the new changes in the extensions folder. If no, the update will be cancelled and skyportal with start as is (y/n)"
-        )
-        print(
-            "Otherwise, just hit enter and this will be ignored and force the update, potentially overwriting new changes\n"
-        )
-        answer = input()
-        if answer.lower() == "y" or answer.lower() == "yes":
-            return True, True, False, exist_in_extensions
-        elif answer.lower() == "n" or answer.lower() == "no":
-            return False, False, True, None
-        else:
-            return True, False, True, None
+        while True:
+            print(
+                "\n1. Cancel starting the app to attempt automatically merging the new changes in the extensions folder"
+            )
+            print("2. Cancel the update and start skyportal as is")
+            print(
+                "3. Ignore and force the update, potentially overwriting new change and breaking the app\n"
+            )
+            choice = input("Please choose an option: ")
+            if choice.lower() == "1":
+                return True, True, False, exist_in_extensions
+            elif choice.lower() == "2":
+                return False, False, True, None
+            elif choice.lower() == "3":
+                return True, False, True, None
+            else:
+                print("Invalid answer. Select again: ")
+
     elif len(changed_files) > 0:
         return True, False, True, None
     else:

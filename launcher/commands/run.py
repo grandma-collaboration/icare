@@ -33,4 +33,4 @@ def run(
             cmd = subprocess.Popen(["make", "run"], cwd="patched_skyportal")
             cmd.communicate()
     else:
-        print("App will no be started as it needs to be updated")
+        print("App will not start as the extensions need to be updated")

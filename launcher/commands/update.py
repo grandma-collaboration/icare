@@ -31,12 +31,20 @@ def update(
             if p.returncode != 0:
                 raise RuntimeError("Failed to git pull grandma")
     if extensions_update:
+        print("\n")
         for file in exists_in_extensions:
-            command = ["git", "merge-file", "extensions/skyportal/" + file, "previous_skyportal/" + file, "skyportal/" + file]
-            print(subprocess.list2cmdline(command))
+            command = [
+                "git",
+                "merge-file",
+                "extensions/skyportal/" + file,
+                "previous_skyportal/" + file,
+                "skyportal/" + file,
+            ]
             subprocess.run(command)
             print("Updated " + file)
-        print("\nDone updating extensions. Please go to the extensions folder, solve potential merge conflicts and start the app again with the --init flag instead")
+        print(
+            "\nDone updating extensions. Please go to the extensions folder, solve potential merge conflicts and start the app again with the --init flag instead"
+        )
         # replace previous_skyportal with skyportal
         cmd = subprocess.Popen(["cp", "-a", "skyportal/.", "previous_skyportal/"])
         cmd.wait()
