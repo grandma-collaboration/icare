@@ -30,6 +30,21 @@ def diff(
         elif ("b/") in line:
             changed_files.append(line.split("b/")[1].split(" ")[0])
 
+    cmd = subprocess.Popen(
+        ["git", "diff", "main"], stdout=subprocess.PIPE, cwd="skyportal/baselayer"
+    )
+    # get the ouput of the command
+    output = cmd.stdout.read()
+    output = output.decode("utf-8")
+    output = output.split("\n")
+    output = [x for x in output if x != ""]
+    # find the name of the files that have changed
+    for line in output:
+        if ("a/") in line:
+            changed_files.append("baselayer/" + line.split("a/")[1].split(" ")[0])
+        elif ("b/") in line:
+            changed_files.append("baselayer/" + line.split("b/")[1].split(" ")[0])
+
     # check if those files exist in extensions/skyportal/
     exist_in_extensions = []
     for file in set(changed_files):
