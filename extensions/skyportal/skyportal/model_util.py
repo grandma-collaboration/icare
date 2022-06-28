@@ -4,36 +4,49 @@ from skyportal.enum_types import LISTENER_CLASSES, sqla_enum_types
 from baselayer.app.env import load_env
 
 all_acl_ids = [
-    "Become user",
-    "Comment",
-    "Annotate",
-    "Manage users",
-    "Manage sources",
-    "Manage groups",
-    "Manage shifts",
-    "Manage allocations",
-    "Upload data",
-    "System admin",
-    "Post taxonomy",
-    "Delete taxonomy",
-    "Classify",
+    'Become user',
+    'Comment',
+    'Annotate',
+    'Manage users',
+    'Manage sources',
+    'Manage groups',
+    'Manage shifts',
+    'Manage allocations',
+    'Manage observing runs',
+    'Manage Analysis Services',
+    'Upload data',
+    'Run Analyses',
+    'System admin',
+    'Post taxonomy',
+    'Delete taxonomy',
+    'Classify',
 ] + [c.get_acl_id() for c in LISTENER_CLASSES]
 
 
 role_acls = {
-    "Super admin": all_acl_ids,
-    "Group admin": [
-        "Annotate",
-        "Comment",
-        "Manage shifts",
-        "Manage sources",
-        "Upload data",
-        "Post taxonomy",
-        "Manage users",
-        "Classify",
+    'Super admin': all_acl_ids,
+    'Group admin': [
+        'Annotate',
+        'Comment',
+        'Manage shifts',
+        'Manage sources',
+        'Manage Analysis Services',
+        'Upload data',
+        'Run Analyses',
+        'Post taxonomy',
+        'Manage users',
+        'Classify',
+        'Manage observing runs',
     ],
-    "Full user": ["Annotate", "Comment", "Upload data", "Classify"],
-    "View only": [],
+    'Full user': [
+        'Annotate',
+        'Comment',
+        'Upload data',
+        'Classify',
+        'Run Analyses',
+        'Manage observing runs',
+    ],
+    'View only': [],
 }
 
 env, cfg = load_env()
@@ -56,10 +69,10 @@ def add_user(username, roles=[], auth=False, first_name=None, last_name=None):
 
     # Add user to sitewide public group
     public_group = Group.query.filter(
-        Group.name == cfg["misc"]["public_group_name"]
+        Group.name == cfg["misc.public_group_name"]
     ).first()
     if public_group is None:
-        public_group = Group(name=cfg["misc"]["public_group_name"])
+        public_group = Group(name=cfg["misc.public_group_name"])
         DBSession().add(public_group)
         DBSession().flush()
 
@@ -108,13 +121,12 @@ def provision_token():
 def provision_public_group():
     """If public group name is set in the config file, create it."""
     env, cfg = load_env()
-    public_group_name = cfg["misc.public_group_name"]
-    if public_group_name:
-        pg = Group.query.filter(Group.name == public_group_name).first()
+    public_group_name = cfg['misc.public_group_name']
+    pg = Group.query.filter(Group.name == public_group_name).first()
 
-        if pg is None:
-            DBSession().add(Group(name=public_group_name))
-            DBSession().commit()
+    if pg is None:
+        DBSession().add(Group(name=public_group_name))
+        DBSession().commit()
 
 
 def setup_permissions():
