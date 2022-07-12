@@ -1,0 +1,29 @@
+app:
+  title: GRANDMA SkyPortal
+
+server:
+  ssl: True
+  auth:
+    debug_login: False
+    iam_oauth2_key:
+    iam_oauth2_secret:
+
+user:
+  default_role: 'Full user'
+  default_groups: ['GRANDMA']
+  default_acls: ['Manage shifts']
+
+fink:
+  fink_topics:
+  - fink_kn_candidates_ztf
+  - fink_early_kn_candidates_ztf
+  - fink_rate_based_kn_candidates_ztf
+  fink_username: null
+  fink_password: null
+  fink_group_id: null
+  fink_servers: null
+  skyportal_group: Fink
+  skyportal_token: null
+  skyportal_url: http://localhost:5000
+  testing: false
+  whitelisted: true

@@ -43,10 +43,8 @@ if __name__ == "__main__":
     try:
         import fire
     except ImportError:
-        print("This tool depends on `fire`.  Please install it using:")
-        print()
-        print("  pip install fire")
-        print()
+        print("\nThis tool depends on `fire`.  Please install it using:")
+        print("\n  pip install fire")
         sys.exit(-1)
 
     # Monkey-patch away fire's paging
@@ -66,7 +64,6 @@ if __name__ == "__main__":
         and "set_user_role" not in sys.argv
     ):
         # check environment
-        print(len(list(Path("skyportal").glob("*"))) == 0)
         with status("Initializing submodules"):
             initialize_submodules()
 

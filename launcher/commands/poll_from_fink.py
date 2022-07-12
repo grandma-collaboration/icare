@@ -19,7 +19,6 @@ def poll_from_fink(
     else:
         config["testing"] = False
     # write config.yaml to skyportal-fink-client
-    print(config)
     with open("extensions/skyportal-fink-client/config.yaml", "w") as stream:
         try:
             yaml.dump(config, stream)

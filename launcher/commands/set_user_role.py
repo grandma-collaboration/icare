@@ -20,8 +20,6 @@ def set_user_role(
     if role:
         command.append(f"--role={role.replace('_', ' ')}")
 
-    print(command)
-
     p = subprocess.run(
         command,
         cwd="patched_skyportal",

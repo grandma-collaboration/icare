@@ -18,7 +18,6 @@ def copy_token():
             except yaml.YAMLError as exc:
                 print(exc)
         # update config.yaml with tokens
-        print(config)
         config["skyportal_token"] = skyportal_token["INITIAL_ADMIN"]
         # write config.yaml to skyportal-fink-client
         with open("extensions/skyportal-fink-client/config.yaml", "w") as stream:
@@ -28,4 +27,4 @@ def copy_token():
                 print(exc)
     except Exception as e:
         print(e)
-        print("Failed to copy token")
+        print("\nFailed to copy token")

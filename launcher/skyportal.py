@@ -1,11 +1,12 @@
 import subprocess
 import json
 from distutils.dir_util import copy_tree
+from .commands.apply_config import apply_config
 
 
 def patch(source="extensions/skyportal/", destination="patched_skyportal/"):
     """Make grandma-specific file modifications to SkyPortal."""
-    print("Applying grandma-specific patches to SkyPortal")
+    print("\n Applying grandma-specific patches to SkyPortal")
 
     # add grandma-specific SP extensions
     copy_tree(source, destination)
@@ -34,3 +35,5 @@ def patch(source="extensions/skyportal/", destination="patched_skyportal/"):
         for line in ext_req:
             if line not in skyportal_req:
                 f.write(line)
+
+    apply_config()

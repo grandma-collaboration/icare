@@ -1,3 +1,7 @@
+groups:
+  - name: GRANDMA
+    =id: GRANDMA
+
 user:
   - username: sitewide_group_admin
     roles:
