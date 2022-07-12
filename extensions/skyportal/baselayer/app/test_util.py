@@ -2,22 +2,21 @@ import os
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions
 from selenium.common.exceptions import (
-    NoSuchElementException,
     ElementClickInterceptedException,
-    TimeoutException,
     JavascriptException,
+    NoSuchElementException,
     StaleElementReferenceException,
+    TimeoutException,
 )
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 from seleniumrequests.request import RequestsSessionMixin
 
 from baselayer.app import models
 from baselayer.app.config import load_config
-
 
 cfg = load_config()
 
@@ -184,7 +183,9 @@ def login(driver):
         pass
 
     try:
-        element = driver.wait_for_xpath('//a[contains(@href,"/login/iam-oauth2")]', 5)
+        element = driver.wait_for_xpath(
+            '//a[contains(@href,"/login/iam-oauth2")]', 5
+        )
         element.click()
     except TimeoutException:
         pass
