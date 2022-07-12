@@ -143,8 +143,13 @@ jobs:
           fi
           sudo tar -xzf ${CACHED_DOWNLOAD_DIR}/geckodriver-v${GECKO_VER}-linux64.tar.gz -C /usr/local/bin
           geckodriver --version
-          pip install --upgrade selenium
+          pip install selenium==4.2.0
           python -c "import selenium; print(f'Selenium {selenium.__version__}')"
+
+      - name: Patch test_frontend.py for a longer timeout
+        run: |
+          cd skyportal
+          sed -i 's/timeout=60/timeout=180/g' baselayer/tools/test_frontend.py
 
       - name: Refresh SkyPortal dependencies for tested version
         run: |

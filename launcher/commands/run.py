@@ -14,8 +14,9 @@ def run(
     clear: bool = False,
 ):
     """🚀 Launch Grandma SkyPortal"""
+    skyportal_start = True
     if init or do_update:
-        build(
+        skyportal_start = build(
             init=init,
             repo=repo,
             branch=branch,
@@ -24,9 +25,12 @@ def run(
         )
 
     # create common docker network (if it does not exist yet)
-    if test:
-        cmd = subprocess.Popen(["make", "run_testing"], cwd="patched_skyportal")
-        cmd.communicate()
+    if skyportal_start:
+        if test:
+            cmd = subprocess.Popen(["make", "run_testing"], cwd="patched_skyportal")
+            cmd.communicate()
+        else:
+            cmd = subprocess.Popen(["make", "run"], cwd="patched_skyportal")
+            cmd.communicate()
     else:
-        cmd = subprocess.Popen(["make", "run"], cwd="patched_skyportal")
-        cmd.communicate()
+        print("App will not start as the extensions need to be updated")
