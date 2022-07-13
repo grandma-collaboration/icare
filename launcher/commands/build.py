@@ -18,6 +18,7 @@ def build(
     branch: str = "main",
     do_update: bool = False,
     clear: bool = False,
+    update_prod: bool = False,
 ):
     """Build grandma
     :param init: Initialize grandma
@@ -43,7 +44,7 @@ def build(
     if not exists:
         patched_skyportal_dir.mkdir()
 
-    if new_changes or not exists:
+    if new_changes or not exists or update_prod:
         # copy skyportal to patched_skyportal
         cmd = subprocess.Popen(["cp", "-a", "skyportal/.", "patched_skyportal/"])
         cmd.wait()
