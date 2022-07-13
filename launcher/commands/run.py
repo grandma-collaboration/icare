@@ -12,6 +12,7 @@ def run(
     do_update: bool = False,
     test: bool = False,
     clear: bool = False,
+    update_prod: bool = False,
 ):
     """🚀 Launch Grandma SkyPortal"""
     skyportal_start = True
@@ -22,6 +23,7 @@ def run(
             branch=branch,
             do_update=do_update,
             clear=clear,
+            update_prod=update_prod,
         )
 
     # create common docker network (if it does not exist yet)
