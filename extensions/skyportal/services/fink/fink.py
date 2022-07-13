@@ -42,12 +42,17 @@ def skyportal_fink_client():
         [instrument in skyportal_instruments.keys() for instrument in instruments]
     ):
         # open yaml config file
-        token = files.yaml_to_dict(
-            os.path.abspath(os.path.join(os.path.dirname(__file__)))
-            + "/../../.tokens.yaml"
-        )
-        skyportal_token = token["INITIAL_ADMIN"]
-        # get all instruments from skyportalapi
+        try:
+            token = files.yaml_to_dict(
+                os.path.abspath(os.path.join(os.path.dirname(__file__)))
+                + "/../../.tokens.yaml"
+            )
+            skyportal_token = token["INITIAL_ADMIN"]
+        except Exception as e:
+            log("Can't retrieve skyportal token")
+            skyportal_token = ""
+            time.sleep(15)
+            # get all instruments from skyportalapi
 
         status, skyportal_instruments = skyportalapi.get_all_instruments(
             skyportal_url, skyportal_token
