@@ -15,7 +15,10 @@ def update(
     """
 
     # show diff between patched skyportal and skyportal
-    p = subprocess.run(["git", "submodule", "update", "--init", "--recursive"], cwd="skyportal")
+    p = subprocess.run(["git", "pull", "origin", "main"], cwd="skyportal")
+    if p.returncode != 0:
+        raise RuntimeError("Failed to pull new changes")
+    p = subprocess.run(["git", "submodule", "update", "--init", "--recursive"])
     if p.returncode != 0:
         raise RuntimeError("Failed to update all submodules recursively")
     skyportal_update, extensions_update, skyportal_start, exists_in_extensions = diff()
