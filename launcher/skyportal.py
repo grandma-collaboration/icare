@@ -28,11 +28,18 @@ def patch(source="extensions/skyportal/", destination="patched_skyportal/"):
     # python
     with open(".requirements/ext.txt", "r") as f:
         ext_req = f.readlines()
+    with open(
+        source + "services/fink/skyportal-fink-client/requirements.txt", "r"
+    ) as f:
+        fink_req = f.readlines()
     with open(destination + "requirements.txt", "r") as f:
         skyportal_req = f.readlines()
     with open(destination + "requirements.txt", "w") as f:
         f.writelines(skyportal_req)
         for line in ext_req:
+            if line not in skyportal_req:
+                f.write(line)
+        for line in fink_req:
             if line not in skyportal_req:
                 f.write(line)
 
