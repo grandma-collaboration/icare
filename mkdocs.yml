@@ -3,6 +3,7 @@ site_name: SkyPortal for GRANDMA
 nav:
   - Home : index.md
   - User Guide : ./user_guide/index.md
+  - Dev Guide : ./dev_guide/index.md
   - Workshop Exercices: ./workshop/index.md
 
 theme:
