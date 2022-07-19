@@ -16,7 +16,7 @@ def run(
 ):
     """🚀 Launch Grandma SkyPortal"""
     skyportal_start = True
-    if init or do_update:
+    if init or do_update or update_prod:
         skyportal_start = build(
             init=init,
             repo=repo,
