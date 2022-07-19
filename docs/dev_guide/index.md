@@ -17,7 +17,7 @@ Using basic SkyPortal, you have baselayer as a submodule, and skyportal on top o
 
 Here, we want to add features on top of skyportal, but also modify existing features in both skyportal and baselayer.
 In order to do this, we have an extensions directory, containing the different features we want to add.
-It could have extensions other than skyportal if we need to run other apps at the same time as skyportal, but for now we only have an extensions/skyportal directory containing new/modified features for skyportal and baselayer.
+It could have extensions other than skyportal if we need to run other apps at the same time as skyportal, but for now we only have an extensions/skyportal directory containing new/modified features for skyportal and baselayer. When building the app, we simply need to copy skyportal to a directory called `patched_skyportal` and then copy the extensions/skyportal directory to the same directory, replacing skyportal's original files with the ones in `extensions/skyportal`.
 Here is how it is structured:
 
 ``` mermaid
