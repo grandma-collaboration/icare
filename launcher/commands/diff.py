@@ -24,10 +24,10 @@ def diff(
     output = [x for x in output if x != ""]
     # find the name of the files that have changed
     changed_files = []
-    new_baselayer=None
+    new_baselayer = None
     for i in range(len(output)):
-        if 'diff --git a/baselayer b/baselayer' in output[i]:
-            new_baselayer= output[i+1].split(" ")[1].split("..")[0]
+        if "diff --git a/baselayer b/baselayer" in output[i]:
+            new_baselayer = output[i + 1].split(" ")[1].split("..")[0]
         elif ("a/") in output[i]:
             changed_files.append(output[i].split("a/")[1].split(" ")[0])
         elif ("b/") in output[i]:
@@ -37,7 +37,9 @@ def diff(
     # find the hash of the baselayer pinned in the main branch
     if new_baselayer is not None:
         cmd = subprocess.Popen(
-            ["git", "diff", new_baselayer], stdout=subprocess.PIPE, cwd="skyportal/baselayer"
+            ["git", "diff", new_baselayer],
+            stdout=subprocess.PIPE,
+            cwd="skyportal/baselayer",
         )
         # get the ouput of the command
         output = cmd.stdout.read()
