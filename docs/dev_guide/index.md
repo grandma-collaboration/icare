@@ -13,9 +13,9 @@ graph LR
 
 Using basic SkyPortal, you have baselayer as a submodule, and skyportal on top of it adding backend and frontend.
 
-*Important to note for later, is that baselayer is where the authentication with Google is handled.*
+*One important thing keep in mind, is that baselayer is where the authentication with Google is handled.*
 
-Here, we want to add feature on top of skyportal, but also modify existing features in both skyportal and baselayer.
+Here, we want to add features on top of skyportal, but also modify existing features in both skyportal and baselayer.
 In order to do this, we have an extensions directory, containing the different features we want to add.
 It could have extensions other than skyportal if we need to run other apps at the same time as skyportal, but for now we only have an extensions/skyportal directory containing new/modified features for skyportal and baselayer.
 Here is how it is structured:
@@ -98,7 +98,7 @@ In baselayer, everything related to the authentication is located in the baselay
 - psa.py
 - test_utils.py
 
-app_server.py is the main file for the app. It is the bridge between routes and handlers, effectively serving the requests, coming from the frontend or simple API calls. But also, it happens to be the file that handles the authentication with python social auth.
+app_server.py is the main file for the app. It is the bridge between API routes and handlers, serving the requests coming from the frontend or simple API calls. But also, it happens to be the file that handles the authentication with python social auth.
 
 ```
 settings = {
@@ -117,7 +117,7 @@ if cfg["server.auth.debug_login"]:
         "baselayer.app.psa.FakeGoogleOAuth2",
     )
 ```
-* In this code snippet, you can see everything in app_server.py responsible for the authentication. First, the path to the authentication handler is defined. Here, it is pointing to `social_core.backends.google.GoogleOAuth2` from the pip package `social-core`. This is the authentication handler that is used by the python social auth library. Then, we define the key and secret for the authentication handler, which are stored in the `config.yaml` file of baselayer and/or skyportal. Last but not least we define a path to an alternative handler used when starting the app in debug mode (no real authentication, to run tests or in development), which is `baselayer.app.psa.FakeGoogleOAuth2`.
+* In this code snippet, you can see everything in app_server.py responsible for the authentication. First, the path to the authentication handler is defined. Here, it is pointing to `social_core.backends.google.GoogleOAuth2` from the pip package `social-core`. This is the authentication handler that is used by the python social auth library. Then, we define the key and secret for the authentication handler, which are stored in the `config.yaml` file of baselayer and/or skyportal. Last but not least, we define a path to an alternative handler used when starting the app in debug mode (no real authentication, to run tests or in development), which is in `baselayer.app.psa.FakeGoogleOAuth2`.
 
 To use IAM instead of Google, we changed those lines to:
 
@@ -137,10 +137,11 @@ if cfg["server.auth.debug_login"]:
     )
 ```
 
-As you can notice, the pointer to the debug handler is the same. That is because we modified the handler it is pointing to directly. Also, you can see that instead of pointing to social_core's GoogleOAuth2, we point to IAMOAuth2 that we added in baselayer/app/auth/IAMOAuth2.py. It is a custom handler that herits from social_core's base OAuth2 handler.
+You can see that instead of pointing to social_core's GoogleOAuth2, we point to IAMOAuth2 that we added in baselayer/app/auth/IAMOAuth2.py. It is a custom handler that herits from social_core's base OAuth2 handler.
 We also had to modify the test utils file, as the auth route is not the same.
+Also, as you may notice, the pointer to the debug handler is the same. That is because we modified the handler it is pointing to directly.
 
-Then, we modified some files in skyportal. Those are minor changes, but they are important to notice. Every where that the auth route to google is used, we have to change it to the auth route to IAM. Otherwise, the code is the same. We also added a custom button for the login, with IAM's logo instead of Google's.
+Then, we modified some files in skyportal. Those are minor changes, but they are important to know about. Everywhere that the auth route to google is used, we had to change it to the auth route to IAM (iam-oauth). Otherwise, the code is the same. We also added a custom button for the login, with IAM's logo instead of Google's (can be found in `skyportal/static`).
 
 ### Grandma Data
 
@@ -154,8 +155,8 @@ classDiagram
     skyportal : Makefile
 ```
 
-grandma_data is a submodule, pointing to a git repo where we gather technical information about telescopes and instruments. They are contained in yaml files, and we added `db_grandma.yaml` that references to the telescope and instruments in the git repo.
-Then, we added a Makefile in skyportal, that adds a command to load the data in the database: `make load_grandma_data`.
+grandma_data is a submodule, pointing to a git repo containing yaml files where we gather technical information about telescopes and instruments. In SkyPortal, you can populate the DB using yaml files, which is why we added a `db_grandma.yaml` that references to the telescope and instruments from grandma_data.
+Then, we modified SkyPortal's Makefile to add a command that allows us to load the data in the database: `make load_grandma_data`.
 
 ### SkyPortal-Fink-Client
 
@@ -168,18 +169,18 @@ classDiagram
     fink : skyportal_fink_client
 ```
 
-Seperately from this project, we developed an extension for skyportal called skyportal-fink-client. It is a client that polls alerts data from Fink broker, and pushes them to SkyPortal. GRANDMA needs it to receive alerts for kilonova candidates.
+Seperately from this project, we developed an extension for skyportal called skyportal-fink-client. It is a client that polls alerts from Fink broker, and pushes them to SkyPortal. GRANDMA needs it to receive alerts for kilonova candidates.
 
-To make it easier during deployment (to avoid to configure it and start it manually and seperately from skyportal), we added a script to configure it and run it automatically with skyportal as a microservice.
-When starting SkyPortal, it will wait for the app to be fully started, verify that the DB contains the telescope(s) and instrument(s) associated to the alerts, and then it will start polling them. Everything is logged in the log folder of skyportal along with the other logs of the app. This is done so you can keep a history of the alerts that were polled, so you can verify that the alerts are being pushed to SkyPortal correctly.
+To make it easier during deployment (to avoid to configure it and start it manually, and seperately from skyportal), we added a script to configure it and run it automatically in skyportal as a microservice.
+When starting SkyPortal, it will wait for the app to be fully started, verify that the DB contains the telescope(s) and instrument(s) associated to the alerts, and then it will start polling and posting them. Everything is logged in the log folder of skyportal along with the other logs of the app. This is done so you can keep a history of the alerts that were polled, to verify if needed that the alerts are being pushed to SkyPortal correctly.
 
 ## System Commands
 
 Now that we've explored the architecture of grandma_skyportal, let's see how do we actually add the extensions to SkyPortal, update Skyportal and said extensions, and much more.
 
-In grandma_skyportal, you'll find a launcher directory, containing different commands. The taxonomy of the launcher directly follows the one established in Fritz, for consistency sake.
+In grandma_skyportal, you'll find a launcher directory, containing different commands. The launcher directory follows the same patterns established in Fritz, for consistency sake.
 
-Here are the diffent commands, all prefixed with `./grandma.sh`.
+Here are the different commands, all prefixed with `./grandma.sh` to run:
 
 - run
 - update
@@ -189,9 +190,19 @@ Here are the diffent commands, all prefixed with `./grandma.sh`.
 - set_user_role
 - load_grandma_data
 
-In this documentation, we'll focus only on the use of the `run` command. Effectively, other commands will we called along with the `run` command, as arguments. For example, we can use `./grandma.sh run --clear --init` to clear the database, recreate tables and then run the app.
+In this documentation, we'll focus only on the `run` command. Effectively, other commands will we called along with the `run` command as arguments. For example, we can use `./grandma.sh run --clear --init` to clear the database, recreate tables and then run the app.
 
 ### Starting the app for the first time
+
+First, you need to install the dependencies required to use the commands mentioned in the previous section. Whether you use the `pip` or `conda` package manager, you need to install the packages from the `requirements.txt` file.
+
+```
+pip install -r requirements.txt
+```
+or
+```
+conda install --file requirements.txt
+```
 
 To run the app for the first time, we can use the `run` command as such:
 ```
@@ -202,12 +213,12 @@ This will install all the required dependencies, clear the database if it exists
 
 ### Updating SkyPortal and the extensions (development)
 
-To update the version of SkyPortal that is pinned in the app, we can use the `update` command as such:
+To update the version of SkyPortal that is pinned in the repo, we can use the `update` command as such:
 ```
 ./grandma.sh run --do_update
 ```
 
-This will update the version of SkyPortal that is pinned in the app. When doing so, we are basically running a `git diff` to see which files have been modified. If some of these files are also the files we have modified in the extensions folder, we also need to merge new changes into the extensions folder. If we don't do this, when replacing skyportal's files by the files in the extensions folder, we'll lose the changes we new changes from SkyPortal. Besides from missing on new features, it is very likely to break the app. Which is why, when we detect that some skyportal changes affect the files in extensions, we give the user 3 choices:
+This will update the version of SkyPortal that is pinned in the app. When doing so, we are basically running a `git diff` to see which files have been modified. If some of those files are also the files we have copied and modified in the extensions folder, we need to merge new changes in the extensions folder. If we don't do this, when replacing skyportal's files by the files in the extensions folder, we'll lose new changes. And besides from missing on new features, it is very likely to break the app. Which is why, when we detect that some skyportal changes affect the files in extensions, we give the user 3 choices to choose from:
 
 - Stop running the app, and merge new changes in the extensions folder. The user can then go to the extensions folder and fix potential merge conflict before running the app again.
 - Update SkyPortal and run the app without updating files in the extensions folder. This will likely break the app.
@@ -238,15 +249,15 @@ To see the list of user and roles, run:
 
 ### Updating grandma_skyportal (production)
 
-The commands mentioned above are meant to update the version of skyportal that is pinned along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
+The commands mentioned above are meant to update the version of skyportal that is pinned in the repo, along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
 
 Before attempting to update the app in production, we need to make sure that the current state of the database is stamped using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database.
-To do that, go to the `patched_skyportal` folder, and run the following command:
+To do that in production, stop the app, go to the `patched_skyportal` folder, and run the following command:
 ```
 PYTHONPATH=. alembic -x config=config.yaml stamp head
 ```
 
-Then, in production, simply stop the app, run
+Then, run
 ```
 git pull
 ```
@@ -255,9 +266,9 @@ to get new changes, and then run
 ```
 ./grandma.sh run --update_prod
 ```
-to update the app in production. When the app runs, as the database state has been stamped, a migration server should start automatically and update the database.
+to update the app in production. When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
 
-## Access the Production VM
+## Access the Production VM (at IJCLAB)
 
 We deployed grandma_skyportal on a VM at IJCLAB/CNRS, which is accessible remotely via SSH. However, for security reasons, we don't want to expose an SSH connection to the public internet. Which is why you will need an IJCLAB account, so you can first connect to a public VM of IJCLAB, and then connect to the private VM dedicated to grandma_skyportal.
 
@@ -297,24 +308,33 @@ For now, starting the app is not done automatically when the VM reboots. You can
 
 After starting the app remotely from your computer, you will very likely close the SSH connection, effectively closing the terminal in which you ran the app. This is fine, and won't close the app. However, if you want to stop the app, you won't be able to go back to that terminal to close it using the `Ctrl+C` key as you would normally do. Instead, you need to reboot the VM, connect to it, and repeat the steps detailed above.
 
-If you are using a new VM, you might have to install the python dependencies first. To do so, run the following command:
+## Deploy on a new VM
+
+If you are using a new VM, you might have to install the python dependencies first. To do so, run the following command with conda:
 ```
 conda install --file skyportal/requirements.txt
 conda install --file skyportal/baselayer/requirements.txt
 ```
-If you encounter some issues, please refer to the last section of this page for more information. Some packages are not available in conda yet, so you might need to install them using pip instead (but with your conda environment activated).
+
+or with pip:
+```
+pip install -r skyportal/requirements.txt
+pip install -r skyportal/baselayer/requirements.txt
+```
+
+If you encounter some issues, please refer to the last section of this page for more information. Some packages are not available in conda yet, so if you are using conda, you might need to install them using pip (but with your conda environment still activated).
 
 ## Common issues
 
 ### NPM and Node.js version
 
-First, we need to detail how the VM works. The system is based on CentOS 7, which is a Linux distribution. When rebooting it from the terminal, it behaves normally and keeps everything installed. However, the goal is that the system is independent of the app, so that it can be reinstalled completely and the app can be started again. This is done so that the same system image can be used to deploy the same app again on a new VM easily for example.
+First, we need to detail how the VM works. The system is based on CentOS 7, which is a Linux distribution. When rebooting it from the terminal, it behaves normally and keeps everything installed. However, the goal is that the system (the OS) is independent of the app, so that it can be reinstalled completely and the app can be started again. This is done so that the same system image can be used to deploy the same app and DB again on a new VM easily for example. This is why the OS is installed on a temporary disk, but the app on a permanent one.
 
 When the VM is completely restarted, for example by someone from the "Service d'exploitation", the system will be reinstalled completely.
 
-One issue we encountered is that the version of some packages neede by skyportal shipped with CentOS are outdated. So for some packages, instead of installing them from the system upon restart, they are installed in a permanent disk, where the app and the database are also kept. This is done for Postgres (the database), and for conda (the python environment manager). However, this is not done yet for Node.js and NPM (the package manager for Node.js). Therefore, one problem you can encounter if the VM has been fully restarted, is that SkyPortal won't run because node.js is not up to date.
+One issue we encountered is that the version of some packages needed by skyportal shipped with CentOS are outdated. So for some packages, instead of installing them from the system's repo upon restart, they are installed on the permanent disk, where the app and the database are also kept. This is done for Postgres (the database), and for conda (the python environment manager). However, this is not done yet for Node.js and NPM (the package manager for Node.js). Therefore, one problem you can encounter if the VM has been fully restarted, is that SkyPortal won't run because node.js is not up to date.
 
-To fix this issue, (needs to be reran everytime the Vm is fully restarted, it is not needed for a simple reboot ran in the terminal), run the following command:
+To fix this issue, (needs to be reran everytime the VM is fully restarted, it is not needed for a simple reboot ran in the terminal), run the following command:
 ```
 npm install -g n
 ```
@@ -328,7 +348,9 @@ This will install an npm package called n, which allows you to switch between di
 
 ### Installing Python dependencies
 
-To manage python dependencies, we use conda. Conda is a python package manager that is used to manage dependencies of the app. It is a bit more complicated than pip, but all packages are already compiled, and you can also switch between versions of python.
+To manage python dependencies in production, we use conda. Conda is a python package manager that is used to manage the dependencies of the app. It is a bit more complicated than pip, but all packages are pre-compiled, and you can also switch between versions of python very easily.
 
 However, some dependencies of SkyPortal are not available in conda, as they haven't been published there yet.
-What we recommend when running skyportal for the first time is to try to install as many packages with conda as possible, and then install the remaining dependencies with pip (with the conda environment activated).
+What we recommend when running skyportal for the first time is to try to install as many packages as possible with conda, and then install the remaining dependencies with pip (with the conda environment activated).
+
+Good luck!
