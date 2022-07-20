@@ -186,13 +186,6 @@ skyportal_handlers = [
     (r'/api/filters(/.*)?', FilterHandler),
     (r'/api/followup_request/schedule(/[0-9]+)', FollowupRequestSchedulerHandler),
     (
-        r'/api/default_observation_plan(/[0-9A-Za-z-_\.\+]+)?',
-        DefaultObservationPlanRequestHandler,
-    ),
-    (r'/api/facility', FacilityMessageHandler),
-    (r'/api/filters(/.*)?', FilterHandler),
-    (r'/api/followup_request/schedule(/[0-9]+)', FollowupRequestSchedulerHandler),
-    (
         r'/api/followup_request/prioritization(/.*)?',
         FollowupRequestPrioritizationHandler,
     ),
