@@ -174,6 +174,144 @@ Seperately from this project, we developed an extension for skyportal called sky
 To make it easier during deployment (to avoid to configure it and start it manually, and seperately from skyportal), we added a script to configure it and run it automatically in skyportal as a microservice.
 When starting SkyPortal, it will wait for the app to be fully started, verify that the DB contains the telescope(s) and instrument(s) associated to the alerts, and then it will start polling and posting them. Everything is logged in the log folder of skyportal along with the other logs of the app. This is done so you can keep a history of the alerts that were polled, to verify if needed that the alerts are being pushed to SkyPortal correctly.
 
+
+## System Dependencies
+
+### Dependencies
+
+SkyPortal requires the following software to be installed.  We show
+how to install them on MacOS and Debian-based systems below.
+
+- Python 3.8 or later
+- Supervisor (v>=3.0b2)
+- NGINX (v>=1.7)
+- PostgreSQL (v>=14)
+- Node.JS/npm (v>=5.8.0)
+
+When installing SkyPortal on Debian-based systems, 2 additional packages are required to be able to install pycurl later on:
+
+- libcurl4-gnutls-dev
+- libgnutls28-dev
+
+### Source download, Python environment
+
+Clone the [GRANDMA SkyPortal repository](https://github.com/grandma-collaboration/grandma_skyportal) and start a new
+virtual environment.
+
+```
+git clone https://github.com/grandma-collaboration/grandma_skyportal
+cd grandma_skyportal/
+virtualenv env
+source env/bin/activate
+```
+
+(You can also use `conda` or `pipenv` to create your environment.)
+
+If you are using Windows Subsystem for Linux (WSL) be sure you clone the repository onto a location on the virtual machine, not the mounted Windows drive. Additionally, we recommend that you use WSL 2, and not WSL 1, in order to avoid complications in interfacing with the Linux image's `localhost` network.
+
+### Installation: Debian-based Linux and WSL
+
+1. Install nginx and python
+
+Run the following commands to install the dependencies:
+```
+sudo apt install nginx supervisor libpq-dev npm python3-pip libcurl4-gnutls-dev libgnutls28-dev
+```
+
+2. Installing PostgreSQL
+
+The version of PostgreSQL that is shipped with most Debian-based Linux distributions is not up to date (usually 12 instead of 14). If you already have an older version installed, you first need to remove it:
+```
+sudo systemctl stop postgresql
+sudo pg_dropcluster --stop <older_version> main
+sudo apt-get --purge remove postgresql postgresql-*
+sudo rm -r /var/lib/postgresql/<older_version>
+sudo rm -r /etc/postgresql/<older_version>
+```
+Here are the steps to install version 14:
+```
+sudo apt update && sudo apt upgrade
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt -y update
+sudo apt -y install postgresql-14
+```
+
+To verify if the installation was successful, run the following command:
+```
+systemctl status postgresql
+```
+It should be displayed as "Loaded" and "Active".
+
+You can also run:
+```
+sudo -u postgres psql -c "SELECT version();"
+```
+to verify that the version is the right one.
+
+Sometimes, if you removed an older version of postgresql before installing a newer one, a cluster won't be automaticcally created for the newer version. You can create a cluster manually by running the following command:
+```
+sudo pg_createcluster <new_version> main --start
+sudo systemctl restart postgresql
+```
+
+Then, run the same commands mentionned above to verify that the installation was successful.
+
+3. Installing node.js
+
+In section 1, we installed nginx, python but also the npm in its version shipped with the system. However, that version is not recent enough to run SkyPortal. To update it, run:
+```
+sudo npm i -g n
+sudo n 17
+```
+
+*n is an npm package that allows you to switch between versions of node.js and npm easily.*
+
+Then, open a new terminal and run:
+```
+node --version
+```
+to verify that you are running the right version (17 or more).
+
+2. Configure your database permissions.
+
+In `pg_hba.conf` (typically located in
+`/etc/postgresql/<postgres-version>/main`), insert the following lines
+*before* any other `host` lines:
+
+```
+host skyportal skyportal 127.0.0.1/32 trust
+host skyportal_test skyportal 127.0.0.1/32 trust
+host all postgres 127.0.0.1/32 trust
+```
+
+If you are deploying SkyPortal using IPv6 rather than IPv4, you should add the following lines instead:
+
+```
+host skyportal skyportal ::1/128 trust
+host skyportal_test skyportal ::1/128 trust
+host all postgres ::1/128 trust
+```
+
+In some PostgreSQL installations, the default TCP port may be different from the 5432 value assumed in our default configuration file values. To remedy this, you can either edit your config.yaml file to reflect your system's PostgreSQL default port, or update your system-wide config to use port 5432 by editing /etc/postgresql/12/main/postgresql.conf (replace "12" with your installed version number) and changing the line `port = XXXX` (where "XXXX" is whatever the system default was) to `port = 5432`.
+
+Restart PostgreSQL:
+
+```
+sudo service postgresql restart
+```
+
+3. To run the test suite, you'll need Geckodriver:
+
+- Download the latest version from https://github.com/mozilla/geckodriver/releases/
+- Extract the binary to somewhere on your path
+- Ensure it runs with `geckodriver --version`
+
+In later versions of Ubuntu (16.04+), you can install Geckodriver through apt:
+```
+sudo apt install firefox-geckodriver
+```
+
 ## System Commands
 
 Now that we've explored the architecture of grandma_skyportal, let's see how do we actually add the extensions to SkyPortal, update Skyportal and said extensions, and much more.
@@ -251,22 +389,19 @@ To see the list of user and roles, run:
 
 The commands mentioned above are meant to update the version of skyportal that is pinned in the repo, along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
 
-Before attempting to update the app in production, we need to make sure that the current state of the database is stamped using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database.
-To do that in production, stop the app, go to the `patched_skyportal` folder, and run the following command:
-```
-PYTHONPATH=. alembic -x config=config.yaml stamp head
-```
-
-Then, run
+To do that in production, stop the app, and run
 ```
 git pull
 ```
 
-to get new changes, and then run
+to get the new changes, and then run
 ```
 ./grandma.sh run --update_prod
 ```
-to update the app in production. When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
+to update the app in production. First, this will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
+When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
+
+
 
 ## Access the Production VM (at IJCLAB)
 
@@ -303,6 +438,19 @@ cd /pdisk/htdocs/skyportal/deployment/grandma_skyportal
 ```
 ./grandma.sh run
 ```
+
+We advise you to open a second terminal, go to the `patched_skyportal` folder and run:
+```
+make log
+```
+so you can see the logs of the app, and verify that everything is running correctly.
+
+When the app is fully started, and if you haven't encountered any bugs/errors, you can use the following command to make the app available to the public:
+```
+sudo -i
+setenforce 0
+```
+
 
 For now, starting the app is not done automatically when the VM reboots. You can do it manually by running the commands mentioned above.
 
