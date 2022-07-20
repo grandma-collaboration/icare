@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import { Paper } from "@mui/material";
@@ -107,9 +108,15 @@ const FollowUpAdvocates = ({ classes }) => {
           </Typography>
           <DragHandleIcon className={`${classes.widgetIcon} dragHandle`} />
           <div>
-            <strong>Current Shift</strong>
-            <br />
             {currentShift ? (
+              <>
+              <Link
+                key="currentShift"
+                to={`/shifts/${currentShift.id}`}
+              >
+                <strong>Current Shift</strong>
+              </Link>
+              <br />
               <Typography variant="body2" display="inline">
                 Current Shift: {currentShift.name}
                 <br />
@@ -135,6 +142,7 @@ const FollowUpAdvocates = ({ classes }) => {
                 <br />
                 <br />
               </Typography>
+              </>
             ) : (
               <Typography variant="body2" display="inline">
                 No Current Shift
@@ -142,10 +150,15 @@ const FollowUpAdvocates = ({ classes }) => {
                 <br />
               </Typography>
             )}
-            <strong>My Next Shift</strong>
-            <br />
             {nextShift ? (
               <>
+                <Link
+                  key="currentShift"
+                  to={`/shifts/${nextShift.id}`}
+                >
+                  <strong>My Next Shift</strong>
+                </Link>
+                <br />
                 {countdown && (
                   <Typography variant="body2" display="inline">
                     In: {countdown[0]}d, {countdown[1]}h, {countdown[2]}m<br />

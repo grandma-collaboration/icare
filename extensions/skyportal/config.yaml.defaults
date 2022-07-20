@@ -141,7 +141,7 @@ app:
           url: /
 
         - name: Dashboard Grandma
-          icon: Bathtub
+          icon: ElderlyWoman
           url: /dashboardGrandma
 
         - name: Sources
