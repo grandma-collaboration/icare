@@ -36,7 +36,9 @@ def update(
             p = subprocess.run(["git", "pull"], cwd="skyportal")
             if p.returncode != 0:
                 raise RuntimeError("Failed to git pull grandma")
-            p = subprocess.run(["git", "submodule", "update", "--init", "--recursive"], cwd="skyportal")
+            p = subprocess.run(
+                ["git", "submodule", "update", "--init", "--recursive"], cwd="skyportal"
+            )
             if p.returncode != 0:
                 raise RuntimeError("Failed to update all submodules recursively")
     if extensions_update:

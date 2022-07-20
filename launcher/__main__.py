@@ -28,7 +28,7 @@ def initialize_submodules():
             stderr=subprocess.STDOUT,
         )
         print(p.stdout.decode("utf-8"))
-    if len(list(Path("extensions/skyportal-fink-client").glob("*"))) == 0:
+    if len(list(Path("extensions/services/fink/skyportal-fink-client").glob("*"))) == 0:
         p = subprocess.run(
             ["git", "submodule", "update", "--init"],
             stdout=subprocess.PIPE,

@@ -1,0 +1,8 @@
+astropy
+astropy-healpix
+confluent-kafka
+fink-filters==2.2
+fink-utils==0.4.0
+fink-client==2.11
+pyspark==3.2.1
+pyarrow==7.0.0
