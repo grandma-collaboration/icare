@@ -38,6 +38,13 @@ def build(
     if do_update:
         new_changes, skyportal_start = update(repo=repo, branch=branch)
     if update_prod:
+        print("Stamping current database state")
+        cmd = subprocess.Popen(
+            ["alembic", "-x", "config=config.yaml", "stamp", "head"],
+            cwd="patched_skyportal",
+        )
+        cmd.wait()
+        print("Updating submodules")
         cmd = subprocess.Popen(["git", "submodule", "update", "--init", "--recursive"])
         cmd.wait()
     # if patched_skyportal directory exists, patch it
