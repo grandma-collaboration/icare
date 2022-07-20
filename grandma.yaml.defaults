@@ -2,9 +2,9 @@ app:
   title: GRANDMA SkyPortal
 
 server:
-  ssl: True
+  ssl: False
   auth:
-    debug_login: False
+    debug_login: True
     iam_oauth2_key:
     iam_oauth2_secret:
 
