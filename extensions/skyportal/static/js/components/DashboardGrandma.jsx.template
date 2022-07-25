@@ -79,15 +79,15 @@ const HomePage = () => {
   const profile = useSelector((state) => state.profile);
 
   let currentLayouts =
-    profile?.preferences.layouts == null
+    profile?.preferences.layoutsGrandmaDashboard == null
       ? defaultLayouts
-      : profile.preferences.layouts;
+      : profile.preferences.layoutsGrandmaDashboard;
 
   const dispatch = useDispatch();
 
   const LayoutChangeHandler = (currentLayout, allLayouts) => {
     const prefs = {
-      layouts: allLayouts,
+      layoutsGrandmaDashboard: allLayouts,
     };
     dispatch(profileActions.updateUserPreferences(prefs));
   };
@@ -95,7 +95,7 @@ const HomePage = () => {
   const resetLayouts = () => {
     currentLayouts = defaultLayouts;
     const prefs = {
-      layouts: defaultLayouts,
+      layoutsGrandmaDashboard: defaultLayouts,
     };
     dispatch(profileActions.updateUserPreferences(prefs));
   };
