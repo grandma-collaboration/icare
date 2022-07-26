@@ -10,7 +10,7 @@ import subprocess
 import yaml
 
 
-def check_config_exists(cfg="grandma.defaults.yaml", yes=False):
+def check_config_exists(cfg="icare.defaults.yaml", yes=False):
     c = cfg.replace(".defaults", "")
     if not Path(c).exists():
         cd = (
@@ -26,7 +26,7 @@ def check_config_exists(cfg="grandma.defaults.yaml", yes=False):
             raise IOError(f"{c} does not exist, aborting")
 
 
-def check_config(cfg="grandma.defaults.yaml", yes=False):
+def check_config(cfg="icare.defaults.yaml", yes=False):
     """
     Check if config exists, generate a K token for SP, adjust cfg and distribute to K and SP
     """

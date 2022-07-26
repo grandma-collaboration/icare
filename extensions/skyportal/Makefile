@@ -4,7 +4,7 @@ BOLD=\033[1m
 NORMAL=\033[0m
 
 VER := $(shell python -c "import skyportal; print(skyportal.__version__)")
-BANNER := $(shell echo -e "Welcome to $(BOLD)SkyPortal for Grandma v$(VER)$(NORMAL) (https://skyportal.io)")
+BANNER := $(shell echo -e "Welcome to $(BOLD)Icare v$(VER)$(NORMAL)")
 
 $(info $())
 $(info $(BANNER))

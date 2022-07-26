@@ -16,13 +16,13 @@ class MyDumper(yaml.SafeDumper):
 def apply_config():
     print("\nApplying config")
     try:
-        file = "grandma.yaml"
+        file = "icare.yaml"
         if not Path(file).exists():
-            file = "grandma.yaml.defaults"
+            file = "icare.yaml.defaults"
 
         with open(file, "r") as stream:
             try:
-                grandma_config = yaml.safe_load(stream)
+                icare_config = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
                 print(exc)
 
@@ -32,17 +32,17 @@ def apply_config():
             except yaml.YAMLError as exc:
                 print(exc)
 
-        # replace keys of skyportal_config with values of grandma_config
-        for key in grandma_config:
+        # replace keys of skyportal_config with values of icare_config
+        for key in icare_config:
             if key in skyportal_config:
-                for subkey in grandma_config[key]:
-                    skyportal_config[key][subkey] = grandma_config[key][subkey]
+                for subkey in icare_config[key]:
+                    skyportal_config[key][subkey] = icare_config[key][subkey]
             else:
-                skyportal_config[key] = grandma_config[key]
+                skyportal_config[key] = icare_config[key]
 
             # # if key is a list, replace values
             # else:
-            # skyportal_config[key] = grandma_config[key]
+            # skyportal_config[key] = icare_config[key]
         # write config.yaml to skyportal-fink-client
         with open("patched_skyportal/config.yaml.defaults", "w") as stream:
             try:
@@ -50,4 +50,4 @@ def apply_config():
             except yaml.YAMLError as exc:
                 print(exc)
     except Exception as e:
-        print("\nFailed to apply grandma patches to the config: {}".format(e))
+        print("\nFailed to apply icare patches to the config: {}".format(e))

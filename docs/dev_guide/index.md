@@ -2,7 +2,7 @@
 
 ## System Architecture
 
-grandma_skyportal works in a similar way to [Fritz Marshal](), but with some noticeable differences. Let's detail the system's architecture:
+Icare works in a similar way to [Fritz Marshal](), but with some noticeable differences. Let's detail the system's architecture:
 
 ``` mermaid
 graph LR
@@ -195,12 +195,12 @@ When installing SkyPortal on Debian-based systems, 2 additional packages are req
 
 ### Source download, Python environment
 
-Clone the [GRANDMA SkyPortal repository](https://github.com/grandma-collaboration/grandma_skyportal) and start a new
+Clone the [Icare repository](https://github.com/grandma-collaboration/icare) and start a new
 virtual environment.
 
 ```
-git clone https://github.com/grandma-collaboration/grandma_skyportal
-cd grandma_skyportal/
+git clone https://github.com/grandma-collaboration/icare
+cd icare/
 virtualenv env
 source env/bin/activate
 ```
@@ -314,11 +314,11 @@ sudo apt install firefox-geckodriver
 
 ## System Commands
 
-Now that we've explored the architecture of grandma_skyportal, let's see how do we actually add the extensions to SkyPortal, update Skyportal and said extensions, and much more.
+Now that we've explored the architecture of icare, let's see how do we actually add the extensions to SkyPortal, update Skyportal and said extensions, and much more.
 
-In grandma_skyportal, you'll find a launcher directory, containing different commands. The launcher directory follows the same patterns established in Fritz, for consistency sake.
+In icare, you'll find a launcher directory, containing different commands. The launcher directory follows the same patterns established in Fritz, for consistency sake.
 
-Here are the different commands, all prefixed with `./grandma.sh` to run:
+Here are the different commands, all prefixed with `./icare.sh` to run:
 
 - run
 - update
@@ -328,7 +328,7 @@ Here are the different commands, all prefixed with `./grandma.sh` to run:
 - set_user_role
 - load_grandma_data
 
-In this documentation, we'll focus only on the `run` command. Effectively, other commands will we called along with the `run` command as arguments. For example, we can use `./grandma.sh run --clear --init` to clear the database, recreate tables and then run the app.
+In this documentation, we'll focus only on the `run` command. Effectively, other commands will we called along with the `run` command as arguments. For example, we can use `./icare.sh run --clear --init` to clear the database, recreate tables and then run the app.
 
 ### Starting the app for the first time
 
@@ -344,7 +344,7 @@ conda install --file requirements.txt
 
 To run the app for the first time, we can use the `run` command as such:
 ```
-./grandma.sh run --clear --init
+./icare.sh run --clear --init
 ```
 
 This will install all the required dependencies, clear the database if it exists, create the database, and run the app.
@@ -353,7 +353,7 @@ This will install all the required dependencies, clear the database if it exists
 
 To update the version of SkyPortal that is pinned in the repo, we can use the `update` command as such:
 ```
-./grandma.sh run --do_update
+./icare.sh run --do_update
 ```
 
 This will update the version of SkyPortal that is pinned in the app. When doing so, we are basically running a `git diff` to see which files have been modified. If some of those files are also the files we have copied and modified in the extensions folder, we need to merge new changes in the extensions folder. If we don't do this, when replacing skyportal's files by the files in the extensions folder, we'll lose new changes. And besides from missing on new features, it is very likely to break the app. Which is why, when we detect that some skyportal changes affect the files in extensions, we give the user 3 choices to choose from:
@@ -368,24 +368,24 @@ This will update the version of SkyPortal that is pinned in the app. When doing 
 
 To load data from the grandma_data repo, we can use the `load_grandma_data` command as such:
 ```
-./grandma.sh load_grandma_data
+./icare.sh load_grandma_data
 ```
 
 ### Set user roles
 
 In SkyPortal, there is a script that an admin can use to set user roles manually from the terminal in production for example.
-Here, we just added a command to call that script with the same syntax as other command from grandma_skyportal.
+Here, we just added a command to call that script with the same syntax as other command from icare.
 You can use it as such:
 ```
-./grandma.sh set_user_role --user=<user_name> --role=<role_with_underscores_instead_of_spaces>
+./icare.sh set_user_role --user=<user_name> --role=<role_with_underscores_instead_of_spaces>
 ```
 
 To see the list of user and roles, run:
 ```
-./grandma.sh set_user_role --list
+./icare.sh set_user_role --list
 ```
 
-### Updating grandma_skyportal (production)
+### Updating icare (production)
 
 The commands mentioned above are meant to update the version of skyportal that is pinned in the repo, along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
 
@@ -396,7 +396,7 @@ git pull
 
 to get the new changes, and then run
 ```
-./grandma.sh run --update_prod
+./icare.sh run --update_prod
 ```
 to update the app in production. First, this will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
 When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
@@ -405,14 +405,14 @@ When the app runs, as the database's state has been stamped, a migration server 
 
 ## Access the Production VM (at IJCLAB)
 
-We deployed grandma_skyportal on a VM at IJCLAB/CNRS, which is accessible remotely via SSH. However, for security reasons, we don't want to expose an SSH connection to the public internet. Which is why you will need an IJCLAB account, so you can first connect to a public VM of IJCLAB, and then connect to the private VM dedicated to grandma_skyportal.
+We deployed icare on a VM at IJCLAB/CNRS, which is accessible remotely via SSH. However, for security reasons, we don't want to expose an SSH connection to the public internet. Which is why you will need an IJCLAB account, so you can first connect to a public VM of IJCLAB, and then connect to the private VM dedicated to icare.
 
 - Connect to the public VM of IJCLAB:
 ```
 ssh <your_user_name>@lx3.lal.in2p3.fr
 ```
 
-- Connect to the private VM running grandma_skyportal:
+- Connect to the private VM running icare:
 ```
 ssh grandmadmin@grandma-v2.ijclab.in2p3.fr
 ```
@@ -429,14 +429,14 @@ sudo -i
 conda activate skyportal
 ```
 
-- then go to the `grandma_skyportal` folder and run the following command:
+- then go to the `icare` folder and run the following command:
 ```
-cd /pdisk/htdocs/skyportal/deployment/grandma_skyportal
+cd /pdisk/htdocs/skyportal/deployment/icare
 ```
 
 - to run the app, run
 ```
-./grandma.sh run
+./icare.sh run
 ```
 
 We advise you to open a second terminal, go to the `patched_skyportal` folder and run:
