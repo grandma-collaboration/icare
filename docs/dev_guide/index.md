@@ -321,7 +321,7 @@ In grandma_skyportal, you'll find a launcher directory, containing different com
 Here are the different commands, all prefixed with `./grandma.sh` to run:
 
 - run
-- update
+- do_update
 - build
 - diff
 - clear
@@ -351,18 +351,57 @@ This will install all the required dependencies, clear the database if it exists
 
 ### Updating SkyPortal and the extensions (development)
 
-To update the version of SkyPortal that is pinned in the repo, we can use the `update` command as such:
+To update the version of SkyPortal that is pinned in the repo, first create a new branch (if you are working on a fork, which is preferable, don't forget to merge the changes coming from upstream in your main branch first) and use
+```
+git checkout <new-branch-name>
+```
+to switch to the new branch. Then, to be sure that the submodules are all at the right version pinned to the branch (they might be on an older or newer version if you made some modifications earlier, even on another branch. Submodules usually don't automatically checkout to the pinned version after you checkout to a branch), use:
+```
+git pull
+git submodule update --init --recursive
+```
+
+Last but not least, remove the `patched_skyportal` and `previous_skyportal` directories if they exist:
+```
+sudo rm -rf patched_skyportal
+sudo rm -rf precious_skyportal
+```
+
+Now, you can use the `do_update` command as such:
 ```
 ./grandma.sh run --do_update
 ```
 
-This will update the version of SkyPortal that is pinned in the app. When doing so, we are basically running a `git diff` to see which files have been modified. If some of those files are also the files we have copied and modified in the extensions folder, we need to merge new changes in the extensions folder. If we don't do this, when replacing skyportal's files by the files in the extensions folder, we'll lose new changes. And besides from missing on new features, it is very likely to break the app. Which is why, when we detect that some skyportal changes affect the files in extensions, we give the user 3 choices to choose from:
+This will update the version of SkyPortal that is pinned in the app. When doing so, we are basically running a `git diff` to see which files have been modified. If some of those files are also the files we have copied and modified in the extensions folder, we need to merge new changes in the extensions folder too. If we don't do this, when replacing skyportal's files by the files in the extensions folder, we'll lose new changes. And besides from missing on new features, it is very likely to break the app. Which is why, when we detect that some changes coming from skyportal are made on same files we have in the extensions folder, we give the user 3 choices:
 
 - Stop running the app, and merge new changes in the extensions folder. The user can then go to the extensions folder and fix potential merge conflict before running the app again.
 - Update SkyPortal and run the app without updating files in the extensions folder. This will likely break the app.
 - Cancel the update and run the app normally.
 
 *These features are still in development, you might experience some issues.*
+
+After updating the version that is pinned, and fixing potential merge conflict, rerun the app with:
+```
+./grandma.sh run
+```
+
+If everything seems to be working fine, commit your changes to your branch (don't forget to `git add` all the modified files, including skyportal itself using `git add skyportal`), open a PR and wait for the GitHUb actions to finish running. If everything is green, ask for a review and merge the changes to the main branch **ONLY** when all reviewers approved your changes.
+
+### Updating grandma_skyportal (production)
+
+The commands mentioned above are meant to update the version of skyportal that is pinned in the repo, along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
+
+To do that in production, stop the app, and run
+```
+git pull
+```
+
+to get the new changes, and then run
+```
+./grandma.sh run --update_prod
+```
+to update the app in production. First, this will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
+When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
 
 ### Loading data from the grandma_data repo
 
@@ -385,24 +424,6 @@ To see the list of user and roles, run:
 ./grandma.sh set_user_role --list
 ```
 
-### Updating grandma_skyportal (production)
-
-The commands mentioned above are meant to update the version of skyportal that is pinned in the repo, along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
-
-To do that in production, stop the app, and run
-```
-git pull
-```
-
-to get the new changes, and then run
-```
-./grandma.sh run --update_prod
-```
-to update the app in production. First, this will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
-When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
-
-
-
 ## Access the Production VM (at IJCLAB)
 
 We deployed grandma_skyportal on a VM at IJCLAB/CNRS, which is accessible remotely via SSH. However, for security reasons, we don't want to expose an SSH connection to the public internet. Which is why you will need an IJCLAB account, so you can first connect to a public VM of IJCLAB, and then connect to the private VM dedicated to grandma_skyportal.
@@ -412,7 +433,7 @@ We deployed grandma_skyportal on a VM at IJCLAB/CNRS, which is accessible remote
 ssh <your_user_name>@lx3.lal.in2p3.fr
 ```
 
-- Connect to the private VM running grandma_skyportal:
+- Connect to the private VM running grandma_skyportal (to be able to do so, you first need to ask someone at the "Service d'exploitation", or someone that already has access to the VM to add your SSH key to the grandmadmin user):
 ```
 ssh grandmadmin@grandma-v2.ijclab.in2p3.fr
 ```
@@ -443,18 +464,30 @@ We advise you to open a second terminal, go to the `patched_skyportal` folder an
 ```
 make log
 ```
-so you can see the logs of the app, and verify that everything is running correctly.
+so you can see the logs of the app in real time, and verify that everything is running correctly.
 
 When the app is fully started, and if you haven't encountered any bugs/errors, you can use the following command to make the app available to the public:
 ```
-sudo -i
 setenforce 0
 ```
 
+*Help: If any of the commands mentioned above fail for some reason, please make sure that everytime you open a new terminal, you connect to the machine again via SSH, and that you elevate your privileges using `sudo -i`*
 
 For now, starting the app is not done automatically when the VM reboots. You can do it manually by running the commands mentioned above.
 
 After starting the app remotely from your computer, you will very likely close the SSH connection, effectively closing the terminal in which you ran the app. This is fine, and won't close the app. However, if you want to stop the app, you won't be able to go back to that terminal to close it using the `Ctrl+C` key as you would normally do. Instead, you need to reboot the VM, connect to it, and repeat the steps detailed above.
+
+If you have trouble starting or accessing the app, maybe that Nginx or PostgreSQL did not start correctly. First stop the app, and use `systemctl` to see the status of a service (they should be named `nginx` and `postgresql-14`):
+```
+systemctl status <service_name>
+```
+
+If it is not displayed as active and loaded, try restarting it using:
+```
+systemctl restart <service_name>
+```
+
+Verify their status once more, and if everything seems to be working you should be able to start the app again.
 
 ## Deploy on a new VM
 
