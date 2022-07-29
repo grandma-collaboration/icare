@@ -77,7 +77,7 @@ const TelescopeMapDashboard = () => {
         </div>
       }
     >
-      <Paper className={classes.paperContent}>
+      <Paper>
         <TelescopeMap telescopes={telescopeList} />
       </Paper>
     </Suspense>
