@@ -36,7 +36,7 @@ def initialize_submodules():
         )
         print(p.stdout.decode("utf-8"))
         if p.returncode != 0:
-            raise RuntimeError("Failed to initialize grandma's submodules")
+            raise RuntimeError("Failed to initialize icare's submodules")
 
 
 if __name__ == "__main__":
@@ -83,5 +83,5 @@ if __name__ == "__main__":
             "poll_from_fink": poll_from_fink,
             "load_grandma_data": load_grandma_data,
         },
-        name="grandma",
+        name="icare",
     )

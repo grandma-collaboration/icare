@@ -8,8 +8,8 @@ def update(
     repo: Optional[str] = None,
     branch: Optional[str] = None,
 ):
-    """Update grandma
-    :param init: Initialize before updating grandma
+    """Update Icare
+    :param init: Initialize before updating Icare
     :param repo: Remote repository to pull from
     :param branch: Branch on the remote repository
     """
@@ -32,10 +32,10 @@ def update(
         if repo is not None and branch is not None:
             p = subprocess.run(["git", "checkout", branch], cwd="skyportal")
             if p.returncode != 0:
-                raise RuntimeError("Failed to update grandma's submodules")
+                raise RuntimeError("Failed to update icare's submodules")
             p = subprocess.run(["git", "pull"], cwd="skyportal")
             if p.returncode != 0:
-                raise RuntimeError("Failed to git pull grandma")
+                raise RuntimeError("Failed to git pull icare")
             p = subprocess.run(
                 ["git", "submodule", "update", "--init", "--recursive"], cwd="skyportal"
             )

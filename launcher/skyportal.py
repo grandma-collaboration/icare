@@ -5,22 +5,22 @@ from .commands.apply_config import apply_config
 
 
 def patch(source="extensions/skyportal/", destination="patched_skyportal/"):
-    """Make grandma-specific file modifications to SkyPortal."""
-    print("\n Applying grandma-specific patches to SkyPortal")
+    """Make icare-specific file modifications to SkyPortal."""
+    print("\n Applying icare-specific patches to SkyPortal")
 
-    # add grandma-specific SP extensions
+    # add icare-specific SP extensions
     copy_tree(source, destination)
 
-    # add grandma-specific dependencies for SP
+    # add icare-specific dependencies for SP
     # js
-    with open(source + "package.grandma.json", "r") as f:
-        grandma_pkg = json.load(f)
+    with open(source + "package.icare.json", "r") as f:
+        icare_pkg = json.load(f)
     with open(destination + "package.json", "r") as f:
         skyportal_pkg = json.load(f)
 
     skyportal_pkg["dependencies"] = {
         **skyportal_pkg["dependencies"],
-        **grandma_pkg["dependencies"],
+        **icare_pkg["dependencies"],
     }
     with open(destination + "package.json", "w") as f:
         json.dump(skyportal_pkg, f, indent=2)

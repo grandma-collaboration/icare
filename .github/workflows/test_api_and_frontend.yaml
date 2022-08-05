@@ -43,6 +43,13 @@ jobs:
           ref: main
           submodules: true
 
+      - name: Checkout branch being tested
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+          clean: false
+
       - name: Fetch submodules
         run: |
           git submodule update --init --recursive
@@ -74,9 +81,9 @@ jobs:
           pip install -r skyportal/requirements.txt
           pip install -r skyportal/baselayer/requirements.txt
 
-      - name: Apply Grandma patches
+      - name: Apply Icare patches
         run: |
-          ./grandma.sh build
+          ./icare.sh build
 
       - name: Write SkyPortal configs
         run: |
@@ -127,7 +134,7 @@ jobs:
           psql -U skyportal -h localhost -c "GRANT ALL PRIVILEGES ON DATABASE skyportal_test TO skyportal;" skyportal_test
 
           export NPM_CONFIG_LEGACY_PEER_DEPS="true"
-          ./grandma.sh build --init
+          ./icare.sh build --init
 
           pip list --format=columns
           npm ls --depth 0 || true

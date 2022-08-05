@@ -20,8 +20,8 @@ def build(
     clear: bool = False,
     update_prod: bool = False,
 ):
-    """Build grandma
-    :param init: Initialize grandma
+    """Build Icare
+    :param init: Initialize Icare
     :param repo: Remote repository to pull from
     :param do_update: pull <repo>/<branch>, autostash SP and update submodules
     :param clear: Clear the database
