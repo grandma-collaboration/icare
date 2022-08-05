@@ -1,7 +1,7 @@
-# SkyPortal for Grandma
+# Icare
 
 ## What is it ?
-SkyPortal for Grandma is a custom "layer" of both frontend and backend, added on top of [SkyPortal](https://skyportal.io/) to provide the features required only by Grandma.
+Icare is a custom "layer" of both frontend and backend, added on top of [SkyPortal](https://skyportal.io/) to provide the features required only by Grandma.
 
 Besides from building on top of SkyPortal, it also provides 2 extensions:
 
@@ -13,36 +13,35 @@ Besides from building on top of SkyPortal, it also provides 2 extensions:
 
 ##### Full Account Creation Tutorial: [User Guide](./user_guide/index.md)
 
-Users can login to SkyPortal for Grandma using either their Slack account or their eduGAIN account. The service used for
+Users can login to Icare using either their Slack account or their eduGAIN account. The service used for
 authentication is called IAM. One benefit of this service is that you will be able to use your
-standard account, without the need to remember a username and a password specific to Skyportal for
-Grandma.  Also you will be able to use any of the authentication methods proposed and still
-remain the same user for Skyportal for Grandma.
+standard account, without the need to remember a username and a password specific to Icare.
+Also you will be able to use any of the authentication methods proposed and still remain the same user in Icare.
 
 Your IAM account will be automatically created the first time you connect to
-[SkyPortal for Grandma](https://grandma-v2.ijclab.in2p3.fr/) but we recommend that you follow
-the steps below to create it before attempting to connect to Skyportal for Grandma.
+[Icare](https://grandma-v2.ijclab.in2p3.fr/) but we recommend that you follow
+the steps below to create it before attempting to connect to Icare.
 
 **Important : Do not try to connect to SkyPortal until your account is verified. If you still did that,
 you will need to delete your cache/cookies before logging in.**
 
 ## How to create and configure your IAM account.
 
-It is recommended to create your IAM account before connecting to Skyportal for Grandma by
+It is recommended to create your IAM account before connecting to Icare by
 connecting directly to the [IAM service](https://iam-grandma.ijclab.in2p3.fr/login).
 You will have to enter some information required to create your account. Note that the that
 the firstname, lastname, email you enter will be used to initialize your Skyportal
 profile. The email you specifiy don't need to be the same as the email associated with the
-Slack or eduGAIN account you used to authenticate and will be used as your Skyportal for Grandma
+Slack or eduGAIN account you used to authenticate and will be used as your Icare
 identifier (username).
 
 **Note: one of the mandatory information to create your IAM account is the `Note` field: we request you to put your
 affiliation in this note, as well as other information you may find useful.**
 
 Once your account has been created and verified, you can login again to
-[SkyPortal for Grandma](https://grandma-v2.ijclab.in2p3.fr/) using your IAM account
-A Skyportal for Grandma username will be automatically created. You can edit it your profile information
-by clicking on the button on the top-right corner of the Skyportal for Grandma window.
+[Icare](https://grandma-v2.ijclab.in2p3.fr/) using your IAM account
+A Icare username will be automatically created. You can edit it your profile information
+by clicking on the button on the top-right corner of the Icare window.
 
 If you want to be able to authenticate using several methods, once your IAM account has been
 created and validated, connect again to the [IAM service](https://iam-grandma.ijclab.in2p3.fr/login),
@@ -76,4 +75,4 @@ At first, you will be granted the `Manage shift` permission, which allows you to
 
 ## User Guide
 
-You will find a more in depth guide to use SkyPortal for Grandma on the [User Guide](./user_guide/index.md) page.
+You will find a more in depth guide to use Icare on the [User Guide](./user_guide/index.md) page.

@@ -27,7 +27,7 @@ Please click the link: accounts will not be validated until you confirmed your e
 **Your account won't be verified by an administrator until you do it.** Once it is done, wait
 for your account to be validated by an administrator: once it is done you'll receive a new email
 that also contains a link to set your IAM password: **just ignore it** as you will not need it
-to access Skyportal for GRANDMA with Slack or eduGAIN.
+to access Icare with Slack or eduGAIN.
 
 Account Creation Confirmation email             |  Setting your password
 :-------------------------:|:-------------------------:
