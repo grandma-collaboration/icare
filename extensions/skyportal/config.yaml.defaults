@@ -127,6 +127,8 @@ app:
       component: TelescopePage
     - path: "/instruments"
       component: InstrumentPage
+    - path: "/services"
+      component: AnalysisServicePage
     - path: "/shifts"
       component: ShiftNoId
     - path: "/shifts/:id"
@@ -201,6 +203,10 @@ app:
         - name: Galaxies
           icon: TornadoOutlined
           url: /galaxies
+          
+        - name: Analysis Services
+          icon: SentimentSatisfied
+          url: /services
 
     - name: Admin
       permissions: ["Manage users", "System admin"]
@@ -282,7 +288,7 @@ app:
       resizeable: true
       minW: 2
       layouts:
-        xlg: [0, 3, 5, 5]
+        xlg: [0, 3, 5, 2]
         lg: [0, 3, 4, 1]
         md: [0, 6, 5, 2]
         sm: [0, 6, 6, 1]
