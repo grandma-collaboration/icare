@@ -15,7 +15,7 @@ def diff(
     cmd = subprocess.Popen(["git", "fetch"], stdout=subprocess.PIPE, cwd="skyportal")
     output = cmd.wait()
     cmd = subprocess.Popen(
-        ["git", "diff", "main"], stdout=subprocess.PIPE, cwd="skyportal"
+        ["git", "diff", "origin/main"], stdout=subprocess.PIPE, cwd="skyportal"
     )
     # get the ouput of the command
     output = cmd.stdout.read()
@@ -64,7 +64,7 @@ def diff(
     # if there are changes, ask the user if he wants to continue, return true or false
     if len(exist_in_extensions) > 0 and len(changed_files) > 0:
         print(
-            "The following files from skyportal for which we have a modified version have been changed:"
+            "The following files from skyportal for which we have a modified version have been changed:\n"
         )
         for file in exist_in_extensions:
             print(file)

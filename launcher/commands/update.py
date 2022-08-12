@@ -14,10 +14,6 @@ def update(
     :param branch: Branch on the remote repository
     """
 
-    # show diff between patched skyportal and skyportal
-    p = subprocess.run(["git", "pull", "origin", "main"], cwd="skyportal")
-    if p.returncode != 0:
-        raise RuntimeError("Failed to pull new changes")
     p = subprocess.run(["git", "submodule", "update", "--init", "--recursive"])
     if p.returncode != 0:
         raise RuntimeError("Failed to update all submodules recursively")
