@@ -205,7 +205,7 @@ app:
         - name: Galaxies
           icon: TornadoOutlined
           url: /galaxies
-          
+
         - name: Analysis Services
           icon: SentimentSatisfied
           url: /services
