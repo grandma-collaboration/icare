@@ -125,6 +125,7 @@ from skyportal.handlers.api import (
     SourcesConfirmedInGCNHandler,
     GCNsAssociatedWithSourceHandler,
 )
+from skyportal.handlers.api.fink_photometry import FinkPhotometryHandler
 from skyportal.handlers.api.internal import (
     PlotPhotometryHandler,
     PlotSpectroscopyHandler,
@@ -328,6 +329,7 @@ skyportal_handlers = [
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/groups', ObjGroupsHandler),
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/color_mag', ObjColorMagHandler),
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/tns', ObjTNSHandler),
+    (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/fink', FinkPhotometryHandler),
     (r'/api/(sources|spectra)/([0-9A-Za-z-_\.\+]+)/comments', CommentHandler),
     (r'/api/(sources|spectra)/([0-9A-Za-z-_\.\+]+)/comments(/[0-9]+)?', CommentHandler),
     (
