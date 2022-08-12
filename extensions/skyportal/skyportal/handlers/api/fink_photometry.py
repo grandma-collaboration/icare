@@ -48,12 +48,12 @@ class FinkPhotometryHandler(BaseHandler):
                         return self.error('Missing expected column')
 
                     stmt = Instrument.select(session.user_or_token).where(
-                        Instrument.name == 'CFH12k' or Instrument.name == 'ZTF'
+                        Instrument.name == 'CFH12k'
                     )
                     instrument = session.scalars(stmt).first()
                     if not instrument:
                         return self.error(
-                            'No instrument named CFH12k or ZTF found to post the photometry'
+                            'No instrument named CFH12k found to post the photometry'
                         )
                     instrument_id = instrument.id
                     data = {
