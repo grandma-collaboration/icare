@@ -64,8 +64,8 @@ if __name__ == "__main__":
         and "set_user_role" not in sys.argv
     ):
         # check environment
-        with status("Initializing submodules"):
-            initialize_submodules()
+        # with status("Initializing submodules"):
+        #     initialize_submodules()
 
         env_ok = dependencies_ok()
         if not env_ok:

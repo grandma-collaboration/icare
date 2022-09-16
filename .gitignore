@@ -3,5 +3,4 @@ node_modules
 env
 geckodriver.log
 patched_skyportal
-previous_skyportal
-grandma.yaml
+icare.yaml

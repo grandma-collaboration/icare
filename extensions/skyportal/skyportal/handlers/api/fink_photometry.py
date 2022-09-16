@@ -48,6 +48,7 @@ class FinkPhotometryHandler(BaseHandler):
                         return self.error('Missing expected column')
 
                     stmt = Instrument.select(session.user_or_token).where(
+
                         Instrument.name == 'CFH12k'
                     )
                     instrument = session.scalars(stmt).first()
