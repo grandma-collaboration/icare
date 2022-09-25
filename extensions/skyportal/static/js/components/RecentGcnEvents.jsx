@@ -99,7 +99,10 @@ const RecentGcnEvents = ({ classes }) => {
   }, [recentEventSources]);
 
   const gcnEventSourcesAssociated = (gcnEvent) => {
-    dispatch(sourcesActions.fetchGcnEventSources(gcnEvent.dateobs));
+    dispatch(sourcesActions.fetchGcnEventSources(gcnEvent.dateobs, {
+      numberDetections: 2,
+      localizationCumprob: 0.95
+    }));
   };
 
   const getGcnEventSources = (gcnEventList) => {
@@ -176,7 +179,7 @@ const RecentGcnEvents = ({ classes }) => {
       <div className={classes.widgetPaperDiv}>
         <div className={styles.header}>
           <Typography variant="h6" display="inline">
-            Recent GCN Events and their sources
+            GW/GRB Events
           </Typography>
           <DragHandleIcon className={`${classes.widgetIcon} dragHandle`} />
           <div className={classes.widgetIcon}>
