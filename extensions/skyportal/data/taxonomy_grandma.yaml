@@ -1,0 +1,14 @@
+- group_ids:
+  - 1
+  - 2
+  hierarchy:
+    class: Grandma Campaign Source Status
+    subclasses:
+    - class: Kilonova
+    - class: Not Kilonova
+    - class: GRB
+    - class: Not GRB
+    - class: GW Counterpart
+    - class: Not GW Counterpart
+  name: Grandma Campaign Source Status
+  version: '1.0'

@@ -463,7 +463,7 @@ app:
         sm: [0, 0, 4.5, 3]
         xs: [0, 1, 4, 3]
 
-    TopSources:
+    RecentSources:
       resizeable: true
       minW: 2
       layouts:
