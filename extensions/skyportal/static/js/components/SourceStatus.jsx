@@ -16,7 +16,7 @@ const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart']
 const SourceStatus = ({ source }) => {
     const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
-    
+
 
     const { taxonomyList } = useSelector((state) => state.taxonomies);
     // find the grandma taxonomy, called "Grandma Campaign Source Status"
@@ -113,6 +113,3 @@ SourceStatus.propTypes = {
 };
 
 export default SourceStatus;
-  
-
-  

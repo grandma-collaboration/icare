@@ -92,7 +92,7 @@ def remove_previous_status(last_update):
                                 action_type='skyportal/REFRESH_SOURCE',
                                 payload={'obj_key': obj.internal_key}
                             )
-                        
+
         except Exception as e:
             log(str(e))
             session.rollback()
