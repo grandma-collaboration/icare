@@ -71,10 +71,10 @@ app:
   # See https://stackoverflow.com/a/35604855 for syntax
   # These are Javascript component routes
   routes:
+    # - path: "/"
+    #  component: HomePage
+    #  exact: True
     - path: "/"
-      component: HomePage
-      exact: True
-    - path: "/dashboardGrandma"
       component: DashboardGrandma
       exact: True
     - path: "/source/:id"
@@ -158,9 +158,9 @@ app:
           icon: Home
           url: /
 
-        - name: Dashboard Grandma
-          icon: ElderlyWoman
-          url: /dashboardGrandma
+        # - name: Dashboard Grandma
+        #  icon: ElderlyWoman
+        #  url: /dashboardGrandma
 
         - name: Sources
           icon: Storage
@@ -182,7 +182,7 @@ app:
           icon: LocalCafe
           url: /runs
 
-        - name: GCN Events
+        - name: GW/GRB Events
           icon: SettingsInputAntenna
           url: /gcn_events
 
@@ -463,7 +463,7 @@ app:
         sm: [0, 0, 4.5, 3]
         xs: [0, 1, 4, 3]
 
-    TopSources:
+    RecentSources:
       resizeable: true
       minW: 2
       layouts:

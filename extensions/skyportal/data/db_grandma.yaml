@@ -14,4 +14,4 @@ instrument:
   file: grandma_data/instruments.yaml
 
 taxonomy:
-  file: taxonomy_sitewide.yaml
+  file: taxonomy_grandma.yaml
