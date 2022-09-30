@@ -149,7 +149,7 @@ const RecentSourcesList = ({ sources, styles }) => {
 
   const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart']
   const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart']
-    
+
   return (
     <div className={styles.sourceListContainer}>
       <ul className={styles.sourceList}>
