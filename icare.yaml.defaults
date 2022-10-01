@@ -31,8 +31,10 @@ fink:
 gcn:
   server: gcn.nasa.gov
   # you can obtain a client_id and client_secret at https://gcn.nasa.gov/quickstart
-  client_id: 6u6fdce9tt7d6c8pnhgtph2gof
-  client_secret: 1pvv6ocgcfva1k3rs092rb088oeng4rs37jmgu7n55c1hfoueqv7
+  # you can set a group_id to remember the last GCN the app ingested from the stream
+  client_group_id:
+  client_id:
+  client_secret:
   notice_types:
     # - SWIFT_BAT_GRB_ALERT #NOT WORKING
     - SWIFT_BAT_GRB_LC
