@@ -631,7 +631,7 @@ smtp:
   port: 587  # Default Gmail settings; modify as needed
 
 # This value needs to be either "sendgrid" or "smtp" (without quotes)
-email_service:
+email_service: smtp
 
 invitations:
   enabled: False  # If debug_login=True above, invite tokens won't be used during auth
