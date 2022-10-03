@@ -11,6 +11,7 @@ import { fetchRecentSources } from "..//ducks/recentSources";
 
 const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart']
 const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart']
+const not_defined = "No Status Yet";
 
 
 const SourceStatus = ({ source }) => {
@@ -86,6 +87,15 @@ const SourceStatus = ({ source }) => {
                                 {c}
                             </Button>
                         ))}
+                        <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => {
+                            changeSourceStatus(not_defined);
+                        }}
+                        >
+                            {not_defined}
+                        </Button>
                     </div>
                     <br/>
                     <Button
