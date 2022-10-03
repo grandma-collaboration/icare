@@ -117,6 +117,10 @@ export const useSourceListStyles = makeStyles((theme) => ({
   rejected: {
     background: "#ff0000!important",
   },
+  not_confirmed: {
+    // grey background
+    background: "#e0e0e0!important",
+  },
 }));
 
 const defaultPrefs = {
@@ -125,6 +129,9 @@ const defaultPrefs = {
 
 const RecentSourcesList = ({ sources, styles }) => {
   const [thumbnailIdxs, setThumbnailIdxs] = useState({});
+
+  const { taxonomyList } = useSelector((state) => state.taxonomies);
+  const grandma_taxonomy = taxonomyList?.filter((t) => t.name === "Grandma Campaign Source Status")[0];
 
   useEffect(() => {
     sources?.forEach((source) => {
@@ -155,8 +162,8 @@ const RecentSourcesList = ({ sources, styles }) => {
       <ul className={styles.sourceList}>
         {sources.map((source) => {
           let recentSourceName = `${source.obj_id}`;
-          let classification = null;
-          let confirmed_or_rejected = null;
+          let grandma_classification = "No Status Yet";
+          let confirmed_or_rejected = 'not_confirmed';
           if (source.classifications.length > 0) {
             // Display the most recent non-zero probability class
             const filteredClasses = source.classifications?.filter(
@@ -167,17 +174,31 @@ const RecentSourcesList = ({ sources, styles }) => {
             );
 
             if (sortedClasses.length > 0) {
-              classification = sortedClasses[0].classification;
-              if (!rejected_classes.includes(classification) && !confirmed_classes.includes(classification)) {
+              const classification = sortedClasses[0].classification;
+              if (!rejected_classes.includes(classification) && !confirmed_classes.includes(classification) && classification !== "No Status Yet") {
                 recentSourceName += ` (${classification})`;
               }
-              else if (confirmed_classes.includes(classification)) {
-                confirmed_or_rejected = 'confirmed';
-              }
-              else if (rejected_classes.includes(classification)) {
-                confirmed_or_rejected = 'rejected';
-              }
             }
+            console.log("source.classifications", source.classifications);
+            console.log("grandma_taxonomy", grandma_taxonomy);
+            if (grandma_taxonomy) {
+
+              grandma_classification = sortedClasses.filter((c) => c.taxonomy_id === grandma_taxonomy.id)[0]?.classification || "No Status Yet";
+              console.log(grandma_taxonomy);
+              console.log(grandma_classification);
+
+              if (grandma_classification) {
+                if (rejected_classes.includes(grandma_classification)) {
+                  confirmed_or_rejected = "rejected";
+                } else if (confirmed_classes.includes(grandma_classification)) {
+                  confirmed_or_rejected = "confirmed";
+                } else {
+                  confirmed_or_rejected = "not_confirmed";
+                }
+              }
+
+            }
+
           }
 
           const imgClasses = source.thumbnails[thumbnailIdxs[source.obj_id]]
@@ -229,7 +250,7 @@ const RecentSourcesList = ({ sources, styles }) => {
                         </Link>
                         <br/>
                         {confirmed_or_rejected !== null && (
-                        <Chip className={styles[confirmed_or_rejected]} size="small" label={classification} key={classification}/>
+                        <Chip className={styles[confirmed_or_rejected]} size="small" label={grandma_classification} key={grandma_classification}/>
                         )}
                       </span>
                       <span>
