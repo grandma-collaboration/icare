@@ -182,7 +182,7 @@ app:
           icon: LocalCafe
           url: /runs
 
-        - name: GW/GRB Events
+        - name: GW/GRB/IceCube Events
           icon: SettingsInputAntenna
           url: /gcn_events
 
