@@ -179,7 +179,7 @@ const RecentGcnEvents = ({ classes }) => {
       <div className={classes.widgetPaperDiv}>
         <div className={styles.header}>
           <Typography variant="h6" display="inline">
-            GW/GRB Events
+            GW/GRB/IceCube Events
           </Typography>
           <DragHandleIcon className={`${classes.widgetIcon} dragHandle`} />
           <div className={classes.widgetIcon}>
