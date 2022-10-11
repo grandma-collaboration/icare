@@ -2,7 +2,7 @@
   - 1
   - 2
   hierarchy:
-    class: Grandma Campaign Source Status
+    class: Grandma Campaign Source Classification
     subclasses:
     - class: Kilonova
     - class: Not Kilonova
@@ -10,6 +10,20 @@
     - class: Not GRB
     - class: GW Counterpart
     - class: Not GW Counterpart
-    - class: No Status Yet
-  name: Grandma Campaign Source Status
-  version: '1.1'
+    - class: GW Candidate
+    - class: Not GW Candidate
+    - class: Supernova
+    - class: Not Supernova
+    - class: I-care
+  name: Grandma Campaign Source Classification
+  version: '1.2'
+- group_ids:
+  - 1
+  - 2
+  hierarchy:
+    class: Grandma Campaign Source Observation
+    subclasses:
+    - class: GO GRANDMA
+    - class: STOP GRANDMA
+  name: Grandma Campaign Source Observation
+  version: '1.0'
