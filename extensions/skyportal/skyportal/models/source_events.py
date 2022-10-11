@@ -90,4 +90,3 @@ def classification_before_insert(mapper, connection, target):
             session.commit()
     except Exception as e:
         log(f"Could not remove previous classifications: {e}")
-        
