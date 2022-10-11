@@ -9,9 +9,9 @@ import { useDispatch, useSelector } from "react-redux";
 import * as sourcestatus from "../ducks/sourcestatus";
 import { fetchRecentSources } from "..//ducks/recentSources";
 
-const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart']
-const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart']
-const not_defined = "No Status Yet";
+const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
+const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'GW Candidate', 'Not Supernova']
+const not_defined = "I-care";
 
 
 const SourceStatus = ({ source }) => {
@@ -20,18 +20,18 @@ const SourceStatus = ({ source }) => {
 
 
     const { taxonomyList } = useSelector((state) => state.taxonomies);
-    // find the grandma taxonomy, called "Grandma Campaign Source Status"
+    // find the grandma taxonomy, called "Grandma Campaign Source Classification"
 
-    const changeSourceStatus = (status) => {
+    const changeSourceClassificationStatus = (status) => {
         console.log(status)
-        const grandma_taxonomy = taxonomyList.filter((t) => t.name === "Grandma Campaign Source Status")[0];
+        const source_status_taxonomy = taxonomyList.filter((t) => t.name === "Grandma Campaign Source Classification")[0];
 
-        if (grandma_taxonomy) {
+        if (source_status_taxonomy) {
 
             dispatch(sourcestatus.updateStatus({
                 obj_id: source.obj_id,
                 classification: status,
-                taxonomy_id: grandma_taxonomy?.id,
+                taxonomy_id: source_status_taxonomy?.id,
                 probability: 1.0
             })).then((response) => {
                 if (response.status === "success") {
@@ -47,6 +47,33 @@ const SourceStatus = ({ source }) => {
         }
     }
 
+    const changeSourceObsStatus = (status) => {
+        console.log(status)
+        const source_obs_taxonomy = taxonomyList?.filter((t) => t.name === "Grandma Campaign Source Observation")[0];
+
+        if (source_obs_taxonomy) {
+
+            dispatch(sourcestatus.updateStatus({
+                obj_id: source.obj_id,
+                classification: status,
+                taxonomy_id: source_obs_taxonomy?.id,
+                probability: 1.0
+            })).then((response) => {
+                if (response.status === "success") {
+                    dispatch(fetchRecentSources());
+                    setOpen(false)
+                }
+                else {
+                    dispatch(showNotification(`Failed to update source status: ${response.message}`, "error"));
+                }
+            });
+        } else {
+            dispatch(showNotification("Failed to update source status: no grandma taxonomy found", "error"));
+        }
+    }
+
+
+
     return (
         <div>
             <Button
@@ -58,55 +85,84 @@ const SourceStatus = ({ source }) => {
             </Button>
             <Dialog open={open}>
                 <DialogContent>
-                    <h3>
-                        Status of {source?.obj_id}
-                    </h3>
-                    <div style={ {display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridGap: '1rem'} }>
+                <div style={ {display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '1rem'} }>
+                    <div>
+                        <h3>
+                            Classification Status of {source?.obj_id}
+                        </h3>
+                        <div style={ {display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridGap: '1rem'} }>
 
-                        {confirmed_classes.map((c) => (
+                            {confirmed_classes.map((c) => (
+                                <Button
+                                    key={c}
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => {
+                                        changeSourceClassificationStatus(c);
+                                    }}
+                                >
+                                    {c}
+                                </Button>
+                            ))}
+                            {rejected_classes.map((c) => (
+                                <Button
+                                    key={c}
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => {
+                                        changeSourceClassificationStatus(c);
+                                    }}
+                                >
+                                    {c}
+                                </Button>
+                            ))}
                             <Button
-                                key={c}
-                                variant="outlined"
-                                size="small"
-                                onClick={() => {
-                                    changeSourceStatus(c);
-                                }}
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                                changeSourceClassificationStatus(not_defined);
+                            }}
                             >
-                                {c}
+                                {not_defined}
                             </Button>
-                        ))}
-                        {rejected_classes.map((c) => (
-                            <Button
-                                key={c}
-                                variant="outlined"
-                                size="small"
-                                onClick={() => {
-                                    changeSourceStatus(c);
-                                }}
-                            >
-                                {c}
-                            </Button>
-                        ))}
+                        </div>
+                        <br/>
                         <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => {
-                            changeSourceStatus(not_defined);
-                        }}
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                                setOpen(false);
+                            }}
                         >
-                            {not_defined}
+                            Close
                         </Button>
                     </div>
-                    <br/>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {
-                            setOpen(false);
-                        }}
-                    >
-                        Close
-                    </Button>
+                    <div>
+                        <h3>
+                            Source Observation Status
+                        </h3>
+                        <div style={ {display: 'grid', gridTemplateColumns: '1fr', gridGap: '1rem'} }>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() => {
+                                    changeSourceObsStatus("GO GRANDMA");
+                                }}
+                            >
+                                GO GRANDMA
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() => {
+                                    changeSourceObsStatus("STOP GRANDMA");
+                                }}
+                            >
+                                STOP GRANDMA
+                            </Button>
+                        </div>
+                    </div>
+                </div>
                 </DialogContent>
             </Dialog>
         </div>

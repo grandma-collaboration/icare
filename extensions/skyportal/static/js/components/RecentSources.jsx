@@ -121,6 +121,12 @@ export const useSourceListStyles = makeStyles((theme) => ({
     // grey background
     background: "#e0e0e0!important",
   },
+  go: {
+    background: "#03c04a!important",
+  },
+  stop: {
+    background: "#ff0000!important",
+  }
 }));
 
 const defaultPrefs = {
@@ -131,7 +137,8 @@ const RecentSourcesList = ({ sources, styles }) => {
   const [thumbnailIdxs, setThumbnailIdxs] = useState({});
 
   const { taxonomyList } = useSelector((state) => state.taxonomies);
-  const grandma_taxonomy = taxonomyList?.filter((t) => t.name === "Grandma Campaign Source Status")[0];
+  const source_status_taxonomy = taxonomyList?.filter((t) => t.name === "Grandma Campaign Source Classification")[0];
+  const source_obs_taxonomy = taxonomyList?.filter((t) => t.name === "Grandma Campaign Source Observation")[0];
 
   useEffect(() => {
     sources?.forEach((source) => {
@@ -154,16 +161,20 @@ const RecentSourcesList = ({ sources, styles }) => {
     return <div>No recent sources available.</div>;
   }
 
-  const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart']
-  const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart']
+  const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
+  const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'GW Candidate', 'Not Supernova']
+  const not_confirmed_classes = ['I-care']
+  const obs_classes = ['GO GRANDMA', 'STOP GRANDMA']
 
   return (
     <div className={styles.sourceListContainer}>
       <ul className={styles.sourceList}>
         {sources.map((source) => {
           let recentSourceName = `${source.obj_id}`;
-          let grandma_classification = "No Status Yet";
+          let grandma_source_classification = "I-care";
           let confirmed_or_rejected = 'not_confirmed';
+          let grandma_obs_classification = null;
+          let obs_status = null;
           if (source.classifications.length > 0) {
             // Display the most recent non-zero probability class
             const filteredClasses = source.classifications?.filter(
@@ -175,28 +186,37 @@ const RecentSourcesList = ({ sources, styles }) => {
 
             if (sortedClasses.length > 0) {
               const classification = sortedClasses[0].classification;
-              if (!rejected_classes.includes(classification) && !confirmed_classes.includes(classification) && classification !== "No Status Yet") {
+              if (!rejected_classes.includes(classification) && !confirmed_classes.includes(classification) && !not_confirmed_classes.includes(classification) && !obs_classes.includes(classification)) {
                 recentSourceName += ` (${classification})`;
               }
             }
             console.log("source.classifications", source.classifications);
-            console.log("grandma_taxonomy", grandma_taxonomy);
-            if (grandma_taxonomy) {
+            console.log("source_status_taxonomy", source_status_taxonomy);
+            if (source_status_taxonomy) {
 
-              grandma_classification = sortedClasses.filter((c) => c.taxonomy_id === grandma_taxonomy.id)[0]?.classification || "No Status Yet";
-              console.log(grandma_taxonomy);
-              console.log(grandma_classification);
+              grandma_source_classification = sortedClasses.filter((c) => c.taxonomy_id === source_status_taxonomy.id)[0]?.classification || "I-care";
+              console.log(source_status_taxonomy);
+              console.log(grandma_source_classification);
 
-              if (grandma_classification) {
-                if (rejected_classes.includes(grandma_classification)) {
+              if (grandma_source_classification) {
+                if (rejected_classes.includes(grandma_source_classification)) {
                   confirmed_or_rejected = "rejected";
-                } else if (confirmed_classes.includes(grandma_classification)) {
+                } else if (confirmed_classes.includes(grandma_source_classification)) {
                   confirmed_or_rejected = "confirmed";
-                } else {
+                } else if (not_confirmed_classes.includes(grandma_source_classification)) {
                   confirmed_or_rejected = "not_confirmed";
                 }
               }
 
+            }
+
+            if (source_obs_taxonomy) {
+              grandma_obs_classification = sortedClasses.filter((c) => c.taxonomy_id === source_obs_taxonomy.id)[0]?.classification;
+              if (grandma_obs_classification == 'GO GRANDMA') {
+                obs_status = 'go';
+              } else if (grandma_obs_classification == 'STOP GRANDMA') {
+                obs_status = 'stop';
+              }
             }
 
           }
@@ -250,7 +270,10 @@ const RecentSourcesList = ({ sources, styles }) => {
                         </Link>
                         <br/>
                         {confirmed_or_rejected !== null && (
-                        <Chip className={styles[confirmed_or_rejected]} size="small" label={grandma_classification} key={grandma_classification}/>
+                        <Chip className={styles[confirmed_or_rejected]} size="small" label={grandma_source_classification} key={grandma_source_classification}/>
+                        )}
+                        {obs_status !== null && (
+                        <Chip className={styles[obs_status]} size="small" label={grandma_obs_classification} key={grandma_obs_classification}/>
                         )}
                       </span>
                       <span>
