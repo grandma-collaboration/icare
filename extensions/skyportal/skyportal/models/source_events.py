@@ -14,12 +14,10 @@ log = make_log('source_events')
 def source_after_insert(mapper, connection, target):
     # add a classification I-care from the Grandma Campaign Source Classification taxonomy
 
-    log(f"After insert triggered for {str(target.id)}")
 
     @event.listens_for(inspect(target).session, "after_flush", once=True)
     def receive_after_flush(session, context):
         # find the taxonomy
-        log(f"After flush triggered for {str(target.id)}")
         try:
             user = session.scalars(sa.select(User).where(User.id == 1)).first()
             groups = session.scalars(sa.select(Group)).all()
@@ -39,7 +37,6 @@ def source_after_insert(mapper, connection, target):
                     groups=groups,
                 )
                 session.add(classification)
-                log(f"Added classification {classification} to {str(target.id)}")
 
                 # if the name of the source contains 'GRB' or 'GW', add a classification 'GO GRANDMA' from the Grandma Campaign Source Observation taxonomy
                 # do the same if the source name is like 'YYYY-MM-DDTHH-MM-SS.sss' (using regex)
@@ -54,10 +51,9 @@ def source_after_insert(mapper, connection, target):
                         groups=groups,
                     )
                     session.add(classification)
-                    log(f"Added classification {classification} to {str(target.id)}")
 
         except Exception as e:
-            log(f"Could not add classification I-care: {e}")
+            log(f"Could not add classification I-care or GO GRANDMA: {e}")
 
 @sa.event.listens_for(Classification, "before_insert")
 def classification_before_insert(mapper, connection, target):
@@ -65,7 +61,6 @@ def classification_before_insert(mapper, connection, target):
     # remove all previous classifications from the Grandma Campaign Source Classification taxonomy on that source
     log(f"Before insert triggered for {str(target.obj_id)}")
     try:
-        log(str(target))
         with DBSession() as session:
             source_classification_taxonomy = session.scalars(sa.select(Taxonomy).where(Taxonomy.name == "Grandma Campaign Source Classification")).first()
             source_obs_taxonomy = session.scalars(sa.select(Taxonomy).where(Taxonomy.name == "Grandma Campaign Source Observation")).first()
