@@ -107,6 +107,7 @@ const FollowUpAdvocates = ({ classes }) => {
             Follow-up Advocates
           </Typography>
           <DragHandleIcon className={`${classes.widgetIcon} dragHandle`} />
+          {shifts?.length > 0 ? (
           <div>
             {currentShift ? (
               <>
@@ -147,7 +148,6 @@ const FollowUpAdvocates = ({ classes }) => {
               <Typography variant="body2" display="inline">
                 No Current Shift
                 <br />
-                <br />
               </Typography>
             )}
             {nextShift ? (
@@ -171,10 +171,17 @@ const FollowUpAdvocates = ({ classes }) => {
               <Typography variant="body2" display="inline">
                 You have no upcoming shifts
                 <br />
-                <br />
               </Typography>
             )}
           </div>
+          ) : (
+            <div>
+            <Typography variant="body2" display="inline">
+              Fetching shifts...
+              <br />
+            </Typography>
+          </div>
+          )}
         </div>
       </div>
     </Paper>

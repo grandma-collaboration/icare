@@ -163,8 +163,8 @@ const RecentSourcesList = ({ sources, styles }) => {
 
   const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
   const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'GW Candidate', 'Not Supernova']
-  const not_confirmed_classes = ['I-care']
-  const obs_classes = ['GO GRANDMA', 'STOP GRANDMA']
+  const not_confirmed_classes = ["I-care", "Not I-care"]
+  const obs_classes = ['GO GRANDMA', 'STOP GRANDMA', 'GO GRANDMA (HIGH PRIORITY)']
 
   return (
     <div className={styles.sourceListContainer}>
@@ -212,7 +212,7 @@ const RecentSourcesList = ({ sources, styles }) => {
 
             if (source_obs_taxonomy) {
               grandma_obs_classification = sortedClasses.filter((c) => c.taxonomy_id === source_obs_taxonomy.id)[0]?.classification;
-              if (grandma_obs_classification == 'GO GRANDMA') {
+              if (grandma_obs_classification == 'GO GRANDMA' || grandma_obs_classification == 'GO GRANDMA (HIGH PRIORITY)') {
                 obs_status = 'go';
               } else if (grandma_obs_classification == 'STOP GRANDMA') {
                 obs_status = 'stop';

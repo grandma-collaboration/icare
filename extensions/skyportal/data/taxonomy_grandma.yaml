@@ -15,8 +15,9 @@
     - class: Supernova
     - class: Not Supernova
     - class: I-care
+    - class: Not I-care
   name: Grandma Campaign Source Classification
-  version: '1.2'
+  version: '1.3'
 - group_ids:
   - 1
   - 2
@@ -25,5 +26,6 @@
     subclasses:
     - class: GO GRANDMA
     - class: STOP GRANDMA
+    - class: GO GRANDMA (HIGH PRIORITY)
   name: Grandma Campaign Source Observation
-  version: '1.0'
+  version: '1.1'

@@ -11,8 +11,8 @@ import { fetchRecentSources } from "..//ducks/recentSources";
 
 const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
 const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'GW Candidate', 'Not Supernova']
-const not_defined = "I-care";
-
+const not_defined = ["I-care", "Not I-care"]
+const obs_status = ["GO GRANDMA", "STOP GRANDMA", "GO GRANDMA (HIGH PRIORITY)"]
 
 const SourceStatus = ({ source }) => {
     const [open, setOpen] = useState(false);
@@ -116,15 +116,17 @@ const SourceStatus = ({ source }) => {
                                     {c}
                                 </Button>
                             ))}
-                            <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => {
-                                changeSourceClassificationStatus(not_defined);
-                            }}
-                            >
-                                {not_defined}
-                            </Button>
+                            {not_defined.map((c) => (
+                                <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() => {
+                                    changeSourceClassificationStatus(c);
+                                }}
+                                >
+                                    {c}
+                                </Button>
+                            ))}
                         </div>
                         <br/>
                         <Button
@@ -141,26 +143,18 @@ const SourceStatus = ({ source }) => {
                         <h3>
                             Source Observation Status
                         </h3>
-                        <div style={ {display: 'grid', gridTemplateColumns: '1fr', gridGap: '1rem'} }>
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                onClick={() => {
-                                    changeSourceObsStatus("GO GRANDMA");
-                                }}
-                            >
-                                GO GRANDMA
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                onClick={() => {
-                                    changeSourceObsStatus("STOP GRANDMA");
-                                }}
-                            >
-                                STOP GRANDMA
-                            </Button>
-                        </div>
+                        {obs_status.map((c) => (
+                                <Button
+                                    key={c}
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => {
+                                        changeSourceObsStatus(c);
+                                    }}
+                                >
+                                    {c}
+                                </Button>
+                            ))}
                     </div>
                 </div>
                 </DialogContent>
