@@ -34,16 +34,12 @@ def apply_config():
 
         # replace keys of skyportal_config with values of icare_config
         for key in icare_config:
-            if key in skyportal_config:
+            if key in skyportal_config and isinstance(icare_config[key], dict):
                 for subkey in icare_config[key]:
                     skyportal_config[key][subkey] = icare_config[key][subkey]
             else:
                 skyportal_config[key] = icare_config[key]
 
-            # # if key is a list, replace values
-            # else:
-            # skyportal_config[key] = icare_config[key]
-        # write config.yaml to skyportal-fink-client
         with open("patched_skyportal/config.yaml.defaults", "w") as stream:
             try:
                 yaml.dump(skyportal_config, stream, Dumper=MyDumper, sort_keys=False)
