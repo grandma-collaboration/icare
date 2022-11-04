@@ -162,7 +162,7 @@ const RecentSourcesList = ({ sources, styles }) => {
   }
 
   const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
-  const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'GW Candidate', 'Not Supernova']
+  const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
   const not_confirmed_classes = ["I-care", "Not I-care"]
   const obs_classes = ['GO GRANDMA', 'STOP GRANDMA', 'GO GRANDMA (HIGH PRIORITY)']
 
