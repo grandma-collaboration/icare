@@ -111,6 +111,8 @@ app:
       component: ObservingRunPage
     - path: "/allocations"
       component: AllocationPage
+    - path: "/allocation/:id"
+      component: AllocationSummary
     - path: "/observations"
       component: ObservationPage
     - path: "/galaxies"
