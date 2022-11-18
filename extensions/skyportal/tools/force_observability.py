@@ -7,7 +7,6 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--user_ids', help='Comma-separated list of user IDs to change notification preferences for. Or "*" to change all users.')
 parser.add_argument('--list', action='store_true', help='List all users and their notification preferences')
 parser.add_argument('--prettyprint', action='store_true', help='Do not list notification preferences when using --list', default=False)
-parser.add_argument('--only_missing_email', action='store_true', help='Only list users with missing email addresses', default=False)
 
 if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
@@ -20,6 +19,7 @@ import sqlalchemy as sa  # noqa: E402
 from baselayer.app.env import load_env  # noqa: E402
 from baselayer.app.models import init_db, User, DBSession  # noqa: E402
 from baselayer.app.config import recursive_update
+from skyportal.models import Telescope, DBSession as DBSessionSP  # noqa: E402
 
 env, cfg = load_env()
 init_db(**cfg['database'])
@@ -31,43 +31,23 @@ RED = '\033[91m'
 YELLOW = '\033[93m'
 
 preferences = {
-    "notifications": {
-				"sources": {
-					"email": {
-						"active": True
-					},
-					"active": True,
-					"classifications": [
-						"Kilonova Candidate",
-                        "GO GRANDMA",
-                        "GO GRANDMA (HIGH PRIORITY)",
-                        "STOP GRANDMA",
-					]
-				},
-				"gcn_events": {
-					"email": {
-						"active": True
-					},
-					"active": True,
-					"gcn_tags": [],
-					"gcn_notice_types": [
-						"SWIFT_BAT_GRB_POS_ACK",
-					]
-				}
-			}
+    "observabilityTelescopes": []
 }
 
 for k, v in preferences.items():
 	if isinstance(v, dict):
 		preferences[k] = {key: val for key, val in v.items() if val != ""}
 
-def set_user_notification_preference(user_ids=None):
+def set_user_observability_preference(user_ids=None):
+	telescope_ids = get_telescope_list(id_only=True)
+	preferences['observabilityTelescopes'] = telescope_ids
 	with DBSession() as session:
 		if user_ids == '*':
 			users = session.scalars(sa.select(User)).all()
 		else:
 			user_ids = [int(user_id) for user_id in user_ids.split(',')]
 			users = session.scalars(sa.select(User).where(User.id.in_(user_ids))).all()
+
 		for user in users:
 			user_prefs = deepcopy(user.preferences)
 			if not user_prefs:
@@ -78,16 +58,20 @@ def set_user_notification_preference(user_ids=None):
 
 		session.commit()
 
-def get_users(only_missing_email=False):
+def get_users():
 	with DBSession() as session:
-		if only_missing_email:
-			users = session.scalars(sa.select(User).where(User.contact_email == None)).all()
-		else:
-			users = session.scalars(sa.select(User)).all()
+		users = session.scalars(sa.select(User)).all()
 	return users
 
-def list_user_notifications_preferences(prettyprint=False, only_missing_email=False):
-	users = get_users(only_missing_email=only_missing_email)
+def get_telescope_list(id_only=False):
+	with DBSession() as session:
+		telescopes = session.scalars(sa.select(Telescope)).all()
+		if id_only:
+			telescopes =  [int(t.id) for t in telescopes]
+		return telescopes
+
+def list_user_observability_preferences(prettyprint=False):
+	users = get_users()
 	if len(users) == 0:
 		print('\nNo users in database')
 	else:
@@ -98,16 +82,15 @@ def list_user_notifications_preferences(prettyprint=False, only_missing_email=Fa
 		for i, user in enumerate(users):
 			if hasattr(user, 'preferences'):
 				if user.preferences is not None:
-					notifications_prefs = user.preferences['notifications'] if "notifications" in user.preferences else None
+					observability_prefs = user.preferences['observabilityTelescopes'] if "observabilityTelescopes" in user.preferences else None
 				else:
-					notifications_prefs = None
+					observability_prefs = None
 			else:
-				notifications_prefs = None
-			missing_email_str = f" {RED}(no email){END}" if user.contact_email is None else " "
-			print(f'\nid:{BOLD}{user.id}. {YELLOW}{user.username}{END}{missing_email_str} has the following preferences:\n')
+				observability_prefs = None
+			print(f'\nid:{BOLD}{user.id}. {YELLOW}{user.username}{END} has the following preferences:\n')
 			# pretty print user preferences
-			if prettyprint and notifications_prefs:
-				for k, v in notifications_prefs.items():
+			if prettyprint:
+				for k, v in observability_prefs.items():
 					if isinstance(v, dict):
 						print(f'{k}:')
 						for k2, v2 in v.items():
@@ -119,15 +102,15 @@ def list_user_notifications_preferences(prettyprint=False, only_missing_email=Fa
 								print(f'  {k2}: {v2}')
 					else:
 						print(f'{k}: {v}')
-			elif notifications_prefs:
-				print(notifications_prefs)
+			else:
+				print(observability_prefs)
 
 def main():
 	if args.list or args.user_ids:
 		if args.list:
-			list_user_notifications_preferences(prettyprint=args.prettyprint, only_missing_email=args.only_missing_email)
+			list_user_observability_preferences(prettyprint=args.prettyprint)
 		if args.user_ids:
-			set_user_notification_preference(user_ids=args.user_ids)
+			set_user_observability_preference(user_ids=args.user_ids)
 	else:
 		print(
 			f'\n{BOLD}{RED}No arguments given;{END} printing {BOLD}{GREEN}help{END}:\n'
