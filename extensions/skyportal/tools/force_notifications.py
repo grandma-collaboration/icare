@@ -38,7 +38,7 @@ preferences = {
 					},
 					"active": True,
 					"classifications": [
-						"Kilonova Candidate",
+						"Kilonova candidate",
                         "GO GRANDMA",
                         "GO GRANDMA (HIGH PRIORITY)",
                         "STOP GRANDMA",
