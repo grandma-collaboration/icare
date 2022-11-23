@@ -4,7 +4,8 @@ from .classification import Classification
 from .taxonomy import Taxonomy
 from .obj import Obj
 from baselayer.log import make_log
-from baselayer.app.models import DBSession, User
+from skyportal.models import DBSession
+from baselayer.app.models import User
 from .group import Group
 import re
 
@@ -55,33 +56,35 @@ def source_after_insert(mapper, connection, target):
         except Exception as e:
             log(f"Could not add classification I-care or GO GRANDMA: {e}")
 
-@sa.event.listens_for(Classification, "before_insert")
+@sa.event.listens_for(Classification, "after_insert")
 def classification_before_insert(mapper, connection, target):
     # if a source gets a classification from the Grandma Campaign Source Classification taxonomy,
     # remove all previous classifications from the Grandma Campaign Source Classification taxonomy on that source
-    log(f"Before insert triggered for {str(target.obj_id)}")
-    try:
-        with DBSession() as session:
-            source_classification_taxonomy = session.scalars(sa.select(Taxonomy).where(Taxonomy.name == "Grandma Campaign Source Classification")).first()
-            source_obs_taxonomy = session.scalars(sa.select(Taxonomy).where(Taxonomy.name == "Grandma Campaign Source Observation")).first()
-            if source_classification_taxonomy is None or source_obs_taxonomy is None:
-                log(f"Could not find taxonomy Grandma Campaign Source Classification or Grandma Campaign Observation Status")
-                return
-            else:
-                if target.taxonomy_id == source_classification_taxonomy.id:
-                    stmt = sa.select(Classification).where(
-                        Classification.obj_id == target.obj_id
-                    ).where(Classification.taxonomy_id == source_classification_taxonomy.id)
-                    classifications = session.scalars(stmt).all()
-                    for classification in classifications:
-                        session.delete(classification)
-                elif target.taxonomy_id == source_obs_taxonomy.id:
-                    stmt = sa.select(Classification).where(
-                        Classification.obj_id == target.obj_id
-                    ).where(Classification.taxonomy_id == source_obs_taxonomy.id)
-                    classifications = session.scalars(stmt).all()
-                    for classification in classifications:
-                        session.delete(classification)
-            session.commit()
-    except Exception as e:
-        log(f"Could not remove previous classifications: {e}")
+
+    @event.listens_for(inspect(target).session, "after_flush", once=True)
+    def receive_after_flush(session, context):
+        try:
+            with DBSession() as secondSession:
+                source_classification_taxonomy = secondSession.scalars(sa.select(Taxonomy).where(Taxonomy.name == "Grandma Campaign Source Classification")).first()
+                source_obs_taxonomy = secondSession.scalars(sa.select(Taxonomy).where(Taxonomy.name == "Grandma Campaign Source Observation")).first()
+                if source_classification_taxonomy is None or source_obs_taxonomy is None:
+                    log(f"Could not find taxonomy Grandma Campaign Source Classification or Grandma Campaign Observation Status")
+                    return
+                else:
+                    if target.taxonomy_id == source_classification_taxonomy.id:
+                        stmt = sa.select(Classification).where(
+                            Classification.obj_id == target.obj_id
+                        ).where(Classification.taxonomy_id == source_classification_taxonomy.id)
+                        classifications = secondSession.scalars(stmt).all()
+                        for classification in classifications:
+                            secondSession.delete(classification)
+                    elif target.taxonomy_id == source_obs_taxonomy.id:
+                        stmt = sa.select(Classification).where(
+                            Classification.obj_id == target.obj_id
+                        ).where(Classification.taxonomy_id == source_obs_taxonomy.id)
+                        classifications = secondSession.scalars(stmt).all()
+                        for classification in classifications:
+                            secondSession.delete(classification)
+                secondSession.commit()
+        except Exception as e:
+            log(f"Could not remove previous classifications: {e}")
