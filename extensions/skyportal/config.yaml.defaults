@@ -451,7 +451,7 @@ app:
         md: [5, 0, 5, 3]
         sm: [0, 2, 3, 3]
         xs: [0, 3, 4, 3]
-    
+
     FollowUpAdvocates:
       resizeable: true
       minW: 2
