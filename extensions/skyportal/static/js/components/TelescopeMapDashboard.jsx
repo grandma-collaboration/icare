@@ -67,7 +67,7 @@ const TelescopeMapDashboard = () => {
       </div>
     </div>
   );
-  
+
   const TelescopeToolTip = () => (
     <Tooltip
       title={Title()}
