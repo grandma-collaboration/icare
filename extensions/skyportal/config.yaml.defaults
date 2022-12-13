@@ -151,6 +151,8 @@ app:
       component: ShiftNoId
     - path: "/shifts/:id"
       component: ShiftWithId
+    - path: "/taxonomies"
+      component: TaxonomyPage
 
   sidebar:
     # See https://material-ui.com/components/material-icons/
@@ -233,6 +235,10 @@ app:
         - name: Analysis Services
           icon: SentimentSatisfied
           url: /services
+
+        - name: Taxonomies
+          icon: WallpaperOutlined
+          url: /taxonomies
 
     - name: Admin
       permissions: ["Manage users", "System admin"]
