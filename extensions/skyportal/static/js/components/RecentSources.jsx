@@ -190,13 +190,9 @@ const RecentSourcesList = ({ sources, styles }) => {
                 recentSourceName += ` (${classification})`;
               }
             }
-            console.log("source.classifications", source.classifications);
-            console.log("source_status_taxonomy", source_status_taxonomy);
             if (source_status_taxonomy) {
 
               grandma_source_classification = sortedClasses.filter((c) => c.taxonomy_id === source_status_taxonomy.id)[0]?.classification || "I-care";
-              console.log(source_status_taxonomy);
-              console.log(grandma_source_classification);
 
               if (grandma_source_classification) {
                 if (rejected_classes.includes(grandma_source_classification)) {
