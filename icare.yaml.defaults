@@ -14,19 +14,14 @@ user:
   default_acls: ['Manage shifts']
 
 fink:
-  fink_topics:
+  client_id: <your_client_id>
+  client_secret: <your_client_secret> (optional, can be left empty if you don't have a secret)
+  client_group_id: <your_group_id>
+  topics:
   - fink_kn_candidates_ztf
   - fink_early_kn_candidates_ztf
   - fink_rate_based_kn_candidates_ztf
-  fink_username: null
-  fink_password: null
-  fink_group_id: null
-  fink_servers: null
-  skyportal_group: Fink
-  skyportal_token: null
-  skyportal_url: http://localhost:5000
-  testing: false
-  whitelisted: true
+  servers: <list of servers as a comma separated string>
 
 gcn:
   server: gcn.nasa.gov
