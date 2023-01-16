@@ -147,10 +147,7 @@ class ShiftHandler(BaseHandler):
         """
 
         with self.Session() as session:
-          # measure time to run the whole function
           try:
-            start_time = time.time()
-
             if group_id is not None:
                 queried_shifts = (
                     session.scalars(
@@ -244,10 +241,6 @@ class ShiftHandler(BaseHandler):
                     reverse=True,
                 )
                 shifts.append(shift)
-
-            # measure time to run the whole function
-            end_time = time.time()
-            log(f"Time to run get shifts: {end_time - start_time}")
 
             return self.success(data=shifts)
 

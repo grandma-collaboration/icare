@@ -212,6 +212,7 @@ const SourceDesktop = ({ source }) => {
   const [showPhotometry, setShowPhotometry] = useState(false);
   const [rightPaneVisible, setRightPaneVisible] = useState(true);
   const plotWidth = rightPaneVisible ? 800 : 1200;
+  const image_analysis = useSelector((state) => state.config.image_analysis);
 
   const { instrumentList, instrumentFormParams } = useSelector(
     (state) => state.instruments
@@ -221,6 +222,8 @@ const SourceDesktop = ({ source }) => {
 
   const { observingRunList } = useSelector((state) => state.observingRuns);
   const { taxonomyList } = useSelector((state) => state.taxonomies);
+
+  const currentUser = useSelector((state) => state.profile);
 
   const groups = (useSelector((state) => state.groups.all) || []).filter(
     (g) => !g.single_user_group
@@ -553,6 +556,15 @@ const SourceDesktop = ({ source }) => {
                       <Button secondary>Periodogram Analysis</Button>
                     </Link>
                   )}
+                  {currentUser?.permissions?.includes("Upload data") &&
+                    image_analysis && (
+                      <Link
+                        to={`/source/${source.id}/image_analysis`}
+                        role="link"
+                      >
+                        <Button variant="contained">Image Analysis</Button>
+                      </Link>
+                    )}
                   <AddFinkPhot id={source.id} />
                 </div>
               </Grid>
