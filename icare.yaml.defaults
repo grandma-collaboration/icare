@@ -2,7 +2,8 @@ app:
   title: Icare
 
 server:
-  ssl: False
+  protocol: http # in prod would be https
+  ssl: False # in prod would be True
   auth:
     debug_login: True
     iam_oauth2_key:
