@@ -107,7 +107,7 @@ if __name__ == "__main__":
         if not env_ok:
             print("\nHalting because of unsatisfied dependencies.")
             sys.exit(-1)
-        if "skip_services_check" in sys.argv:
+        if "--skip_services_check" in sys.argv:
             print("\nSkipping services check")
         else:
             if not check_services():
