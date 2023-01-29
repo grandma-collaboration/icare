@@ -107,11 +107,12 @@ if __name__ == "__main__":
         if not env_ok:
             print("\nHalting because of unsatisfied dependencies.")
             sys.exit(-1)
-
-        # check services
-        if not check_services():
-            print("\nHalting because some services are not running")
-            sys.exit(-1)
+        if "skip-services-check" in sys.argv:
+            if not check_services():
+                print("Halting because some services are not running")
+                sys.exit(-1)
+        else:
+            print("\nSkipping services check")
 
     fire.Fire(
         {

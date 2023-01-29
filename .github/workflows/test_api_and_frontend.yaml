@@ -83,10 +83,11 @@ jobs:
 
       - name: Apply Icare patches
         run: |
-          ./icare.sh build
+          ./icare.sh build --skip-services-check
 
       - name: Write SkyPortal configs
         run: |
+          cd skyportal
           cat << EOF > config.yaml
             database:
               database: skyportal
@@ -134,7 +135,7 @@ jobs:
           psql -U skyportal -h localhost -c "GRANT ALL PRIVILEGES ON DATABASE skyportal_test TO skyportal;" skyportal_test
 
           export NPM_CONFIG_LEGACY_PEER_DEPS="true"
-          ./icare.sh build --init
+          ./icare.sh build --init --skip-services-check
 
           pip list --format=columns
           npm ls --depth 0 || true
@@ -160,7 +161,7 @@ jobs:
 
       - name: Refresh SkyPortal dependencies for tested version
         run: |
-          cd skyportal
+          cd patched_skyportal
           export PYTHONPATH=$PYTHONPATH:$(pwd)
           export NPM_CONFIG_LEGACY_PEER_DEPS="true"
           make dependencies
@@ -168,26 +169,26 @@ jobs:
       - name: Run front-end tests part 1
         if: ${{ matrix.test_subset == 'frontend_pt1' }}
         run: |
-          cd skyportal
+          cd patched_skyportal
           PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/frontend/sources_and_followup_etc'
 
       - name: Run front-end tests part 2
         if: ${{ matrix.test_subset == 'frontend_pt2' }}
         run: |
-          cd skyportal
+          cd patched_skyportal
           PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless '--ignore=skyportal/tests/frontend/sources_and_followup_etc skyportal/tests/frontend'
 
       - name: Run API & utils tests
         if: ${{ matrix.test_subset == 'api_and_utils' }}
         run: |
-          cd skyportal
+          cd patched_skyportal
           PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/api skyportal/tests/tools skyportal/tests/utils skyportal/tests/rate_limiting'
 
       - name: Run flaky tests
         if: ${{ matrix.test_subset == 'flaky' }}
         continue-on-error: true
         run: |
-          cd skyportal
+          cd patched_skyportal
           PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/flaky'
 
       - name: Upload logs
@@ -195,18 +196,18 @@ jobs:
         if: ${{ always() }}
         with:
           name: logs
-          path: skyportal/log
+          path: patched_skyportal/log
 
       - name: Upload test post-mortem reports
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
           name: test-results
-          path: skyportal/test-results
+          path: patched_skyportal/test-results
 
       - name: Upload generated plots
         uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
           name: generated-plots
-          path: skyportal/skyportal/tests/data/*_expected.png
+          path: patched_skyportal/skyportal/tests/data/*_expected.png
