@@ -19,6 +19,7 @@ def build(
     do_update: bool = False,
     clear: bool = False,
     update_prod: bool = False,
+    skip_services_check: bool = False,  # not used here
 ):
     """Build Icare
     :param init: Initialize Icare

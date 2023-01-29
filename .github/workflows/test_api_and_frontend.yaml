@@ -83,7 +83,7 @@ jobs:
 
       - name: Apply Icare patches
         run: |
-          ./icare.sh build --skip-services-check
+          ./icare.sh build --skip_services_check
 
       - name: Write SkyPortal configs
         run: |
@@ -135,7 +135,7 @@ jobs:
           psql -U skyportal -h localhost -c "GRANT ALL PRIVILEGES ON DATABASE skyportal_test TO skyportal;" skyportal_test
 
           export NPM_CONFIG_LEGACY_PEER_DEPS="true"
-          ./icare.sh build --init --skip-services-check
+          ./icare.sh build --init --skip_services_check
 
           pip list --format=columns
           npm ls --depth 0 || true
