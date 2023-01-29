@@ -1,8 +1,8 @@
-astropy
-astropy-healpix
-confluent-kafka
-fink-filters==2.2
+fink-client==4.1
+fink-filters==3.7
+fink-science==3.13.3
 fink-utils==0.4.0
-fink-client==2.11
+fastavro==1.6.0
 pyspark==3.2.1
-pyarrow==7.0.0
+astroscrappy
+stdpipe==0.1

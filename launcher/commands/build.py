@@ -19,6 +19,7 @@ def build(
     do_update: bool = False,
     clear: bool = False,
     update_prod: bool = False,
+    skip_services_check: bool = False,  # not used here
 ):
     """Build Icare
     :param init: Initialize Icare
@@ -60,7 +61,7 @@ def build(
         cmd = subprocess.Popen(["rm", "-rf", "patched_skyportal/.git"])
     else:
         print(
-            "No changes detected, not copying skyportal to patched_skyportal, but still patching it"
+            "\nNo changes detected, not copying skyportal to patched_skyportal, but still patching it"
         )
 
     patch_skyportal("extensions/skyportal/", "patched_skyportal/")

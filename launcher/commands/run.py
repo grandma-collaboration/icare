@@ -13,6 +13,7 @@ def run(
     test: bool = False,
     clear: bool = False,
     update_prod: bool = False,
+    skip_services_check: bool = False,  # not used here
 ):
     """🚀 Launch Icare"""
     skyportal_start = True
