@@ -50,3 +50,9 @@ needs-migration?:
 # Add 'workflows' label to any changes to GA workflows (.github folder)
 workflows:
   - .github/**/*
+
+skyportal_updates:
+  - skyportal/**/*
+
+skyportal_fink_client_updates:
+  - extensions/skyportal/services/fink/skyportal-fink-client/**/*
