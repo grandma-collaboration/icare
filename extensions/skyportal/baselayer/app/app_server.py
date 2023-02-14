@@ -33,6 +33,7 @@ settings = {
     "SOCIAL_AUTH_IAM_OAUTH2_KEY": cfg["server.auth.iam_oauth2_key"],
     "SOCIAL_AUTH_IAM_OAUTH2_SECRET": cfg["server.auth.iam_oauth2_secret"],
     "SOCIAL_AUTH_REDIRECT_IS_HTTPS": cfg["server.ssl"],
+    "SOCIAL_AUTH_URLOPEN_TIMEOUT": cfg["server.auth.iam_oauth2_timeout"],
 }
 
 if cfg["server.auth.debug_login"]:
