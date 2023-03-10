@@ -14,11 +14,14 @@ def diff(
 
     cmd = subprocess.Popen(["git", "fetch"], stdout=subprocess.PIPE, cwd="skyportal")
     output = cmd.wait()
+    # run a git diff ignoring fits or fit files
     cmd = subprocess.Popen(
-        ["git", "diff", "origin/main"], stdout=subprocess.PIPE, cwd="skyportal"
+        ["git", "diff", "origin/main", "--", ":!*.fits", ":!*.fit"],
+        stdout=subprocess.PIPE,
+        cwd="skyportal",
     )
-    # get the ouput of the command
     output = cmd.stdout.read()
+    # from the output, remove large files that cannot be decoded, which would fail the utf-8 decoding
     output = output.decode("utf-8")
     output = output.split("\n")
     output = [x for x in output if x != ""]
