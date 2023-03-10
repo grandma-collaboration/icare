@@ -237,6 +237,7 @@ class ShiftHandler(BaseHandler):
                                 **c.author.to_dict(),
                                 "gravatar_url": c.author.gravatar_url,
                             },
+                            "resourceType": "shift",
                         }
                         for c in comments
                     ),

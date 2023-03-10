@@ -1,5 +1,6 @@
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 
 from launcher.commands import (
@@ -113,6 +114,20 @@ if __name__ == "__main__":
             if not check_services():
                 print("Halting because some services are not running")
                 sys.exit(-1)
+
+    # if the patched_skyportal folder exists, we need to remove the node_modules and package-lock.json
+    # files to avoid conflicts with the skyportal package
+    if Path("patched_skyportal").exists():
+        if Path("patched_skyportal", "node_modules").exists():
+            shutil.rmtree("patched_skyportal", "node_modules")
+        if Path("patched_skyportal", "package-lock.json").exists():
+            Path("patched_skyportal", "package-lock.json").unlink()
+    
+    #if previous_skyportal directory exists, we need to remove the entire directory and subdirectories
+    if Path("previous_skyportal").exists():
+        shutil.rmtree("previous_skyportal")
+        
+
 
     fire.Fire(
         {
