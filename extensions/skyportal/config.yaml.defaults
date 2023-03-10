@@ -170,6 +170,10 @@ app:
         #  icon: ElderlyWoman
         #  url: /dashboardGrandma
 
+        - name: GW/GRB/Neutrino
+          icon: SettingsInputAntenna
+          url: /gcn_events
+
         - name: Sources
           icon: Storage
           url: /sources
@@ -182,32 +186,14 @@ app:
           icon: Star
           url: /favorites
 
-        - name: Groups
-          icon: GroupWork
-          url: /groups
-
-        - name: Observing Runs
-          icon: LocalCafe
-          url: /runs
-
-        - name: GW/GRB IceCube Events
-          icon: SettingsInputAntenna
-          url: /gcn_events
-
-        - name: Followup Requests
-          icon: WorkOutlined
-          url: /followup_requests
-
         - name: Shifts
           icon: SubwayRounded
           url: /shifts
 
-        - name: About
-          icon: Info
-          url: /about
+        - name: Groups
+          icon: GroupWork
+          url: /groups
 
-    - name: Other
-      subitems:
         - name: Telescopes
           icon: MyLocation
           url: /telescopes
@@ -216,6 +202,16 @@ app:
           icon: Wifi
           url: /instruments
 
+        - name: Followup Requests
+          icon: WorkOutlined
+          url: /followup_requests
+
+        - name: Observing Runs
+          icon: LocalCafe
+          url: /runs
+
+    - name: Other
+      subitems:
         - name: MMADetectors
           icon: Abc
           url: /mmadetectors
@@ -251,6 +247,10 @@ app:
         - name: Taxonomies
           icon: WallpaperOutlined
           url: /taxonomies
+
+        - name: About
+          icon: Info
+          url: /about
 
     - name: Admin
       permissions: ["Manage users", "System admin"]
