@@ -122,12 +122,10 @@ if __name__ == "__main__":
             shutil.rmtree("patched_skyportal", "node_modules")
         if Path("patched_skyportal", "package-lock.json").exists():
             Path("patched_skyportal", "package-lock.json").unlink()
-    
-    #if previous_skyportal directory exists, we need to remove the entire directory and subdirectories
+
+    # if previous_skyportal directory exists, we need to remove the entire directory and subdirectories
     if Path("previous_skyportal").exists():
         shutil.rmtree("previous_skyportal")
-        
-
 
     fire.Fire(
         {
