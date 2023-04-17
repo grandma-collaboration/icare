@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
@@ -11,13 +11,16 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import relativeTime from "dayjs/plugin/relativeTime";
 
+import * as shiftActions from "../ducks/shift";
+
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
 const FollowUpAdvocates = ({ classes }) => {
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.profile);
   const shifts = useSelector((state) => state.shifts.shiftList);
-  const [currentShift, setCurrentShift] = useState(null);
+  const currentShift = useSelector((state) => state.shift.currentShift);
   const [nextShift, setNextShift] = useState(null);
   const [countdown, setCountdown] = useState(null);
 
@@ -28,11 +31,18 @@ const FollowUpAdvocates = ({ classes }) => {
     return [days, hours, minutes];
   };
 
+  function setCurrentShift(event) {
+    dispatch(shiftActions.fetchShift(event?.id));
+    dispatch({ type: "skyportal/CURRENT_SHIFT_SELECTED_USERS", data: [] });
+  }
+
   const getCurrentShift = () => {
-    const today = new Date();
+    const now = dayjs().utc();
+    console.log(now)
 
     shifts?.forEach((shift) => {
-      if (shift.start_date < today && shift.end_date > today) {
+      console.log(shift.start_date, shift.end_date)
+      if (shift.start_date < now && shift.end_date > now) {
         setCurrentShift(shift);
       }
     });
@@ -44,9 +54,7 @@ const FollowUpAdvocates = ({ classes }) => {
 
     shifts?.forEach((shift) => {
       if (
-        shift.shift_users.filter(
-          (shift_user) => shift_user.id === currentUser.id
-        ).length > 0 &&
+        shift.shift_users_ids.includes(currentUser.id) &&
         shift.start_date > today
       ) {
         nextShifts.push(shift);
@@ -56,9 +64,7 @@ const FollowUpAdvocates = ({ classes }) => {
   };
 
   useEffect(() => {
-    if (!currentShift) {
-      getCurrentShift();
-    }
+    getCurrentShift();
 
     if (!nextShift) {
       getNextShift();
@@ -81,12 +87,13 @@ const FollowUpAdvocates = ({ classes }) => {
   }, [nextShift, shifts]);
 
   const weeklyCoordinator = (shift) => {
-    const shift_users = shift.shift_users.filter(
+    const shift_users = shift?.shift_users?.length > 0 ? shift.shift_users.filter(
       (shift_user) => shift_user.admin === true
-    );
+    ) : [];
+
     // can modify this to deal with multiple coordinators
-    const weekly_Coordinator = `${shift_users[0].first_name}
-      ${shift_users[0].last_name}`;
+    const weekly_Coordinator = shift_users?.length > 0 ? `${shift_users[0].first_name}
+      ${shift_users[0].last_name}` : "None";
     return weekly_Coordinator;
   };
 
@@ -134,9 +141,11 @@ const FollowUpAdvocates = ({ classes }) => {
                 UTC
                 <br />
                 Current Shifters:{" "}
-                {currentShift.shift_users?.map(
-                  (shift_user) =>
-                    `${shift_user.first_name} ${shift_user.last_name}, `
+                {currentShift?.shift_users?.length > 0 && (
+                    currentShift?.shift_users?.map(
+                    (shift_user) =>
+                      `${shift_user.first_name} ${shift_user.last_name}, `
+                    )
                 )}
                 <br />
                 Weekly Coordinator: {weeklyCoordinator(currentShift)}

@@ -1,5 +1,8 @@
 app:
   title: Icare
+  observation_plan:
+    default_filters: ['ztfg', 'ztfr', 'ztfi']
+    use_skyportal_fields: False
 
 server:
   protocol: http # in prod would be https

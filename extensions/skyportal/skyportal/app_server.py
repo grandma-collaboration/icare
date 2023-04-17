@@ -1,4 +1,5 @@
 import tornado.web
+import shutil
 
 from baselayer.app.app_server import MainPageHandler
 from baselayer.app.model_util import create_tables
@@ -61,8 +62,10 @@ from skyportal.handlers.api import (
     MMADetectorSpectrumHandler,
     HealpixUpdateHandler,
     LocalizationHandler,
+    LocalizationNoticeHandler,
     LocalizationTagsHandler,
     LocalizationDownloadHandler,
+    LocalizationCrossmatchHandler,
     LocalizationPropertiesHandler,
     GroupHandler,
     GroupUserHandler,
@@ -115,6 +118,7 @@ from skyportal.handlers.api import (
     RoleHandler,
     UserRoleHandler,
     SharingHandler,
+    SkymapTriggerAPIHandler,
     SourceHandler,
     SourceCopyPhotometryHandler,
     SourceExistsHandler,
@@ -303,7 +307,7 @@ skyportal_handlers = [
     (r'/api/gcn_event(/.*)/tach', GcnTachHandler),
     (r'/api/gcn_event/(.*)/summary(/.*)?', GcnSummaryHandler),
     (r'/api/gcn_event/(.*)/instrument(/.*)?', GcnEventInstrumentFieldHandler),
-    (r'/api/gcn_event/tags', GcnEventTagsHandler),
+    (r'/api/gcn_event/tags(/.*)?', GcnEventTagsHandler),
     (r'/api/gcn_event/properties', GcnEventPropertiesHandler),
     (r'/api/gcn_event(/.*)?', GcnEventHandler),
     (r'/api/sources_in_gcn/(.*)/(.*)', SourcesConfirmedInGCNHandler),
@@ -329,6 +333,8 @@ skyportal_handlers = [
     (r'/api/localization/properties', LocalizationPropertiesHandler),
     (r'/api/localization(/.*)/name(/.*)/download', LocalizationDownloadHandler),
     (r'/api/localization(/.*)/name(/.*)?', LocalizationHandler),
+    (r'/api/localization(/.*)/notice(/.*)?', LocalizationNoticeHandler),
+    (r'/api/localizationcrossmatch', LocalizationCrossmatchHandler),
     (r'/api/groups/public', PublicGroupHandler),
     (r'/api/groups(/[0-9]+)/streams(/[0-9]+)?', GroupStreamHandler),
     (r'/api/groups(/[0-9]+)/users(/.*)?', GroupUserHandler),
@@ -408,6 +414,7 @@ skyportal_handlers = [
     (r'/api/photometry/origins', PhotometryOriginHandler),
     (r'/api/recurring_api(/.*)?', RecurringAPIHandler),
     (r'/api/roles', RoleHandler),
+    (r'/api/skymap_trigger(/[0-9]+)?', SkymapTriggerAPIHandler),
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/copy_photometry', SourceCopyPhotometryHandler),
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/photometry', ObjPhotometryHandler),
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/spectra', ObjSpectraHandler),
@@ -559,6 +566,28 @@ def make_app(cfg, baselayer_handlers, baselayer_settings, process=None, env=None
         print('  in the configuration file!')
         print('!' * 80)
 
+    if 'image_analysis' in cfg:
+        missing_bins = []
+        for exe in ['scamp', 'psfex']:
+            bin = shutil.which(exe)
+            if bin is None:
+                missing_bins.append(exe)
+        if len(missing_bins) > 0:
+            log('!' * 80)
+            log(
+                f"  Can't run image analysis. Missing dependencies: {', '.join(missing_bins)}"
+            )
+            log('!' * 80)
+            return
+        # ignore the flake8 error due to the import being before in this file
+        from skyportal.handlers.api.internal import ImageAnalysisHandler
+        baselayer_handlers = baselayer_handlers + [
+            (
+                r'/api/internal/sources(/[0-9A-Za-z-_\.\+]+)/image_analysis',
+                ImageAnalysisHandler,
+            ),
+        ]
+
     handlers = baselayer_handlers + skyportal_handlers
 
     settings = baselayer_settings
@@ -598,10 +627,20 @@ def make_app(cfg, baselayer_handlers, baselayer_settings, process=None, env=None
     )
 
     app = CustomApplication(handlers, **settings)
+
+    default_engine_args = {'pool_size': 10, 'max_overflow': 15, 'pool_recycle': 3600}
+    database_cfg = cfg['database']
+    if database_cfg.get('engine_args', {}) in [None, '', {}]:
+        database_cfg['engine_args'] = default_engine_args
+    else:
+        database_cfg['engine_args'] = {
+            **default_engine_args,
+            **database_cfg['engine_args'],
+        }
+
     init_db(
-        **cfg['database'],
+        **database_cfg,
         autoflush=False,
-        engine_args={'pool_size': 10, 'max_overflow': 15, 'pool_recycle': 3600},
     )
 
     # If tables are found in the database, new tables will only be added

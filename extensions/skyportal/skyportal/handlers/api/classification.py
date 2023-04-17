@@ -719,7 +719,7 @@ class ObjClassificationQueryHandler(BaseHandler):
                           data:
                             type: array
                             items:
-                              integer
+                              type: integer
                             description: |
                               List of obj IDs with classifications
             400:
