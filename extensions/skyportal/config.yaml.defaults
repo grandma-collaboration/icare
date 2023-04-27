@@ -471,15 +471,15 @@ app:
         sm: [0, 2, 3, 3]
         xs: [0, 3, 4, 3]
 
-    FollowUpAdvocates:
-      resizeable: true
-      minW: 2
-      layouts:
-        xlg: [6, 3, 5, 2]
-        lg: [5, 2, 4, 3]
-        md: [0, 3, 5, 3]
-        sm: [0, 9, 3, 3]
-        xs: [0, 12, 4, 2]
+    # FollowUpAdvocates:
+    #   resizeable: true
+    #   minW: 2
+    #   layouts:
+    #     xlg: [6, 3, 5, 2]
+    #     lg: [5, 2, 4, 3]
+    #     md: [0, 3, 5, 3]
+    #     sm: [0, 9, 3, 3]
+    #     xs: [0, 12, 4, 2]
 
     NewsFeed:
       resizeable: true
