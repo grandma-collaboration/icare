@@ -1,15 +1,11 @@
+import os
 import subprocess
-import time
 from pathlib import Path
 
-import yaml
-
-from launcher.commands.update import update
 from launcher.commands.clear import clear as clear_db
+from launcher.commands.update import update
 from launcher.config import check_config
-from launcher.skyportal import (
-    patch as patch_skyportal,
-)
+from launcher.skyportal import patch as patch_skyportal
 
 
 def build(
@@ -71,6 +67,8 @@ def build(
 
     if init and skyportal_start:
         # run the command make run in skyportal dir
+        env = os.environ.copy()
+        env["NPM_CONFIG_LEGACY_PEER_DEPS"] = "true"
         cmd = subprocess.Popen(["make", "db_init"], cwd="patched_skyportal")
         cmd.wait()
 

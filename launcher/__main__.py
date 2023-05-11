@@ -1,19 +1,10 @@
-from pathlib import Path
-import subprocess
 import shutil
+import subprocess
 import sys
+from pathlib import Path
 
-from launcher.commands import (
-    build,
-    run,
-    update,
-    diff,
-    clear,
-    set_user_role,
-    poll_from_fink,
-    load_grandma_data,
-)
-
+from launcher.commands import (build, clear, diff, load_grandma_data,
+                               poll_from_fink, run, set_user_role, update)
 from tools.check_environment import dependencies_ok
 from tools.status import status
 

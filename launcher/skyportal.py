@@ -1,6 +1,6 @@
-import subprocess
 import json
 from distutils.dir_util import copy_tree
+
 from .commands.apply_config import apply_config
 
 version_operators = ["==", ">=", "<=", ">", "<", "!="]
