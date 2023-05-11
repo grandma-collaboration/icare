@@ -3,8 +3,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-from launcher.commands import (build, clear, diff, load_grandma_data,
-                               poll_from_fink, run, set_user_role, update)
+from launcher.commands import (
+    build,
+    clear,
+    diff,
+    load_grandma_data,
+    poll_from_fink,
+    run,
+    set_user_role,
+    update,
+)
 from tools.check_environment import dependencies_ok
 from tools.status import status
 
