@@ -46,6 +46,8 @@ app:
 
   fink_endpoint: https://fink-portal.org
 
+  mpc_endpoint: https://minorplanetcenter.net
+
   swift:
     protocol: https
     host: www.swift.psu.edu
@@ -68,6 +70,8 @@ app:
   treasuremap_endpoint: http://treasuremap.space
 
   tns_endpoint: https://sandbox.wis-tns.org
+
+  gracedb_endpoint: https://gracedb.ligo.org/api/
 
   # See https://stackoverflow.com/a/35604855 for syntax
   # These are Javascript component routes
@@ -104,8 +108,8 @@ app:
       component: RunSummary
     - path: "/source/:obj_id/analysis/:analysis_id"
       component: SourceAnalysisPage
-    - path: "/manage_data/:id"
-      component: ManageDataForm
+    - path: "/share_data/:id"
+      component: ShareDataForm
     - path: "/filter/:fid"
       component: Filter
     - path: "/runs"
@@ -597,6 +601,8 @@ misc:
 
   allow_nonadmins_delete_objs: False
 
+  bokeh_color_palette: Turbo256
+
 weather:
   # time in seconds to wait before fetching weather for a given telescope
   refresh_time: 3600.0
@@ -831,6 +837,7 @@ colors:
       "BBH": "#333333",
       "GRB": "#f89406",
       "AMON": "#3a87ad",
+      "GO GRANDMA": "#468847",
     }
 
   summary_sources:

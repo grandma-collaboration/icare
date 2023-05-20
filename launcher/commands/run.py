@@ -12,7 +12,7 @@ def run(
     test: bool = False,
     clear: bool = False,
     update_prod: bool = False,
-    production: bool = False,  # not used here
+    production: bool = False,
     skip_services_check: bool = False,  # not used here
 ):
     """🚀 Launch Icare"""
