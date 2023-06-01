@@ -107,6 +107,4 @@ def gcn_event_after_insert(mapper, connection, target):
         except Exception as e:
             log(f"Could not add tag GO GRANDMA: {e}")
             traceback.print_exc()
-            
-
 
