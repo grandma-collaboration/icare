@@ -89,21 +89,3 @@ def classification_before_insert(mapper, connection, target):
                 secondSession.commit()
         except Exception as e:
             log(f"Could not remove previous classifications: {e}")
-
-import traceback
-@sa.event.listens_for(GcnEvent, "after_insert")
-def gcn_event_after_insert(mapper, connection, target):
-    # if a GCN event is added, add a tag 'GO GRANDMA'
-    @event.listens_for(inspect(target).session, "after_flush", once=True)
-    def receive_after_flush(session, context):
-        try:
-            dateobs = target.dateobs
-            tag = GcnTag(
-                sent_by_id = 1,
-                dateobs = dateobs,
-                text = "GO GRANDMA",
-            )
-            session.add(tag)
-        except Exception as e:
-            log(f"Could not add tag GO GRANDMA: {e}")
-            traceback.print_exc()
