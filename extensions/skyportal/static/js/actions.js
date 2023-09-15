@@ -83,7 +83,7 @@ export default function hydrate() {
     dispatch(defaultFollowupRequestsActions.fetchDefaultFollowupRequests());
     dispatch(defaultObservationPlansActions.fetchDefaultObservationPlans());
     dispatch(defaultSurveyEfficienciesActions.fetchDefaultSurveyEfficiencies());
-    dispatch(shiftActions.fetchShifts());
+    dispatch(shiftsActions.fetchShifts());
     dispatch(usersActions.fetchUsers());
     dispatch(streamsActions.fetchStreams());
     dispatch(analysisServicesActions.fetchAnalysisServices());
