@@ -22,9 +22,6 @@ import * as favoritesActions from "./ducks/favorites";
 import * as rejectedActions from "./ducks/rejected_candidates";
 import * as tnsrobotsActions from "./ducks/tnsrobots";
 import * as enumTypesActions from "./ducks/enum_types";
-<<<<<<< extensions/skyportal/static/js/actions.js
-import * as shiftActions from "./ducks/shifts";
-=======
 import * as usersActions from "./ducks/users";
 import * as streamsActions from "./ducks/streams";
 import * as analysisServicesActions from "./ducks/analysis_services";
@@ -57,7 +54,6 @@ import * as remindersActions from "./ducks/reminders";
 import * as groupActions from "./ducks/group";
 import * as instrumentActions from "./ducks/instrument";
 /* eslint-enable no-unused-vars */
->>>>>>> skyportal/static/js/actions.js
 
 export default function hydrate() {
   return (dispatch) => {
@@ -87,12 +83,12 @@ export default function hydrate() {
     dispatch(defaultFollowupRequestsActions.fetchDefaultFollowupRequests());
     dispatch(defaultObservationPlansActions.fetchDefaultObservationPlans());
     dispatch(defaultSurveyEfficienciesActions.fetchDefaultSurveyEfficiencies());
-<<<<<<< extensions/skyportal/static/js/actions.js
     dispatch(shiftActions.fetchShifts());
-=======
     dispatch(usersActions.fetchUsers());
     dispatch(streamsActions.fetchStreams());
     dispatch(analysisServicesActions.fetchAnalysisServices());
->>>>>>> skyportal/static/js/actions.js
+    dispatch(usersActions.fetchUsers());
+    dispatch(streamsActions.fetchStreams());
+    dispatch(analysisServicesActions.fetchAnalysisServices());
   };
 }

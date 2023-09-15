@@ -330,16 +330,12 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
     <div className={styles.sourceListContainer}>
       <ul className={styles.sourceList}>
         {sources.map((source) => {
-<<<<<<< extensions/skyportal/static/js/components/RecentSources.jsx
           let recentSourceName = `${source.obj_id}`;
           let grandma_source_classification = "I-care";
           let confirmed_or_rejected = 'not_confirmed';
           let grandma_obs_classification = null;
           let obs_status = null;
-=======
-          const recentSourceName = `${source.obj_id}`;
           let classification = null;
->>>>>>> skyportal/static/js/components/RecentSources.jsx
           if (source.classifications.length > 0) {
             // Display the most recent non-zero probability class
             const filteredClasses = source.classifications?.filter(
@@ -350,7 +346,6 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
             );
 
             if (sortedClasses.length > 0) {
-<<<<<<< extensions/skyportal/static/js/components/RecentSources.jsx
               const classification = sortedClasses[0].classification;
               if (!rejected_classes.includes(classification) && !confirmed_classes.includes(classification) && !not_confirmed_classes.includes(classification) && !obs_classes.includes(classification)) {
                 recentSourceName += ` (${classification})`;
@@ -379,9 +374,6 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
               } else if (grandma_obs_classification == 'STOP GRANDMA') {
                 obs_status = 'stop';
               }
-=======
-              classification = `(${sortedClasses[0].classification})`;
->>>>>>> skyportal/static/js/components/RecentSources.jsx
             }
 
           }
@@ -427,7 +419,6 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
                   </Link>
                   <div className={styles.sourceInfo}>
                     <div className={styles.sourceNameContainer}>
-<<<<<<< extensions/skyportal/static/js/components/RecentSources.jsx
                       <span className={styles.sourceName}>
                         <Link to={`/source/${source.obj_id}`}>
                           <span className={styles.sourceNameLink}>
@@ -447,7 +438,6 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
                           source.ra
                         )} ${dec_to_dms(source.dec)}`}
                       </span>
-=======
                       <Link
                         to={`/source/${source.obj_id}`}
                         className={styles.sourceName}
@@ -473,20 +463,17 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
                           {`\u03B4: ${dec_to_dms(source.dec)}`}
                         </span>
                       </div>
->>>>>>> skyportal/static/js/components/RecentSources.jsx
                       {source.resaved && <span>(Source was re-saved)</span>}
                     </div>
                     <div className={styles.quickViewContainer}>
                       <span style={{ textAlign: "right" }}>
                         {dayjs().to(dayjs.utc(`${source.created_at}Z`))}
                       </span>
-<<<<<<< extensions/skyportal/static/js/components/RecentSources.jsx
                       <SourceStatus source={source} />
                       <SourceQuickView
                         sourceId={source.obj_id}
                         className={styles.quickViewButton}
                       />
-=======
                       <div
                         style={{
                           minHeight: "3rem",
@@ -500,7 +487,6 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
                           className={styles.quickViewButton}
                         />
                       </div>
->>>>>>> skyportal/static/js/components/RecentSources.jsx
                     </div>
                   </div>
                 </div>
