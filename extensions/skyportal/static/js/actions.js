@@ -87,5 +87,8 @@ export default function hydrate() {
     dispatch(usersActions.fetchUsers());
     dispatch(streamsActions.fetchStreams());
     dispatch(analysisServicesActions.fetchAnalysisServices());
+    dispatch(usersActions.fetchUsers());
+    dispatch(streamsActions.fetchStreams());
+    dispatch(analysisServicesActions.fetchAnalysisServices());
   };
 }
