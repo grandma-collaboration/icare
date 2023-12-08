@@ -1,4 +1,4 @@
-fink-client==4.1
+fink-client==7.2
 fink-filters==3.7
 fink-science==3.13.3
 fink-utils==0.4.0
