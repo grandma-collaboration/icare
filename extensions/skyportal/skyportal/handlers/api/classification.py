@@ -399,7 +399,6 @@ class ClassificationHandler(BaseHandler):
         data = self.get_json()
 
         with self.Session() as session:
-
             if 'classifications' in data:
                 classification_ids = []
                 for classification in data['classifications']:
@@ -460,7 +459,6 @@ class ClassificationHandler(BaseHandler):
         """
 
         with self.Session() as session:
-
             c = session.scalars(
                 Classification.select(session.user_or_token, mode="update").where(
                     Classification.id == classification_id
@@ -551,7 +549,6 @@ class ClassificationHandler(BaseHandler):
         """
 
         with self.Session() as session:
-
             c = session.scalars(
                 Classification.select(session.user_or_token, mode="delete").where(
                     Classification.id == classification_id
@@ -682,7 +679,6 @@ class ObjClassificationHandler(BaseHandler):
         """
 
         with self.Session() as session:
-
             classifications = (
                 session.scalars(
                     Classification.select(session.user_or_token, mode="delete").where(
@@ -785,7 +781,6 @@ class ObjClassificationQueryHandler(BaseHandler):
         end_date = self.get_query_argument('endDate', None)
 
         with self.Session() as session:
-
             # get owned
             classifications = Classification.select(session.user_or_token)
 

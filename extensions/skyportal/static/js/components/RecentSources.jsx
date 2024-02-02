@@ -48,10 +48,8 @@ export const useSourceListStyles = makeStyles((theme) => ({
     WebkitFilter: invertThumbnails ? "invert(1)" : "unset",
   }),
   sourceListContainer: {
-    height: "calc(100% - 3rem)",
+    height: "calc(100% - 2.5rem)",
     overflowY: "auto",
-    marginTop: "0.625rem",
-    paddingTop: "0.625rem",
   },
   sourceList: {
     display: "block",
@@ -222,7 +220,7 @@ const RecentSourcesSearchbar = ({ styles }) => {
   };
   if (inputValue.length > 0) {
     results = sourcesState?.sources?.filter((source) =>
-      source.id.toLowerCase().match(inputValue.toLowerCase())
+      source.id.toLowerCase().match(inputValue.toLowerCase()),
     );
   }
 
@@ -333,10 +331,10 @@ const RecentSourcesList = ({ sources, styles, search = false }) => {
           if (source.classifications.length > 0) {
             // Display the most recent non-zero probability class
             const filteredClasses = source.classifications?.filter(
-              (i) => i.probability > 0
+              (i) => i.probability > 0,
             );
             const sortedClasses = filteredClasses.sort((a, b) =>
-              a.modified < b.modified ? 1 : -1
+              a.modified < b.modified ? 1 : -1,
             );
 
             if (sortedClasses.length > 0) {
@@ -507,7 +505,7 @@ RecentSourcesList.propTypes = {
           public_url: PropTypes.string,
           is_grayscale: PropTypes.bool,
           type: PropTypes.string,
-        })
+        }),
       ),
       resaved: PropTypes.bool,
       classifications: PropTypes.arrayOf(
@@ -521,9 +519,9 @@ RecentSourcesList.propTypes = {
           author_id: PropTypes.number,
           taxonomy_id: PropTypes.number,
           created_at: PropTypes.string,
-        })
+        }),
       ),
-    })
+    }),
   ),
   styles: PropTypes.shape(Object).isRequired,
   search: PropTypes.bool,
@@ -536,7 +534,7 @@ RecentSourcesList.defaultProps = {
 
 const RecentSources = ({ classes }) => {
   const invertThumbnails = useSelector(
-    (state) => state.profile.preferences.invertThumbnails
+    (state) => state.profile.preferences.invertThumbnails,
   );
   const styles = useSourceListStyles({ invertThumbnails });
 
@@ -561,9 +559,6 @@ const RecentSources = ({ classes }) => {
               onSubmit={profileActions.updateUserPreferences}
             />
           </div>
-          <Paper elevation={0}>
-            <RecentSourcesSearchbar styles={styles} />
-          </Paper>
         </div>
         <RecentSourcesList sources={recentSources} styles={styles} />
       </div>
