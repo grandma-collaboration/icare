@@ -4,6 +4,7 @@ import subprocess
 import pathlib
 import pkg_resources
 import re
+import sys
 
 from .status import status
 
@@ -18,7 +19,7 @@ def output(cmd):
 system_dependencies = {
     "python": (
         # Command to get version
-        ["python", "--version"],
+        [sys.executable, "--version"],
         # Extract *only* the version number
         lambda v: v.split()[1],
         # It must be >= 3.7
