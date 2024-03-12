@@ -47,7 +47,7 @@ needs-migration?:
 
 # Add 'workflows' label to any changes to GA workflows (.github folder)
 workflows:
-  - any-glob-to-any-file: "github/**/*"
+  - any-glob-to-any-file: ".github/**/*"
 
 skyportal_updates:
   - any-glob-to-any-file: "skyportal/**/*"
