@@ -518,16 +518,6 @@ app:
         sm: [3, 2, 3, 3]
         xs: [0, 6, 4, 3]
 
-    NewSource:
-      resizeable: true
-      minW: 3
-      layouts:
-        xlg: [11, 5, 5, 3]
-        lg: [8, 5, 4, 3]
-        md: [6, 6, 4, 3]
-        sm: [3, 9, 3, 3]
-        xs: [0, 14, 4, 3]
-
 database:
   database: skyportal
   host: localhost
