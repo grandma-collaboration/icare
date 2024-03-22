@@ -183,6 +183,10 @@ app:
       component: SummarySearch
     - path: "/taxonomies"
       component: TaxonomyPage
+    - path: "/tns_robots"
+      component: TNSRobotsPage
+    - path: "/tns_robot/:id/submissions"
+      component: TNSRobotSubmissionsPage
 
   sidebar:
     # See https://material-ui.com/components/material-icons/
@@ -250,6 +254,10 @@ app:
         - name: Observations
           icon: ZoomInOutlined
           url: /observations
+
+        - name: TNS Robots
+          icon: Assignment
+          url: /tns_robots
 
         - name: Earthquakes
           icon: PieChart
