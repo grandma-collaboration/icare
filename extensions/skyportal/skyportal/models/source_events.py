@@ -25,7 +25,7 @@ def source_after_insert(mapper, connection, target):
         # in which case we don't want to add the classification
         tns_name_regex = r'20\d{2}[a-zA-Z]+'
         if re.fullmatch(tns_name_regex, target.id):
-            log(f"TNS object, not adding classification I-care")
+            log(f"TNS object {target.id}, not adding classification I-care")
             return
         # find the taxonomy
         try:
