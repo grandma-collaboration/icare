@@ -119,6 +119,7 @@ from skyportal.handlers.api import (
     ObjGcnEventHandler,
     ObjMPCHandler,
     ObjTNSHandler,
+    ObjPositionHandler,
     ObservationHandler,
     ObservationTreasureMapHandler,
     ObservationASCIIFileHandler,
@@ -468,6 +469,7 @@ skyportal_handlers = [
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/mpc', ObjMPCHandler),
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/tns', ObjTNSHandler),
     (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/fink', FinkPhotometryHandler),
+    (r'/api/sources(/[0-9A-Za-z-_\.\+]+)/position', ObjPositionHandler),
     (
         r'/api/sources(/[0-9A-Za-z-_\.\+]+)/observability',
         SourceObservabilityPlotHandler,
