@@ -19,6 +19,12 @@ def source_after_insert(mapper, connection, target):
 
     @event.listens_for(inspect(target).session, "after_flush", once=True)
     def receive_after_flush(session, context):
+
+        # first check if the obj.id is in the format 20YY[a-zA-Z] (e.g. 2021a, or 2024aaav)
+        # in which case we don't want to add the classification
+        tns_name_regex = r'20\d{2}[a-zA-Z]+'
+        if re.search(tns_name_regex, target.id):
+            return
         # find the taxonomy
         try:
             user = session.scalars(sa.select(User).where(User.id == 1)).first()
