@@ -129,7 +129,7 @@ def apply_config():
         cfg = load_config(["icare.yaml"])
         cfg.pop("config_files", None)
         cfg = dict(cfg)
-        with open("patched_skyportal/config.yaml", "w") as f:
+        with open("patched_skyportal/config.yaml.defaults", "w") as f:
             try:
                 yaml.dump(
                     cfg, f, Dumper=MyDumper, default_flow_style=False, sort_keys=False
