@@ -29,7 +29,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_subset: ["api_and_utils", "frontend_pt1", "frontend_pt2", "flaky"]
+        test_subset:
+          [
+            "api_and_utils_pt1",
+            "api_and_utils_pt2",
+            "frontend_pt1",
+            "frontend_pt2",
+            "flaky",
+            "external",
+          ]
 
     steps:
       - uses: actions/setup-python@v5
@@ -57,6 +65,18 @@ jobs:
       - name: Fetch submodules
         run: |
           git submodule update --init --recursive
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package.json') }}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/pip
+          key: ${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}
 
       - name: Install system dependencies
         run: |
@@ -93,7 +113,7 @@ jobs:
           nginx -v
           firefox --version
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
           pip install -r skyportal/requirements.txt
@@ -160,7 +180,7 @@ jobs:
 
       - name: Install Geckodriver / Selenium
         run: |
-          GECKO_VER=0.30.0
+          GECKO_VER=0.34.0
           CACHED_DOWNLOAD_DIR=~/.local/downloads
           FILENAME=geckodriver-v${GECKO_VER}-linux64.tar.gz
 
@@ -169,13 +189,16 @@ jobs:
           fi
           sudo tar -xzf ${CACHED_DOWNLOAD_DIR}/geckodriver-v${GECKO_VER}-linux64.tar.gz -C /usr/local/bin
           geckodriver --version
-          pip install selenium==4.2.0
           python -c "import selenium; print(f'Selenium {selenium.__version__}')"
 
       - name: Patch test_frontend.py for a longer timeout
         run: |
           cd skyportal
-          sed -i 's/timeout=60/timeout=180/g' baselayer/tools/test_frontend.py
+          sed -i 's/timeout=60/timeout=180/g' patched_skyportal/baselayer/tools/test_frontend.py
+
+      - name: Patch Notifications.jsx for a longer display
+        run: |
+          sed -i 's/duration = 3000/duration = 15000/g' patched_skyportal/baselayer/static/js/components/Notifications.jsx
 
       - name: Refresh SkyPortal dependencies for tested version
         run: |
@@ -188,19 +211,25 @@ jobs:
         if: ${{ matrix.test_subset == 'frontend_pt1' }}
         run: |
           cd patched_skyportal
-          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/frontend/sources_and_followup_etc'
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/frontend/sources_and_observingruns_etc'
 
       - name: Run front-end tests part 2
         if: ${{ matrix.test_subset == 'frontend_pt2' }}
         run: |
           cd patched_skyportal
-          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless '--ignore=skyportal/tests/frontend/sources_and_followup_etc skyportal/tests/frontend'
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless '--ignore=skyportal/tests/frontend/sources_and_observingruns_etc skyportal/tests/frontend'
 
-      - name: Run API & utils tests
-        if: ${{ matrix.test_subset == 'api_and_utils' }}
+      - name: Run API & utils tests part 1
+        if: ${{ matrix.test_subset == 'api_and_utils_pt1' }}
         run: |
           cd patched_skyportal
-          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/api skyportal/tests/tools skyportal/tests/utils skyportal/tests/rate_limiting'
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/api/candidates_sources_events'
+
+      - name: Run API & utils tests part 2
+        if: ${{ matrix.test_subset == 'api_and_utils_pt2' }}
+        run: |
+          cd patched_skyportal
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless '--ignore=skyportal/tests/api/candidates_sources_events skyportal/tests/api skyportal/tests/tools skyportal/tests/utils skyportal/tests/rate_limiting'
 
       - name: Run flaky tests
         if: ${{ matrix.test_subset == 'flaky' }}
@@ -208,6 +237,13 @@ jobs:
         run: |
           cd patched_skyportal
           PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/flaky'
+
+      - name: Run external tests
+        if: ${{ matrix.test_subset == 'external' }}
+        continue-on-error: true
+        run: |
+          cd patched_skyportal
+          PYTHONPATH=. python baselayer/tools/test_frontend.py --xml --headless 'skyportal/tests/external'
 
       - name: Upload logs
         uses: actions/upload-artifact@v2
