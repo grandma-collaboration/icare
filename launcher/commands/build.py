@@ -4,7 +4,6 @@ from pathlib import Path
 
 from launcher.commands.clear import clear as clear_db
 from launcher.commands.update import update
-from launcher.config import check_config
 from launcher.skyportal import patch as patch_skyportal
 
 

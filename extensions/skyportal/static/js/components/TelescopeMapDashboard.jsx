@@ -5,8 +5,9 @@ import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Tooltip } from "@mui/material";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+
 // lazy import the TelescopeMap component
-const TelescopeMap = lazy(() => import("./TelescopeMap"));
+const TelescopeMap = lazy(() => import("./telescope/TelescopeMap"));
 
 const useStyles = makeStyles((theme) => ({
   help: {
