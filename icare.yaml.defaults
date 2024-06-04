@@ -1,5 +1,6 @@
 app:
   title: Icare
+  factory: skyportal.app_server_icare.make_app_icare
   observation_plan:
     default_filters: ['ztfg', 'ztfr', 'ztfi']
     use_skyportal_fields: False
