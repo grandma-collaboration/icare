@@ -32,19 +32,23 @@ jobs:
         test_subset: ["api_and_utils", "frontend_pt1", "frontend_pt2", "flaky"]
 
     steps:
-      - uses: actions/setup-python@v1
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
       - name: Checkout main
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: main
           submodules: true
 
       - name: Checkout branch being tested
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: true
@@ -56,11 +60,9 @@ jobs:
 
       - name: Install system dependencies
         run: |
-          curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-
           sudo apt install -y wget nodejs unzip firefox nginx libcurl4-gnutls-dev libgnutls28-dev
 
-          pip install pip==21.3.1
+          pip install pip==24.0
           pip install wheel numpy
 
           export NPM_PACKAGES="${HOME}/.npm-packages"
