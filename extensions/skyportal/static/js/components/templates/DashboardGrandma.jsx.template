@@ -16,15 +16,14 @@ import convertLength from "convert-css-length";
 
 import * as profileActions from "../ducks/profile";
 
-import RecentSources from "./RecentSources";
-import GroupList from "./GroupList";
-import NewsFeed from "./NewsFeed";
-import TopSources from "./TopSources";
-import RecentGcnEvents from "./RecentGcnEvents";
-import SourceCounts from "./SourceCounts";
-import WeatherWidget from "./WeatherWidget";
-import NewSource from "./NewSource";
-import TelescopeMapDashboard from "./TelescopeMapDashboard";
+import RecentSources from "../RecentSources";
+import GroupList from "../group/GroupList";
+import NewsFeed from "../NewsFeed";
+import TopSources from "../TopSources";
+import RecentGcnEvents from "../RecentGcnEvents";
+import SourceCounts from "../source/SourceCounts";
+import WeatherWidget from "../WeatherWidget";
+import TelescopeMapDashboard from "../telescope/TelescopeMapDashboard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

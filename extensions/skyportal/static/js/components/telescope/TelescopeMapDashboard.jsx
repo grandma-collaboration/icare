@@ -7,7 +7,7 @@ import { Tooltip } from "@mui/material";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 
 // lazy import the TelescopeMap component
-const TelescopeMap = lazy(() => import("./telescope/TelescopeMap"));
+const TelescopeMap = lazy(() => import("./TelescopeMap"));
 
 const useStyles = makeStyles((theme) => ({
   help: {
