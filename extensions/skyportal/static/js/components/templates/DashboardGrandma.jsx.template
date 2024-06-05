@@ -14,7 +14,7 @@ import CachedIcon from "@mui/icons-material/Cached";
 import Tooltip from "@mui/material/Tooltip";
 import convertLength from "convert-css-length";
 
-import * as profileActions from "../ducks/profile";
+import * as profileActions from "../../ducks/profile";
 
 import RecentSources from "../RecentSources";
 import GroupList from "../group/GroupList";
