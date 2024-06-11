@@ -22,9 +22,7 @@ import { showNotification } from "baselayer/components/Notifications";
 import { ra_to_hours, dec_to_dms } from "../units";
 import * as profileActions from "../ducks/profile";
 import WidgetPrefsDialog from "./WidgetPrefsDialog";
-import SourceQuickView from "./SourceQuickView";
 import SourceStatus from "./SourceStatus";
-import Button from "./Button";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -460,23 +458,6 @@ const RecentSourcesList = ({
                         {dayjs().to(dayjs.utc(`${source.created_at}Z`))}
                       </span>
                       <SourceStatus source={source} />
-                      <SourceQuickView
-                        sourceId={source.obj_id}
-                        className={styles.quickViewButton}
-                      />
-                      <div
-                        style={{
-                          minHeight: "3rem",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-end",
-                        }}
-                      >
-                        <SourceQuickView
-                          sourceId={source.obj_id}
-                          className={styles.quickViewButton}
-                        />
-                      </div>
                       {displayTNS && source?.tns_name?.length > 0 && (
                         <div
                           style={{
