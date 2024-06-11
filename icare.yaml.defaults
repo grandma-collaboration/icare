@@ -307,3 +307,35 @@ fink:
   skyportal_url: http://localhost:5000
   testing: false
   whitelisted: true
+
+gcn:
+  notice_types:
+    - SWIFT_BAT_GRB_LC
+    - SWIFT_BAT_GRB_POS_ACK
+    - SWIFT_XRT_POSITION
+    - ICECUBE_ASTROTRACK_GOLD
+    - ICECUBE_ASTROTRACK_BRONZE
+    - LVC_INITIAL
+    - LVC_UPDATE
+    - LVC_TEST
+    - LVC_RETRACTION
+    - LVC_PRELIMINARY
+  json_notice_types:
+    - einstein_probe.wxt.alert
+    - swift.bat.guano
+  reject_tags:
+    - 'MDC'
+    - 'Subthreshold'
+    - 'StarTrack_Lost_Lock'
+
+external_logging:
+  sentry:
+    endpoint:
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # Sentry recommends adjusting this value in production.
+    traces_sample_rate: 1.0
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate: 1.0
