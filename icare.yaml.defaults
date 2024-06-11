@@ -307,19 +307,3 @@ fink:
   skyportal_url: http://localhost:5000
   testing: false
   whitelisted: true
-
-gcn:
-  server: gcn.nasa.gov
-  # you can obtain a client_id and client_secret at https://gcn.nasa.gov/quickstart
-  # you can set a group_id to remember the last GCN the app ingested from the stream
-  client_group_id:
-  client_id:
-  client_secret:
-  notice_types:
-    # - SWIFT_BAT_GRB_ALERT #NOT WORKING
-    - SWIFT_BAT_GRB_LC
-    # - SWIFT_BAT_GRB_LC_PROC #NOT WORKING
-    - SWIFT_BAT_GRB_POS_ACK
-    # - SWIFT_BAT_GRB_POS_NACK #NOT WORKING
-    # - SWIFT_BAT_GRB_POS_TEST
-    - SWIFT_XRT_POSITION
