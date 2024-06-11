@@ -322,7 +322,6 @@ gcn:
     - LVC_PRELIMINARY
   json_notice_types:
     - einstein_probe.wxt.alert
-    - swift.bat.guano
   reject_tags:
     - 'MDC'
     - 'Subthreshold'
