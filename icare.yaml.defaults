@@ -322,6 +322,7 @@ gcn:
     - LVC_PRELIMINARY
   json_notice_types:
     - einstein_probe.wxt.alert
+    - gcn.notices.icecube.lvk_nu_track_search
   reject_tags:
     - 'MDC'
     - 'Subthreshold'
