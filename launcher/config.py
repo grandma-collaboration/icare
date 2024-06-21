@@ -4,10 +4,8 @@ __all__ = [
 ]
 
 
-from pathlib import Path
 import subprocess
-
-import yaml
+from pathlib import Path
 
 
 def check_config_exists(cfg="icare.defaults.yaml", yes=False):

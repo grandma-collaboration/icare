@@ -2,8 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import Button from "@mui/material/Button";
+
 import { showNotification } from "baselayer/components/Notifications";
-import postFinkPhot from "../ducks/fink_phot";
+import postFinkPhot from "../../ducks/fink_phot";
 
 const AddPhotFink = ({ id }) => {
   const dispatch = useDispatch();

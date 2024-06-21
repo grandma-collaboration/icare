@@ -1,12 +1,292 @@
 app:
   title: Icare
+  factory: skyportal.app_server_icare.make_app_icare
+  observation_plan:
+    default_filters: ['ztfg', 'ztfr', 'ztfi']
+    use_skyportal_fields: False
+
+  routes:
+    - path: "/"
+      component: templates/DashboardGrandma
+      exact: True
+    - path: "/source/:id"
+      component: source/Source
+    - path: "/favorites"
+      component: FavoritesPage
+    - path: "/gcn_events/:dateobs"
+      component: gcn/GcnEventPage
+    - path: "/groups"
+      component: group/Groups
+    - path: "/group/:id"
+      component: group/Group
+    - path: "/profile"
+      component: Profile
+    - path: "/candidates"
+      component: candidate/CandidateList
+    - path: "/sources"
+      component: source/SourceList
+    - path: "/user/:id"
+      component: user/UserInfo
+    - path: "/upload_photometry/:id"
+      component: UploadPhotometry
+    - path: "/about"
+      component: About
+    - path: "/run/:id"
+      component: RunSummary
+    - path: "/source/:obj_id/analysis/:analysis_id"
+      component: source/SourceAnalysisPage
+    - path: "/share_data/:id"
+      component: ShareDataForm
+    - path: "/filter/:fid"
+      component: Filter
+    - path: "/runs"
+      component: ObservingRunPage
+    - path: "/allocations"
+      component: allocation/AllocationPage
+    - path: "/allocation/:id"
+      component: allocation/AllocationSummary
+    - path: "/instrument/:id"
+      component: InstrumentSummary
+    - path: "/telescope/:id"
+      component: telescope/TelescopeSummary
+    - path: "/observations"
+      component: ObservationPage
+    - path: "/galaxies"
+      component: GalaxyPage
+    - path: "/spatial_catalogs"
+      component: SpatialCatalogPage
+    - path: "/followup_requests"
+      component: followup_request/FollowupRequestPage
+    - path: "/group_sources/:id"
+      component: group/GroupSources
+    - path: "/user_management"
+      component: user/UserManagement
+    - path: "/upload_spectrum/:id"
+      component: UploadSpectrum
+    - path: "/observability/:id"
+      component: Observability
+    - path: "/source/:id/finder"
+      component: FindingChart
+    - path: "/source/:id/periodogram"
+      component: Periodogram
+    - path: "/db_stats"
+      component: DBStats
+    - path: "/gcn_events"
+      component: gcn/GcnEvents
+    - path: "/telescopes"
+      component: telescope/TelescopePage
+    - path: "/instruments"
+      component: InstrumentPage
+    - path: "/mmadetectors"
+      component: mma_detector/MMADetectorPage
+    - path: "/earthquakes"
+      component: earthquake/EarthquakesPage
+    - path: "/earthquakes/:event_id"
+      component: earthquake/EarthquakePage
+    - path: "/services"
+      component: analysis/AnalysisServicePage
+    - path: "/recurring_apis"
+      component: RecurringAPIPage
+    - path: "/shifts"
+      component: ShiftNoId
+    - path: "/shifts/:id"
+      component: ShiftWithId
+    - path: "/summary_search"
+      component: SummarySearch
+    - path: "/taxonomies"
+      component: TaxonomyPage
+    - path: "/tns_robots"
+      component: tns/TNSRobotsPage
+    - path: "/tns_robot/:id/submissions"
+      component: tns/TNSRobotSubmissionsPage
+
+  sidebar:
+    # See https://material-ui.com/components/material-icons/
+    - name: main
+      subitems:
+        - name: Dashboard
+          icon: Home
+          url: /
+
+        - name: GW/GRB/Neutrino
+          icon: SettingsInputAntenna
+          url: /gcn_events
+
+        - name: Sources
+          icon: Storage
+          url: /sources
+
+        - name: Candidates
+          icon: Search
+          url: /candidates
+
+        - name: Favorites
+          icon: Star
+          url: /favorites
+
+        - name: Shifts
+          icon: SubwayRounded
+          url: /shifts
+
+        - name: Groups
+          icon: GroupWork
+          url: /groups
+
+        - name: Telescopes
+          icon: MyLocation
+          url: /telescopes
+
+        - name: Instruments
+          icon: Wifi
+          url: /instruments
+
+        - name: Followup Requests
+          icon: WorkOutlined
+          url: /followup_requests
+
+        - name: Observing Runs
+          icon: LocalCafe
+          url: /runs
+
+    - name: Other
+      icon: MoreHoriz
+      subitems:
+        - name: MMADetectors
+          icon: Abc
+          url: /mmadetectors
+
+        - name: Allocations
+          icon: HourglassEmptyOutlined
+          url: /allocations
+
+        - name: Observations
+          icon: ZoomInOutlined
+          url: /observations
+
+        - name: TNS Robots
+          icon: Assignment
+          url: /tns_robots
+
+        - name: Earthquakes
+          icon: PieChart
+          url: /earthquakes
+
+        - name: Galaxies
+          icon: TornadoOutlined
+          url: /galaxies
+
+        - name: Spatial Catalogs
+          icon: PhotoSizeSelectLargeOutlined
+          url: /spatial_catalogs
+
+        - name: Analysis Services
+          icon: SentimentSatisfied
+          url: /services
+
+        - name: Recurring API
+          icon: Restore
+          url: /recurring_apis
+
+        - name: Taxonomies
+          icon: WallpaperOutlined
+          url: /taxonomies
+
+        - name: About
+          icon: Info
+          url: /about
+
+    - name: Admin
+      icon: AdminPanelSettings
+      permissions: ["Manage users", "System admin"]
+      subitems:
+        - name: DB Stats
+          icon: Assessment
+          permissions: ["System admin"]
+          url: /db_stats
+        - name: User Management
+          icon: Group
+          permissions: ["Manage users", "System admin"]
+          url: /user_management
+
+  dashboard_grandma_widgets:
+    RecentGcnEvents:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [0, 0, 6, 2]
+        lg: [0, 0, 6, 2]
+        md: [0, 0, 5, 3]
+        sm: [0, 0, 6, 2]
+        xs: [0, 0, 4, 3]
+
+    TelescopeMapDashboard:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [0, 2, 6, 2]
+        lg: [0, 2, 5, 3]
+        md: [0, 6, 6, 2]
+        sm: [0, 5, 6, 4]
+        xs: [0, 9, 4, 3]
+
+    RecentSources:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [6, 0, 5, 3]
+        lg: [6, 0, 6, 2]
+        md: [5, 0, 5, 3]
+        sm: [0, 2, 3, 3]
+        xs: [0, 3, 4, 3]
+
+    # FollowUpAdvocates:
+    #   resizeable: true
+    #   minW: 2
+    #   layouts:
+    #     xlg: [6, 3, 5, 2]
+    #     lg: [5, 2, 4, 3]
+    #     md: [0, 3, 5, 3]
+    #     sm: [0, 9, 3, 3]
+    #     xs: [0, 12, 4, 2]
+
+    NewsFeed:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [11, 0, 5, 5]
+        lg: [9, 2, 3, 3]
+        md: [5, 3, 5, 3]
+        sm: [3, 2, 3, 3]
+        xs: [0, 6, 4, 3]
+
+  database:
+    database: skyportal
+    host: localhost
+    port: 5432
+    user: skyportal
+    password:
 
 server:
-  ssl: False
+  protocol: http # UPDATE IN PROD
+  host: localhost # UPDATE IN PROD
+  port: 5000 # UPDATE IN PROD
+
+  ssl: False # UPDATE IN PROD
+
+  processes: 4 # UPDATE IN PROD
+  dedicated_frontend_processes: 2 # UPDATE IN PROD
+
   auth:
-    debug_login: True
+    debug_login: True # UPDATE IN PROD
     iam_oauth2_key:
     iam_oauth2_secret:
+    iam_oauth2_timeout: 15
+
+services:
+  dask: False
+
+notifications:
+  enabled: True
 
 user:
   default_role: 'Full user'
@@ -24,17 +304,33 @@ fink:
   servers: <list of servers as a comma separated string>
 
 gcn:
-  server: gcn.nasa.gov
-  # you can obtain a client_id and client_secret at https://gcn.nasa.gov/quickstart
-  # you can set a group_id to remember the last GCN the app ingested from the stream
-  client_group_id:
-  client_id:
-  client_secret:
   notice_types:
-    # - SWIFT_BAT_GRB_ALERT #NOT WORKING
     - SWIFT_BAT_GRB_LC
-    # - SWIFT_BAT_GRB_LC_PROC #NOT WORKING
     - SWIFT_BAT_GRB_POS_ACK
-    # - SWIFT_BAT_GRB_POS_NACK #NOT WORKING
-    # - SWIFT_BAT_GRB_POS_TEST
     - SWIFT_XRT_POSITION
+    - ICECUBE_ASTROTRACK_GOLD
+    - ICECUBE_ASTROTRACK_BRONZE
+    - LVC_INITIAL
+    - LVC_UPDATE
+    - LVC_TEST
+    - LVC_RETRACTION
+    - LVC_PRELIMINARY
+  json_notice_types:
+    - einstein_probe.wxt.alert
+    - icecube.lvk_nu_track_search
+  reject_tags:
+    - 'MDC'
+    - 'Subthreshold'
+    - 'StarTrack_Lost_Lock'
+
+external_logging:
+  sentry:
+    endpoint:
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # Sentry recommends adjusting this value in production.
+    traces_sample_rate: 1.0
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate: 1.0

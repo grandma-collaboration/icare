@@ -12,12 +12,14 @@ from baselayer.app.env import load_env
 from ..email_utils import send_email
 from ..app_utils import get_app_base_url
 
+# instead of overwritint the __init__.py file, we can import the function
+# in this model that we are overwriting anyway (and that never changes on skyportal/main)
+from .source_events import source_after_insert
 
 _, cfg = load_env()
 
 
 class Invitation(Base):
-
     read = update = delete = AccessibleIfUserMatches('invited_by')
 
     token = sa.Column(sa.String(), nullable=False, unique=True)

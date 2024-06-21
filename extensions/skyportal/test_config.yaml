@@ -14,6 +14,7 @@ server:
 misc:
   photometry_detection_threshold_nsigma: 3.0
   minutes_to_keep_candidate_query_cache: 0.033333 # 2 seconds
+  minutes_to_keep_annotations_info_query_cache: 0.033333 # 2 seconds
   allow_nonadmins_delete_objs: True
 
 twilio:
@@ -79,7 +80,7 @@ test_server:
     /api/requestgroups/: https://observe.lco.global # LCO
     /api/triggers/ztf: http://skipper.caltech.edu:4000 # ZTF
     /cgi-bin/internal/process_kait_ztf_request.py: http://herculesii.astro.berkeley.edu # KAIT
-    /api/v0/pointings: http://treasuremap.space
+    /api/v0/pointings: https://treasuremap.space
     /toop/submit_json.php: https://www.swift.psu.edu # Swift
     /api/v0.1/panstarrs/dr2/: https://catalogs.mast.stsci.edu # PS1
 
@@ -112,3 +113,5 @@ analysis_services:
   analysis_folder: analysis_data
   sn_analysis_service:
     port: 6802
+  spectral_cube_analysis_service:
+    port: 7003

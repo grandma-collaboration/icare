@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 import dayjs from "dayjs";
@@ -13,13 +13,16 @@ import makeStyles from "@mui/styles/makeStyles";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 
+import { showNotification } from "baselayer/components/Notifications";
 import { ra_to_hours, dec_to_dms } from "../units";
 import * as profileActions from "../ducks/profile";
 import WidgetPrefsDialog from "./WidgetPrefsDialog";
-import SourceQuickView from "./SourceQuickView";
 import SourceStatus from "./SourceStatus";
-import Button from "./Button";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -43,10 +46,8 @@ export const useSourceListStyles = makeStyles((theme) => ({
     WebkitFilter: invertThumbnails ? "invert(1)" : "unset",
   }),
   sourceListContainer: {
-    height: "calc(100% - 3rem)",
+    height: "calc(100% - 2.5rem)",
     overflowY: "auto",
-    marginTop: "0.625rem",
-    paddingTop: "0.625rem",
   },
   sourceList: {
     display: "block",
@@ -59,12 +60,14 @@ export const useSourceListStyles = makeStyles((theme) => ({
     display: "flex",
     flexFlow: "row nowrap",
     alignItems: "center",
-    padding: "0 0.625rem",
+    padding: "0 0.325rem",
   },
   sourceInfo: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "space-between",
     margin: "10px",
+    marginRight: 0,
     width: "100%",
   },
   sourceNameContainer: {
@@ -73,6 +76,8 @@ export const useSourceListStyles = makeStyles((theme) => ({
   },
   sourceName: {
     fontSize: "1rem",
+    paddingBottom: 0,
+    marginBottom: 0,
   },
   sourceNameLink: {
     color:
@@ -80,21 +85,34 @@ export const useSourceListStyles = makeStyles((theme) => ({
         ? theme.palette.secondary.main
         : theme.palette.primary.main,
   },
+  classification: {
+    fontSize: "0.95rem",
+    color:
+      theme.palette.mode === "dark"
+        ? theme.palette.secondary.main
+        : theme.palette.primary.main,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    marginLeft: "-0.09rem",
+    marginTop: "-0.4rem",
+  },
+  sourceCoordinates: {
+    marginTop: "0.1rem",
+    display: "flex",
+    flexDirection: "column",
+    "& > span": {
+      marginTop: "-0.2rem",
+    },
+  },
   link: {
     color: theme.palette.warning.main,
   },
-  quickViewContainer: {
+  bottomContainer: {
     display: "flex",
     flexDirection: "column",
-    width: "45%",
-    alignItems: "center",
+    width: "100%",
+    alignItems: "flex-end",
     justifyContent: "space-between",
-  },
-  quickViewButton: {
-    minHeight: "30px",
-    visibility: "hidden",
-    textAlign: "center",
-    display: "none",
   },
   sourceItemWithButton: {
     display: "flex",
@@ -105,10 +123,6 @@ export const useSourceListStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor:
         theme.palette.mode === "light" ? theme.palette.secondary.light : null,
-    },
-    "&:hover $quickViewButton": {
-      visibility: "visible",
-      display: "block",
     },
   },
   confirmed: {
@@ -126,14 +140,148 @@ export const useSourceListStyles = makeStyles((theme) => ({
   },
   stop: {
     background: "#ff0000!important",
-  }
+  },
+  root: {
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#333333",
+      },
+      "&:hover fieldset": {
+        borderColor: "#333333",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#333333",
+      },
+    },
+  },
+  textField: {
+    color: "#333333",
+  },
+  icon: {
+    color: "#333333",
+  },
+  paper: {
+    backgroundColor: "#F0F8FF",
+  },
+  // These rules help keep the progress wheel centered. Taken from the first example: https://material-ui.com/components/progress/
+  progress: {
+    display: "flex",
+    // The below color rule is not for the progress container, but for CircularProgress. This component only accepts 'primary', 'secondary', or 'inherit'.
+    color: theme.palette.info.main,
+    "& > * + *": {
+      marginLeft: theme.spacing(2),
+    },
+  },
 }));
 
 const defaultPrefs = {
   maxNumSources: "5",
+  includeSitewideSources: false,
+  displayTNS: true,
 };
 
-const RecentSourcesList = ({ sources, styles }) => {
+function containsSpecialCharacters(str) {
+  /* eslint-disable-next-line no-useless-escape */
+  const regex = /[ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g;
+  return regex.test(str);
+}
+
+const RecentSourcesSearchbar = ({ styles }) => {
+  const [inputValue, setInputValue] = useState("");
+  const [options] = useState([]);
+  const [value] = useState(null);
+  const [loading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const classes = styles;
+
+  const dispatch = useDispatch();
+  const sourcesState = useSelector((state) => state.sources.latest);
+
+  let results = [];
+  const handleChange = (e) => {
+    e.preventDefault();
+    const spec_char = containsSpecialCharacters(e.target.value);
+    if (!spec_char) {
+      setInputValue(e.target.value);
+    } else {
+      dispatch(showNotification("No special characters allowed", "error"));
+      setInputValue([]);
+    }
+  };
+  if (inputValue.length > 0) {
+    results = sourcesState?.sources?.filter((source) =>
+      source.id.toLowerCase().match(inputValue.toLowerCase()),
+    );
+  }
+
+  function formatSource(source) {
+    if (source.id) {
+      source.obj_id = source.id;
+    }
+  }
+
+  const formattedResults = [];
+  Object.assign(formattedResults, results);
+
+  formattedResults.map(formatSource);
+
+  return (
+    <div>
+      <Autocomplete
+        color="primary"
+        id="recent-sources-search-bar"
+        style={{ padding: "0.3rem" }}
+        classes={{ root: classes.root, paper: classes.paper }}
+        isOptionEqualToValue={(option, val) => option.name === val.name}
+        getOptionLabel={(option) => option}
+        onInputChange={handleChange}
+        onClose={() => setOpen(false)}
+        size="small"
+        noOptionsText="No matching sources."
+        options={options}
+        open={open}
+        limitTags={15}
+        value={value}
+        popupIcon={null}
+        renderInput={(params) => (
+          <TextField
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...params}
+            variant="outlined"
+            placeholder="Source"
+            InputProps={{
+              ...params.InputProps,
+              className: classes.textField,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" className={classes.icon} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <div className={classes.progress}>
+                  {loading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : null}
+                </div>
+              ),
+            }}
+          />
+        )}
+      />
+      {results?.length !== 0 && (
+        <RecentSourcesList sources={formattedResults} styles={styles} search />
+      )}
+    </div>
+  );
+};
+
+const RecentSourcesList = ({
+  sources,
+  styles,
+  search = false,
+  displayTNS = true,
+}) => {
   const [thumbnailIdxs, setThumbnailIdxs] = useState({});
 
   const { taxonomyList } = useSelector((state) => state.taxonomies);
@@ -157,7 +305,7 @@ const RecentSourcesList = ({ sources, styles }) => {
     );
   }
 
-  if (sources.length === 0) {
+  if (sources.length === 0 && !search) {
     return <div>No recent sources available.</div>;
   }
 
@@ -175,13 +323,14 @@ const RecentSourcesList = ({ sources, styles }) => {
           let confirmed_or_rejected = 'not_confirmed';
           let grandma_obs_classification = null;
           let obs_status = null;
+          let classification = null;
           if (source.classifications.length > 0) {
             // Display the most recent non-zero probability class
             const filteredClasses = source.classifications?.filter(
-              (i) => i.probability > 0
+              (i) => i.probability > 0,
             );
             const sortedClasses = filteredClasses.sort((a, b) =>
-              a.modified < b.modified ? 1 : -1
+              a.modified < b.modified ? 1 : -1,
             );
 
             if (sortedClasses.length > 0) {
@@ -277,17 +426,70 @@ const RecentSourcesList = ({ sources, styles }) => {
                           source.ra
                         )} ${dec_to_dms(source.dec)}`}
                       </span>
+                      <Link
+                        to={`/source/${source.obj_id}`}
+                        className={styles.sourceName}
+                      >
+                        <span className={styles.sourceNameLink}>
+                          {recentSourceName}
+                        </span>
+                      </Link>
+                      {classification && (
+                        <span className={styles.classification}>
+                          {classification}
+                        </span>
+                      )}
+                      <div className={styles.sourceCoordinates}>
+                        <span
+                          style={{ fontSize: "0.95rem", whiteSpace: "pre" }}
+                        >
+                          {`\u03B1: ${ra_to_hours(source.ra)}`}
+                        </span>
+                        <span
+                          style={{ fontSize: "0.95rem", whiteSpace: "pre" }}
+                        >
+                          {`\u03B4: ${dec_to_dms(source.dec)}`}
+                        </span>
+                      </div>
                       {source.resaved && <span>(Source was re-saved)</span>}
                     </div>
-                    <div className={styles.quickViewContainer}>
-                      <span>
+                    <div className={styles.bottomContainer}>
+                      <span style={{ textAlign: "right" }}>
                         {dayjs().to(dayjs.utc(`${source.created_at}Z`))}
                       </span>
                       <SourceStatus source={source} />
-                      <SourceQuickView
-                        sourceId={source.obj_id}
-                        className={styles.quickViewButton}
-                      />
+                      {displayTNS && source?.tns_name?.length > 0 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-end",
+                          }}
+                        >
+                          <Chip
+                            label={source.tns_name}
+                            color={
+                              source.tns_name.includes("SN")
+                                ? "primary"
+                                : "default"
+                            }
+                            size="small"
+                            style={{
+                              fontWeight: "bold",
+                            }}
+                            onClick={() => {
+                              window.open(
+                                `https://www.wis-tns.org/object/${
+                                  source.tns_name.trim().includes(" ")
+                                    ? source.tns_name.split(" ")[1]
+                                    : source.tns_name
+                                }`,
+                                "_blank",
+                              );
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -314,7 +516,7 @@ RecentSourcesList.propTypes = {
           public_url: PropTypes.string,
           is_grayscale: PropTypes.bool,
           type: PropTypes.string,
-        })
+        }),
       ),
       resaved: PropTypes.bool,
       classifications: PropTypes.arrayOf(
@@ -328,27 +530,35 @@ RecentSourcesList.propTypes = {
           author_id: PropTypes.number,
           taxonomy_id: PropTypes.number,
           created_at: PropTypes.string,
-        })
+        }),
       ),
-    })
+    }),
   ),
   styles: PropTypes.shape(Object).isRequired,
+  search: PropTypes.bool,
+  displayTNS: PropTypes.bool,
 };
 
 RecentSourcesList.defaultProps = {
   sources: undefined,
+  search: false,
+  displayTNS: true,
 };
 
 const RecentSources = ({ classes }) => {
   const invertThumbnails = useSelector(
-    (state) => state.profile.preferences.invertThumbnails
+    (state) => state.profile.preferences.invertThumbnails,
   );
   const styles = useSourceListStyles({ invertThumbnails });
 
   const { recentSources } = useSelector((state) => state.recentSources);
-  const recentSourcesPrefs =
+  const prefs =
     useSelector((state) => state.profile.preferences.recentSources) ||
     defaultPrefs;
+
+  const recentSourcesPrefs = prefs
+    ? { ...defaultPrefs, ...prefs }
+    : defaultPrefs;
 
   return (
     <Paper elevation={1} className={classes.widgetPaperFillSpace}>
@@ -367,7 +577,11 @@ const RecentSources = ({ classes }) => {
             />
           </div>
         </div>
-        <RecentSourcesList sources={recentSources} styles={styles} />
+        <RecentSourcesList
+          sources={recentSources}
+          styles={styles}
+          displayTNS={recentSourcesPrefs?.displayTNS !== false}
+        />
       </div>
     </Paper>
   );
@@ -379,6 +593,10 @@ RecentSources.propTypes = {
     widgetIcon: PropTypes.string.isRequired,
     widgetPaperFillSpace: PropTypes.string.isRequired,
   }).isRequired,
+};
+
+RecentSourcesSearchbar.propTypes = {
+  styles: PropTypes.shape(Object).isRequired,
 };
 
 export default RecentSources;

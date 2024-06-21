@@ -1,7 +1,8 @@
 import subprocess
-from typing import Optional
-from launcher.commands.diff import diff
 from pathlib import Path
+from typing import Optional
+
+from launcher.commands.diff import diff
 
 
 def update(

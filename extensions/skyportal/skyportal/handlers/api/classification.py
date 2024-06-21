@@ -3,10 +3,21 @@ import sqlalchemy as sa
 from sqlalchemy import func
 from marshmallow.exceptions import ValidationError
 from baselayer.app.access import permissions, auth_or_token
+from baselayer.app.env import load_env
 from baselayer.app.flow import Flow
 
 from ..base import BaseHandler
-from ...models import Group, Classification, Taxonomy, Obj, User
+from ...models import (
+    Group,
+    Classification,
+    ClassificationVote,
+    SourceLabel,
+    Taxonomy,
+    Obj,
+    User,
+)
+
+_, cfg = load_env()
 
 DEFAULT_CLASSIFICATIONS_PER_PAGE = 100
 MAX_CLASSIFICATIONS_PER_PAGE = 500
@@ -23,11 +34,30 @@ def post_classification(data, user_id, session):
     """
 
     user = session.scalar(sa.select(User).where(User.id == user_id))
-
-    user_group_ids = [g.id for g in user.accessible_groups]
-    group_ids = data.pop("group_ids", user_group_ids)
-
     obj_id = data['obj_id']
+
+    group_ids = data.pop("group_ids", [])
+    if not isinstance(group_ids, list) or len(group_ids) == 0:
+        public_group = session.scalar(
+            sa.select(Group.id).where(Group.name == cfg['misc.public_group_name'])
+        )
+        if public_group is None:
+            raise ValueError(
+                f'No group_ids were specified and the public group "{cfg["misc.public_group_name"]}" does not exist. Cannot post classification'
+            )
+        group_ids = [public_group]
+
+    origin = data.get('origin')
+
+    ml = data.get('ml', False)
+    if ml in [True, "True", "t", "true"]:
+        ml = True
+    elif ml in [False, "False", "f", "false"]:
+        ml = False
+    else:
+        raise ValueError(
+            f"If provided, ml must be one of True, False, 'True', 'False', 't', 'f', 'true', 'false' (got {ml})"
+        )
 
     # check the taxonomy
     taxonomy_id = data["taxonomy_id"]
@@ -67,7 +97,9 @@ def post_classification(data, user_id, session):
     classification = Classification(
         classification=data['classification'],
         obj_id=obj_id,
+        origin=origin,
         probability=probability,
+        ml=ml,
         taxonomy_id=data["taxonomy_id"],
         author=user,
         author_name=user.username,
@@ -91,6 +123,41 @@ def post_classification(data, user_id, session):
           )
 
     session.add(classification)
+
+    # voting
+    add_vote = True
+    if 'vote' in data:
+        if data['vote'] is False:
+            add_vote = False
+
+    if add_vote:
+        new_vote = ClassificationVote(
+            classification=classification, voter_id=user.id, vote=1
+        )
+        session.add(new_vote)
+
+    # labelling
+    add_label = True
+    if 'label' in data:
+        if data['label'] is False:
+            add_label = False
+
+    if add_label:
+        for group_id in group_ids:
+            source_label = session.scalars(
+                SourceLabel.select(session.user_or_token)
+                .where(SourceLabel.obj_id == obj_id)
+                .where(SourceLabel.group_id == group_id)
+                .where(SourceLabel.labeller_id == user_id)
+            ).first()
+            if source_label is None:
+                label = SourceLabel(
+                    obj_id=obj_id,
+                    labeller_id=user_id,
+                    group_id=group_id,
+                )
+                session.add(label)
+
     session.commit()
 
     flow = Flow()
@@ -123,6 +190,13 @@ class ClassificationHandler(BaseHandler):
               required: true
               schema:
                 type: integer
+            - in: query
+              name: includeTaxonomy
+              nullable: true
+              schema:
+                type: boolean
+              description: |
+                Return associated taxonomy.
           responses:
             200:
               content:
@@ -153,6 +227,13 @@ class ClassificationHandler(BaseHandler):
             description: |
               Arrow-parseable date string (e.g. 2020-01-01). If provided, filter by
               created_at <= endDate
+          - in: query
+            name: includeTaxonomy
+            nullable: true
+            schema:
+              type: boolean
+            description: |
+              Return associated taxonomy.
           - in: query
             name: numPerPage
             nullable: true
@@ -191,15 +272,25 @@ class ClassificationHandler(BaseHandler):
 
         """
 
-        page_number = self.get_query_argument('pageNumber', 1)
-        n_per_page = min(
-            int(
-                self.get_query_argument("numPerPage", DEFAULT_CLASSIFICATIONS_PER_PAGE)
-            ),
-            MAX_CLASSIFICATIONS_PER_PAGE,
-        )
+        try:
+            page_number = int(self.get_query_argument('pageNumber', 1))
+            n_per_page = min(
+                int(
+                    self.get_query_argument(
+                        "numPerPage", DEFAULT_CLASSIFICATIONS_PER_PAGE
+                    )
+                ),
+                MAX_CLASSIFICATIONS_PER_PAGE,
+            )
+        except ValueError:
+            return self.error(
+                f'Cannot parse inputs pageNumber ({page_number}) '
+                f'or numPerPage ({n_per_page}) as an integers.'
+            )
+
         start_date = self.get_query_argument('startDate', None)
         end_date = self.get_query_argument('endDate', None)
+        include_taxonomy = self.get_query_argument('includeTaxonomy', False)
 
         with self.Session() as session:
             if classification_id is not None:
@@ -212,8 +303,10 @@ class ClassificationHandler(BaseHandler):
                     return self.error(
                         f'Cannot find classification with ID: {classification_id}.'
                     )
-
-                return self.success(data=classification)
+                data_out = classification.to_dict()
+                if include_taxonomy:
+                    data_out['taxonomy'] = classification.taxonomy.to_dict()
+                return self.success(data=data_out)
 
             # get owned
             classifications = Classification.select(session.user_or_token)
@@ -236,8 +329,15 @@ class ClassificationHandler(BaseHandler):
             )
             classifications = session.scalars(classifications).unique().all()
 
+            data_out = []
+            for classification in classifications:
+                req = classification.to_dict()
+                if include_taxonomy:
+                    req['taxonomy'] = req.taxonomy.to_dict()
+                data_out.append(req)
+
             info = {}
-            info["classifications"] = [req.to_dict() for req in classifications]
+            info["classifications"] = data_out
             info["totalMatches"] = int(total_matches)
             return self.success(data=info)
 
@@ -258,6 +358,10 @@ class ClassificationHandler(BaseHandler):
                     type: string
                   classification:
                     type: string
+                  origin:
+                    type: string
+                    description: |
+                      String describing the source of this classification.
                   taxonomy_id:
                     type: integer
                   probability:
@@ -277,8 +381,17 @@ class ClassificationHandler(BaseHandler):
                       type: integer
                     description: |
                       List of group IDs corresponding to which groups should be
-                      able to view classification. Defaults to all of
-                      requesting user's groups.
+                      able to view classification. Defaults to the public group.
+                  vote:
+                    type: boolean
+                    nullable: true
+                    description: |
+                      Add vote associated with classification.
+                  label:
+                    type: boolean
+                    nullable: true
+                    description: |
+                      Add label associated with classification.
                 required:
                   - obj_id
                   - classification
@@ -302,7 +415,6 @@ class ClassificationHandler(BaseHandler):
         data = self.get_json()
 
         with self.Session() as session:
-
             if 'classifications' in data:
                 classification_ids = []
                 for classification in data['classifications']:
@@ -363,7 +475,6 @@ class ClassificationHandler(BaseHandler):
         """
 
         with self.Session() as session:
-
             c = session.scalars(
                 Classification.select(session.user_or_token, mode="update").where(
                     Classification.id == classification_id
@@ -377,6 +488,17 @@ class ClassificationHandler(BaseHandler):
             data = self.get_json()
             group_ids = data.pop("group_ids", None)
             data['id'] = classification_id
+
+            ml = data.get('ml', False)
+            if ml in [True, "True", "t", "true"]:
+                ml = True
+            elif ml in [False, "False", "f", "false"]:
+                ml = False
+            else:
+                raise ValueError(
+                    f"If provided, ml must be one of True, False, 'True', 'False', 't', 'f', 'true', 'false' (got {ml})"
+                )
+            data['ml'] = ml
 
             schema = Classification.__schema__()
             try:
@@ -424,6 +546,17 @@ class ClassificationHandler(BaseHandler):
             required: true
             schema:
               type: integer
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  label:
+                    type: boolean
+                    nullable: true
+                    description: |
+                      Add label associated with classification.
         responses:
           200:
             content:
@@ -432,7 +565,6 @@ class ClassificationHandler(BaseHandler):
         """
 
         with self.Session() as session:
-
             c = session.scalars(
                 Classification.select(session.user_or_token, mode="delete").where(
                     Classification.id == classification_id
@@ -443,9 +575,31 @@ class ClassificationHandler(BaseHandler):
                     f'Cannot find a classification with ID: {classification_id}.'
                 )
 
+            data = self.get_json()
+            add_label = data.get('label', True)
+
             obj_key = c.obj.internal_key
+            obj_id = c.obj.id
+            group_ids = [group.id for group in c.groups]
             session.delete(c)
-            session.commit()
+
+            if add_label:
+                for group_id in group_ids:
+                    source_label = session.scalars(
+                        SourceLabel.select(session.user_or_token)
+                        .where(SourceLabel.obj_id == obj_id)
+                        .where(SourceLabel.group_id == group_id)
+                        .where(
+                            SourceLabel.labeller_id == self.associated_user_object.id
+                        )
+                    ).first()
+                    if source_label is None:
+                        label = SourceLabel(
+                            obj_id=obj_id,
+                            labeller_id=self.associated_user_object.id,
+                            group_id=group_id,
+                        )
+                        session.add(label)
 
             self.push_all(
                 action='skyportal/REFRESH_SOURCE',
@@ -455,6 +609,8 @@ class ClassificationHandler(BaseHandler):
                 action='skyportal/REFRESH_CANDIDATE',
                 payload={'id': obj_key},
             )
+
+            session.commit()
 
             return self.success()
 
@@ -495,7 +651,100 @@ class ObjClassificationHandler(BaseHandler):
                 .unique()
                 .all()
             )
-            return self.success(data=classifications)
+
+            classifications_json = []
+            for classification in classifications:
+                classification_dict = classification.to_dict()
+                classification_dict['votes'] = [
+                    v.to_dict() for v in classification.votes
+                ]
+                classifications_json.append(classification_dict)
+
+            return self.success(data=classifications_json)
+
+    @auth_or_token
+    def delete(self, obj_id):
+        """
+        ---
+        description: Delete all of an object's classifications
+        tags:
+          - classifications
+          - sources
+        parameters:
+          - in: path
+            name: classification_id
+            required: true
+            schema:
+              type: integer
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  label:
+                    type: boolean
+                    nullable: true
+                    description: |
+                      Add label associated with classification.
+        responses:
+          200:
+            content:
+              application/json:
+                schema: Success
+        """
+
+        with self.Session() as session:
+            classifications = (
+                session.scalars(
+                    Classification.select(session.user_or_token, mode="delete").where(
+                        Classification.obj_id == obj_id
+                    )
+                )
+                .unique()
+                .all()
+            )
+
+            data = self.get_json()
+            add_label = data.get('label', True)
+
+            for c in classifications:
+                obj_key = c.obj.internal_key
+                obj_id = c.obj.id
+                group_ids = [group.id for group in c.groups]
+                session.delete(c)
+
+                if add_label:
+                    for group_id in group_ids:
+                        source_label = session.scalars(
+                            SourceLabel.select(session.user_or_token)
+                            .where(SourceLabel.obj_id == obj_id)
+                            .where(SourceLabel.group_id == group_id)
+                            .where(
+                                SourceLabel.labeller_id
+                                == self.associated_user_object.id
+                            )
+                        ).first()
+                        if source_label is None:
+                            label = SourceLabel(
+                                obj_id=obj_id,
+                                labeller_id=self.associated_user_object.id,
+                                group_id=group_id,
+                            )
+                            session.add(label)
+
+            session.commit()
+
+            self.push_all(
+                action='skyportal/REFRESH_SOURCE',
+                payload={'obj_key': obj_key},
+            )
+            self.push_all(
+                action='skyportal/REFRESH_CANDIDATE',
+                payload={'id': obj_key},
+            )
+
+            return self.success()
 
 
 class ObjClassificationQueryHandler(BaseHandler):
@@ -535,7 +784,7 @@ class ObjClassificationQueryHandler(BaseHandler):
                           data:
                             type: array
                             items:
-                              integer
+                              type: integer
                             description: |
                               List of obj IDs with classifications
             400:
@@ -548,7 +797,6 @@ class ObjClassificationQueryHandler(BaseHandler):
         end_date = self.get_query_argument('endDate', None)
 
         with self.Session() as session:
-
             # get owned
             classifications = Classification.select(session.user_or_token)
 
@@ -571,3 +819,163 @@ class ObjClassificationQueryHandler(BaseHandler):
             obj_ids = session.scalars(stmt.distinct()).all()
 
             return self.success(data=obj_ids)
+
+
+class ClassificationVotesHandler(BaseHandler):
+    @auth_or_token
+    def post(self, classification_id):
+        """
+        ---
+        description: Vote for a classification.
+        tags:
+          - classifications
+          - classification_votes
+        parameters:
+          - in: path
+            name: classification_id
+            required: true
+            schema:
+              type: string
+            description: |
+              ID of classification to indicate the vote for
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vote:
+                    type: integer
+                    description: |
+                      Upvote or downvote a classification
+                required:
+                  - vote
+        responses:
+          200:
+            content:
+              application/json:
+                schema: Success
+        """
+
+        data = self.get_json()
+        vote = data.get("vote")
+        if vote is None:
+            return self.error("Missing required parameter: `vote`")
+
+        with self.Session() as session:
+            classification = session.scalars(
+                Classification.select(session.user_or_token).where(
+                    Classification.id == classification_id
+                )
+            ).first()
+            if classification is None:
+                return self.error(
+                    f"Cannot find classification with ID {classification_id}"
+                )
+
+            classification_vote = session.scalars(
+                ClassificationVote.select(session.user_or_token).where(
+                    ClassificationVote.classification_id == classification_id,
+                    ClassificationVote.voter_id == self.associated_user_object.id,
+                )
+            ).first()
+            if classification_vote is None:
+                new_vote = ClassificationVote(
+                    classification_id=classification_id,
+                    voter_id=self.associated_user_object.id,
+                    vote=vote,
+                )
+                session.add(new_vote)
+            else:
+                classification_vote.vote = vote
+
+            obj_id = classification.obj.id
+            group_ids = [group.id for group in classification.groups]
+            for group_id in group_ids:
+                source_label = session.scalars(
+                    SourceLabel.select(session.user_or_token)
+                    .where(SourceLabel.obj_id == obj_id)
+                    .where(SourceLabel.group_id == group_id)
+                    .where(SourceLabel.labeller_id == self.associated_user_object.id)
+                ).first()
+            if source_label is None:
+                label = SourceLabel(
+                    obj_id=obj_id,
+                    labeller_id=self.associated_user_object.id,
+                    group_id=group_id,
+                )
+                session.add(label)
+
+            session.commit()
+
+            self.push_all(
+                action="skyportal/REFRESH_SOURCE",
+                payload={"obj_key": classification.obj.internal_key},
+            )
+            return self.success()
+
+    @auth_or_token
+    def delete(self, classification_id):
+        """
+        ---
+        description: Delete classification vote.
+        tags:
+          - classifications
+          - classification_votes
+        parameters:
+          - in: path
+            name: classification_id
+            required: true
+            schema:
+              type: string
+        responses:
+          200:
+            content:
+              application/json:
+                schema: Success
+        """
+
+        with self.Session() as session:
+            classification = session.scalars(
+                Classification.select(session.user_or_token).where(
+                    Classification.id == classification_id
+                )
+            ).first()
+            if classification is None:
+                return self.error(
+                    f"Cannot find classification with ID {classification_id}"
+                )
+
+            classification_vote = session.scalars(
+                ClassificationVote.select(session.user_or_token, mode="delete").where(
+                    ClassificationVote.classification_id == classification_id,
+                    ClassificationVote.voter_id == self.associated_user_object.id,
+                )
+            ).first()
+            session.delete(classification_vote)
+
+            obj_id = classification.obj.id
+            group_ids = [group.id for group in classification.groups]
+            for group_id in group_ids:
+                source_label = session.scalars(
+                    SourceLabel.select(session.user_or_token)
+                    .where(SourceLabel.obj_id == obj_id)
+                    .where(SourceLabel.group_id == group_id)
+                    .where(SourceLabel.labeller_id == self.associated_user_object.id)
+                ).first()
+            if source_label is None:
+                label = SourceLabel(
+                    obj_id=obj_id,
+                    labeller_id=self.associated_user_object.id,
+                    group_id=group_id,
+                )
+                session.add(label)
+
+            session.commit()
+
+            self.push_all(
+                action="skyportal/REFRESH_SOURCE",
+                payload={"obj_key": classification.obj.internal_key},
+            )
+
+            return self.success()

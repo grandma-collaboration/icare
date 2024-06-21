@@ -1,15 +1,10 @@
+import os
 import subprocess
-import time
 from pathlib import Path
 
-import yaml
-
-from launcher.commands.update import update
 from launcher.commands.clear import clear as clear_db
-from launcher.config import check_config
-from launcher.skyportal import (
-    patch as patch_skyportal,
-)
+from launcher.commands.update import update
+from launcher.skyportal import patch as patch_skyportal
 
 
 def build(
@@ -19,6 +14,7 @@ def build(
     do_update: bool = False,
     clear: bool = False,
     update_prod: bool = False,
+    skip_services_check: bool = False,  # not used here
 ):
     """Build Icare
     :param init: Initialize Icare
@@ -60,7 +56,7 @@ def build(
         cmd = subprocess.Popen(["rm", "-rf", "patched_skyportal/.git"])
     else:
         print(
-            "No changes detected, not copying skyportal to patched_skyportal, but still patching it"
+            "\nNo changes detected, not copying skyportal to patched_skyportal, but still patching it"
         )
 
     patch_skyportal("extensions/skyportal/", "patched_skyportal/")
@@ -70,6 +66,8 @@ def build(
 
     if init and skyportal_start:
         # run the command make run in skyportal dir
+        env = os.environ.copy()
+        env["NPM_CONFIG_LEGACY_PEER_DEPS"] = "true"
         cmd = subprocess.Popen(["make", "db_init"], cwd="patched_skyportal")
         cmd.wait()
 

@@ -5,6 +5,5 @@ from .diff import diff
 from .clear import clear
 from .set_user_role import set_user_role
 from .copy_token import copy_token
-from .poll_from_fink import poll_from_fink
 from .load_grandma_data import load_grandma_data
 from .apply_config import apply_config

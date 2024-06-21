@@ -1,0 +1,56 @@
+# Labels to be automatically added to PRs
+
+# Add 'config-change' label to any change to default config files
+config-change:
+  - changed-files:
+      - any-glob-to-any-file: ["skyportal/config.yaml.defaults", "skyportal/test_config.yaml", "icare.yaml.defaults"]
+
+# Add 'demo-data' label to any change to provided demo data
+demo-data:
+  - changed-files:
+      - any-glob-to-any-file: "extensions/skyportal/data/**/*"
+
+# Add 'dependencies' label to any change to dependencies
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: ["skyportal/requirements.txt", "skyportal/requirements.docs.txt", "skyportal/package.json", ".requirements/ext.txt"]
+
+# Add 'documentation' label to any change to the doc directory
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ["skyportal/doc/**/*", "extensions/skyportal/doc/**/*"]
+
+# Add 'formatting-and-linting' label to any changes to the formatting and
+# linting checks, and the pre-commit hooks that run them
+formatting-and-linting:
+  - changed-files:
+      - any-glob-to-any-file: ["skyportal/.eslintignore", "skyportal/.eslintrc.yaml", "skyportal/.flake8", "skyportal/.git-pre-commit", "skyportal/.pep8speaks.yml", "skyportal/.pre-commit-config.yaml", ".pre-commit-config.yaml"]
+
+# Add 'migration' label to any change within the 'alembic' directory
+migration:
+  - changed-files:
+      - any-glob-to-any-file: "skyportal/alembic/versions/*"
+
+# Add 'needs-migration?' label to any change to models.py without changes to
+# the Alembic versions
+needs-migration?:
+  - any:
+      - changed-files:
+        - any-glob-to-any-file: ["skyportal/skyportal/models.py", "skyportal/skyportal/models/*", "extensions/skyportal/skyportal/models.py", "extensions/skyportal/skyportal/models/*"]
+        - all-globs-to-all-files: ["!skyportal/alembic/versions/*"]
+      - changed-files:
+        - any-glob-to-any-file: ["skyportal/baselayer/app/models.py", "skyportal/baselayer/app/models/*", "extensions/skyportal/baselayer/app/models.py", "extensions/skyportal/baselayer/app/models/*"]
+        - all-globs-to-all-files: ["!skyportal/alembic/versions/*"]
+      - changed-files:
+        - any-glob-to-any-file: ["requirements.txt"]
+        - all-globs-to-all-files: ["!skyportal/alembic/versions/*"]
+
+# Add 'workflows' label to any changes to GA workflows (.github folder)
+workflows:
+  - any-glob-to-any-file: ".github/**/*"
+
+skyportal_updates:
+  - any-glob-to-any-file: "skyportal/**/*"
+
+skyportal_fink_client_updates:
+  - any-glob-to-any-file: "extensions/skyportal/services/fink/skyportal-fink-client/**/*"
