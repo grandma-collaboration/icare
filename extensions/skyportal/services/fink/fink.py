@@ -1,33 +1,31 @@
+import base64
+import datetime
+import gzip
+import io
 import os
-
-import sqlalchemy as sa
-from sqlalchemy.orm import joinedload
 import time
-import pandas as pd
+
+import conesearch_alchemy as ca
 import numpy as np
+import pandas as pd
 import requests
+import sqlalchemy as sa
 import yaml
-from astropy.time import Time
+
+from astropy.io import fits
 from astropy.visualization import (
     AsymmetricPercentileInterval,
     LinearStretch,
     LogStretch,
     ImageNormalize,
 )
-import datetime
-import gzip
-import io
-from astropy.io import fits
+from fink_filters.classification import extract_fink_classification_from_pdf
+from fink_client.consumer import AlertConsumer
 from matplotlib import pyplot as plt
-import base64
-import conesearch_alchemy as ca
 
 from baselayer.log import make_log
 from baselayer.app.models import init_db
 from baselayer.app.env import load_env
-
-from fink_client.consumer import AlertConsumer
-from fink_filters.classification import extract_fink_classification_from_pdf
 
 from skyportal.handlers.api.source import post_source
 
