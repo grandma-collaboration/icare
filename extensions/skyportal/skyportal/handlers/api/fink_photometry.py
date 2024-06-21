@@ -49,12 +49,12 @@ class FinkPhotometryHandler(BaseHandler):
 
                     stmt = Instrument.select(session.user_or_token).where(
 
-                        Instrument.name == 'CFH12k'
+                        Instrument.name == 'ZTF'
                     )
                     instrument = session.scalars(stmt).first()
                     if not instrument:
                         return self.error(
-                            'No instrument named CFH12k found to post the photometry'
+                            'Could not find any instrument named ZTF, cannot post photometry from Fink'
                         )
                     instrument_id = instrument.id
                     data = {
