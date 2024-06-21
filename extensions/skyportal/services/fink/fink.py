@@ -40,8 +40,6 @@ from skyportal.models import (
     Stream,
     Filter,
     Candidate,
-    GcnEvent,
-    LocalizationTile,
     Galaxy,
 )
 
@@ -599,118 +597,6 @@ def post_cutouts_to_skyportal(alert, token, log):
             )
             print(e)
 
-
-# TODO: move this to a more appropriate place where it can run for all alerts (not just fink's)
-# it could be added as a DB trigger in the candidates or photometry models
-# it would be triggered we similar conditions as those used for the photstats
-def source_in_recent_gcns(alert, session, user, localization_cumprob, log):
-    """
-    Check if the source is in some of the recent GCNs (within 7 days)
-
-    Arguments
-    ---------
-    alert: dict
-        Alert data
-    session: sqlalchemy.orm.session.Session
-        Database session
-    user: baselayer.app.models.User
-        The user to use to query the database
-    localization_cumprob: float
-        Cumulative probability of the localization
-    log: logging.Logger
-        Logger
-
-    Returns
-    -------
-    obj_in_events: list
-        List of GcnEvent dateobs for which the source is in the localization
-    """
-    obj = session.scalars(Obj.select(user).where(Obj.id == alert["objectId"])).first()
-    date_7_days_ago = datetime.datetime.now() - datetime.timedelta(days=7)
-    obj_in_events = []
-    if obj is not None:
-        if obj.photstats[-1].first_detected_mjd is not None:
-            if obj.photstats[-1].first_detected_mjd >= Time(date_7_days_ago).mjd:
-                gcn_events = session.scalars(
-                    GcnEvent.select(user)
-                    .where(GcnEvent.dateobs > date_7_days_ago)
-                    .where(
-                        GcnEvent.dateobs
-                        < Time(
-                            obj.photstats[-1].first_detected_mjd, format='mjd'
-                        ).datetime
-                    )
-                ).all()
-                if len(gcn_events) > 0:
-                    for gcn_event in gcn_events:
-                        # in gcnevents, we have a list of all its localizations, get the most recent one based on the value of created_at
-                        localizations = gcn_event.localizations
-                        localizations.sort(key=lambda x: x.created_at, reverse=True)
-                        localization = localizations[0]
-                        if localization is not None:
-                            obj_query_options = []
-                            obj_query_options.append(joinedload(Obj.photstats))
-                            obj_query = Obj.select(user, columns=[Obj.id])
-                            obj_query = Obj.select(
-                                user, options=obj_query_options
-                            ).where(Obj.id == alert["objectId"])
-                            cum_prob = (
-                                sa.func.sum(
-                                    LocalizationTile.probdensity
-                                    * LocalizationTile.healpix.area
-                                )
-                                .over(order_by=LocalizationTile.probdensity.desc())
-                                .label('cum_prob')
-                            )
-                            localizationtile_subquery = (
-                                sa.select(
-                                    LocalizationTile.probdensity, cum_prob
-                                ).filter(
-                                    LocalizationTile.localization_id == localization.id
-                                )
-                            ).subquery()
-
-                            min_probdensity = (
-                                sa.select(
-                                    sa.func.min(
-                                        localizationtile_subquery.columns.probdensity
-                                    )
-                                ).filter(
-                                    localizationtile_subquery.columns.cum_prob
-                                    <= localization_cumprob
-                                )
-                            ).scalar_subquery()
-
-                            tile_ids = session.scalars(
-                                sa.select(LocalizationTile.id).where(
-                                    LocalizationTile.localization_id == localization.id,
-                                    LocalizationTile.probdensity >= min_probdensity,
-                                )
-                            ).all()
-
-                            tiles_subquery = (
-                                sa.select(Obj.id)
-                                .filter(
-                                    LocalizationTile.id.in_(tile_ids),
-                                    LocalizationTile.healpix.contains(Obj.healpix),
-                                )
-                                .subquery()
-                            )
-
-                            obj_query = obj_query.join(
-                                tiles_subquery,
-                                Obj.id == tiles_subquery.c.id,
-                            )
-
-                            obj_in_loc = session.scalars(obj_query).first()
-                            if obj_in_loc is not None:
-                                log(f"Found {alert['objectId']} in {gcn_event.dateobs}")
-                                obj_in_events.append(
-                                    gcn_event.dateobs.strftime("%Y-%m-%dT%H:%M:%S")
-                                )
-    return obj_in_events
-
-
 def distance(ra1, dec1, ra2, dec2):
     """
     Calculate the distance between two points on the sky
@@ -1035,24 +921,6 @@ def post_alert(
                 token,
                 log,
             )
-
-            # TODO: add this as a DB trigger later on
-            # obj_in_events = source_in_recent_gcns(alert, session, user, 0.95, log)
-            # if len(obj_in_events) > 0:
-            #     group_users = session.scalars(
-            #         GroupUser.select(user).where(GroupUser.group_id.in_(group_ids))
-            #     ).all()
-            #     for group_user in group_users:
-            #         session.add(
-            #             UserNotification(
-            #                 user=group_user.user,
-            #                 text=f"Object {alert['objectId']} was found in GCN event(s): {', '.join(obj_in_events)} (new alert)",
-            #                 notification_type="obj_in_events",
-            #                 url=f"/source/{alert['objectId']}",
-            #             )
-            #         )
-            #     session.commit()
-
 
 def poll_fink_alerts(token: str):
     """
