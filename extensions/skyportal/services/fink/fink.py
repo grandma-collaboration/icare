@@ -932,7 +932,7 @@ def post_alert(
 
     # check if the object already exists in the database
     with DBSession() as session:
-        user = session.query(User).get(user_id)
+        user = session.scalar(sa.select(User).where(User.id == user_id))
 
         # FILTER ASSOCIATED TO TOPIC
         filters = session.scalars(
@@ -1121,7 +1121,7 @@ def poll_fink_alerts(token: str):
 
     try:
         with DBSession() as session:
-            user = session.query(User).get(1)
+            user = session.scalar(sa.select(User).where(User.id == 1))
             user_id = user.id
             instrument = session.scalars(
                 Instrument.select(user).where(Instrument.name == "ZTF")
