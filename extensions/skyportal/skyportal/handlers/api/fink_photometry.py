@@ -82,7 +82,7 @@ class FinkPhotometryHandler(BaseHandler):
                     add_external_photometry(data, self.associated_user_object)
 
                 self.push_all(
-                    action='skyportal/FETCH_SOURCE_PHOTOMETRY',
+                    action='skyportal/REFRESH_SOURCE_PHOTOMETRY',
                     payload={'obj_id': obj.id, 'magsys': magsys},
                 )
                 return self.success()
