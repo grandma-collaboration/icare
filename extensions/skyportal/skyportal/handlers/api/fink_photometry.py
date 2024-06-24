@@ -21,8 +21,10 @@ class FinkPhotometryHandler(BaseHandler):
         object_id = object_id.strip()
 
         data = self.get_json()
-        magsys = data.get('magsys', 'ab')
-        if magsys not in ['ab', 'vega']:
+        current_magsys = data.get('magsys', 'ab')
+        if current_magsys is None:
+            current_magsys = 'ab'
+        elif current_magsys not in ['ab', 'vega']:
             return self.error('Invalid magsys, must be either ab or vega')
 
         try:
@@ -83,7 +85,7 @@ class FinkPhotometryHandler(BaseHandler):
 
                 self.push_all(
                     action='skyportal/REFRESH_SOURCE_PHOTOMETRY',
-                    payload={'obj_id': obj.id, 'magsys': magsys},
+                    payload={'obj_id': obj.id, 'magsys': current_magsys},
                 )
                 return self.success()
         except Exception as e:
