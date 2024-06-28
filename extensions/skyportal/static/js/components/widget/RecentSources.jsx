@@ -19,8 +19,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 
 import { showNotification } from "baselayer/components/Notifications";
-import { ra_to_hours, dec_to_dms } from "../units";
-import * as profileActions from "../ducks/profile";
+import { ra_to_hours, dec_to_dms } from "../../units";
+import * as profileActions from "../../ducks/profile";
 import WidgetPrefsDialog from "./WidgetPrefsDialog";
 import SourceStatus from "./SourceStatus";
 

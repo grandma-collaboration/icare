@@ -6,8 +6,8 @@ import Button from "./Button";
 import { showNotification } from "baselayer/components/Notifications";
 import { useDispatch, useSelector } from "react-redux";
 
-import * as sourcestatus from "../ducks/sourcestatus";
-import { fetchRecentSources } from "../ducks/recentSources";
+import * as sourcestatus from "../../ducks/sourcestatus";
+import { fetchRecentSources } from "../../ducks/recentSources";
 
 const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
 const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
