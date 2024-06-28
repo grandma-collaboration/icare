@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import Button from "./Button";
+
+import Button from "../Button";
 import { showNotification } from "baselayer/components/Notifications";
 import { useDispatch, useSelector } from "react-redux";
 
