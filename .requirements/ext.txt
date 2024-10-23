@@ -1,8 +1,7 @@
-fink-client==7.2
+fink-client==8.7
 fink-filters==3.7
 fink-science==3.13.3
 fink-utils==0.4.0
-fastavro==1.6.0
 pyspark==3.2.1
 astroscrappy
 stdpipe==0.1
