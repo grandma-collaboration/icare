@@ -44,9 +44,9 @@ def run(
                 env=env,
             )
             cmd.communicate()
-            print("\nBuilding webpack, this may take a while...")
+            print("\nBuilding rspack, this may take a while...")
             cmd = subprocess.Popen(
-                ["./node_modules/.bin/webpack", "--mode=production"],
+                ["./node_modules/.bin/rspack", "--mode=production"],
                 cwd="patched_skyportal",
                 env=env,
             )
