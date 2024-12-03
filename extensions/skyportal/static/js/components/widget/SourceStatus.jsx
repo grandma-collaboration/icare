@@ -9,14 +9,17 @@ import { useDispatch, useSelector } from "react-redux";
 
 import * as sourcestatus from "../../ducks/sourcestatus";
 import { fetchRecentSources } from "../../ducks/recentSources";
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 
 const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
 const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
 const not_defined = ["I-care", "Not I-care"]
-const obs_status = ["GO GRANDMA", "STOP GRANDMA", "GO GRANDMA (HIGH PRIORITY)"]
+const obs_status = ["GO GRANDMA (HIGH PRIORITY)", "GO GRANDMA", "STOP GRANDMA"]
 
 const SourceStatus = ({ source }) => {
     const [open, setOpen] = useState(false);
@@ -97,7 +100,7 @@ const SourceStatus = ({ source }) => {
 
 
     return (
-        <div>
+        <div key={source.obj_id}>
             <Tooltip title="Edit Grandma Source Status" placement="left">
                 <IconButton
                     variant="outlined"
@@ -107,15 +110,21 @@ const SourceStatus = ({ source }) => {
                     <EditIcon fontSize="small" />
                 </IconButton>
             </Tooltip>
-            <Dialog open={open}>
+            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
+                <DialogTitle disableTypography style={ {display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '4rem'} }>
+                    <h3>Edit Grandma Source Status</h3>
+                    <IconButton onClick={() => setOpen(false)}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <Divider />
                 <DialogContent>
-                    <div style={ {display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '1rem'} }>
+                    <div style={ {display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gridGap: '1rem'} }>
                         <div>
                             <h3>
-                                Classification Status of {source?.obj_id}
+                                Classification Status
                             </h3>
                             <div style={ {display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridGap: '1rem'} }>
-
                                 {confirmed_classes.map((c) => (
                                     <Button
                                         key={c}
@@ -155,33 +164,24 @@ const SourceStatus = ({ source }) => {
                         </div>
                         <div>
                             <h3>
-                                Source Observation Status
+                                Observation Status
                             </h3>
                             <div style={ {display: 'grid', gridTemplateColumns: '1fr', gridGap: '1rem'} }>
                             {obs_status.map((c) => (
-                                    <Button
-                                        key={c}
-                                        variant="outlined"
-                                        size="small"
-                                        onClick={() => {
-                                            changeSourceObsStatus(c);
-                                        }}
-                                    >
-                                        {c}
-                                    </Button>
-                                ))}
+                                <Button
+                                    key={c}
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => {
+                                        changeSourceObsStatus(c);
+                                    }}
+                                >
+                                    {c}
+                                </Button>
+                            ))}
                             </div>
                         </div>
                     </div>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {
-                            setOpen(false);
-                        }}
-                    >
-                        Close
-                    </Button>
                 </DialogContent>
             </Dialog>
         </div>
