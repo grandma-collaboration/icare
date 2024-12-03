@@ -9,6 +9,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import * as sourcestatus from "../../ducks/sourcestatus";
 import { fetchRecentSources } from "../../ducks/recentSources";
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
 
 const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
 const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
@@ -95,13 +98,15 @@ const SourceStatus = ({ source }) => {
 
     return (
         <div>
-            <Button
-                variant="outlined"
-                size="small"
-                onClick={() => setOpen(true)}
-            >
-                Update Status
-            </Button>
+            <Tooltip title="Edit Grandma Source Status" placement="left">
+                <IconButton
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setOpen(true)}
+                >
+                    <EditIcon fontSize="small" />
+                </IconButton>
+            </Tooltip>
             <Dialog open={open}>
                 <DialogContent>
                     <div style={ {display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '1rem'} }>
