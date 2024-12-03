@@ -254,10 +254,10 @@ jobs:
           path: patched_skyportal/log
 
       - name: Upload test post-mortem reports
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: test-results
+          name: test-results-${{ matrix.test_subset }}
           path: patched_skyportal/test-results
 
       - name: Upload generated plots
