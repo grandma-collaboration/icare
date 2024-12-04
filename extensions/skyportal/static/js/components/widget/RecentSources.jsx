@@ -19,13 +19,19 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 
 import { showNotification } from "baselayer/components/Notifications";
-import { ra_to_hours, dec_to_dms } from "../../units";
+import { dec_to_dms, ra_to_hours } from "../../units";
 import * as profileActions from "../../ducks/profile";
 import WidgetPrefsDialog from "./WidgetPrefsDialog";
+
 import SourceStatus from "./SourceStatus";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
+
+const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
+const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
+const not_confirmed_classes = ["I-care", "Not I-care"]
+const obs_classes = ['GO GRANDMA', 'STOP GRANDMA', 'GO GRANDMA (HIGH PRIORITY)']
 
 export const useSourceListStyles = makeStyles((theme) => ({
   stampContainer: {
@@ -125,22 +131,6 @@ export const useSourceListStyles = makeStyles((theme) => ({
         theme.palette.mode === "light" ? theme.palette.secondary.light : null,
     },
   },
-  confirmed: {
-    background: "#03c04a!important",
-  },
-  rejected: {
-    background: "#ff0000!important",
-  },
-  not_confirmed: {
-    // grey background
-    background: "#e0e0e0!important",
-  },
-  go: {
-    background: "#03c04a!important",
-  },
-  stop: {
-    background: "#ff0000!important",
-  },
   root: {
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -171,6 +161,22 @@ export const useSourceListStyles = makeStyles((theme) => ({
     "& > * + *": {
       marginLeft: theme.spacing(2),
     },
+  },
+  confirmed: {
+    background: "#03c04a!important",
+  },
+  rejected: {
+    background: "#ff0000!important",
+  },
+  not_confirmed: {
+    // grey background
+    background: "#e0e0e0!important",
+  },
+  go: {
+    background: "#03c04a!important",
+  },
+  stop: {
+    background: "#ff0000!important",
   },
 }));
 
@@ -309,21 +315,16 @@ const RecentSourcesList = ({
     return <div>No recent sources available.</div>;
   }
 
-  const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
-  const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
-  const not_confirmed_classes = ["I-care", "Not I-care"]
-  const obs_classes = ['GO GRANDMA', 'STOP GRANDMA', 'GO GRANDMA (HIGH PRIORITY)']
-
   return (
     <div className={styles.sourceListContainer}>
       <ul className={styles.sourceList}>
         {sources.map((source) => {
           let recentSourceName = `${source.obj_id}`;
+          let classification = null;
           let grandma_source_classification = "I-care";
           let confirmed_or_rejected = 'not_confirmed';
           let grandma_obs_classification = null;
           let obs_status = null;
-          let classification = null;
           if (source.classifications.length > 0) {
             // Display the most recent non-zero probability class
             const filteredClasses = source.classifications?.filter(
@@ -421,19 +422,6 @@ const RecentSourcesList = ({
                         <Chip className={styles[obs_status]} size="small" label={grandma_obs_classification} key={grandma_obs_classification}/>
                         )}
                       </span>
-                      <span>
-                        {`\u03B1, \u03B4: ${ra_to_hours(
-                          source.ra
-                        )} ${dec_to_dms(source.dec)}`}
-                      </span>
-                      <Link
-                        to={`/source/${source.obj_id}`}
-                        className={styles.sourceName}
-                      >
-                        <span className={styles.sourceNameLink}>
-                          {recentSourceName}
-                        </span>
-                      </Link>
                       {classification && (
                         <span className={styles.classification}>
                           {classification}
@@ -457,7 +445,6 @@ const RecentSourcesList = ({
                       <span style={{ textAlign: "right" }}>
                         {dayjs().to(dayjs.utc(`${source.created_at}Z`))}
                       </span>
-                      <SourceStatus source={source} />
                       {displayTNS && source?.tns_name?.length > 0 && (
                         <div
                           style={{
@@ -490,6 +477,7 @@ const RecentSourcesList = ({
                           />
                         </div>
                       )}
+                      <SourceStatus source={source} />
                     </div>
                   </div>
                 </div>
