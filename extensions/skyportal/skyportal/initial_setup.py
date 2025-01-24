@@ -7,8 +7,8 @@ import model_util
 
 from baselayer.app.env import load_env
 from baselayer.app.model_util import create_tables
-from baselayer.tools.status import status
 from baselayer.app.psa import TornadoStorage
+from baselayer.tools.status import status
 from skyportal.models import Base, DBSession, User, init_db
 
 """
@@ -29,13 +29,15 @@ PYTHONPATH=$PYTHONPATH:"." python skyportal/initial_setup.py  \
            --adminuser=<email> --user=<anotheremail>
 """
 
-parser = argparse.ArgumentParser(description="Initialize Skyportal and add admin/users")
+parser = argparse.ArgumentParser(
+    description="Initialize Skyportal and optionally add admin/users"
+)
 
 parser.add_argument(
-    '--config',
-    dest='config',
-    default='config.yaml',
-    help='Path to config file (default: config.yaml)',
+    "--config",
+    dest="config",
+    default="config.yaml",
+    help="Path to config file (default: config.yaml)",
 )
 
 parser.add_argument(
@@ -69,7 +71,7 @@ if __name__ == "__main__":
         print("Note: user is not a valid email address")
 
     with status(f"Connecting to database {cfg['database.database']}"):
-        init_db(**cfg['database'])
+        init_db(**cfg["database"])
 
     with status(
         f"Creating tables in database {cfg['database.database']} if they do not exist"
@@ -92,7 +94,9 @@ if __name__ == "__main__":
 
             for u in [super_admin_user]:
                 DBSession().add(
-                    TornadoStorage.user.create_social_auth(u, u.username, "iam-oauth2")
+                    TornadoStorage.user.create_social_auth(
+                        u, u.username, "iam-oauth2"
+                    )
                 )
     if user != "":
         with status(f"Creating user ({user})"):
@@ -102,7 +106,9 @@ if __name__ == "__main__":
 
             for u in [user]:
                 DBSession().add(
-                    TornadoStorage.user.create_social_auth(u, u.username, "iam-oauth2")
+                    TornadoStorage.user.create_social_auth(
+                        u, u.username, "iam-oauth2"
+                    )
                 )
     if adminuser == "" and results.adminuser is not None:
         print("Note: adminuser is not a valid email address")

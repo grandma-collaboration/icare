@@ -1,30 +1,26 @@
-__all__ = ['Invitation']
+__all__ = ["Invitation"]
 
 import sqlalchemy as sa
-from sqlalchemy.orm import relationship
-from sqlalchemy.dialects import postgresql as psql
-from sqlalchemy_utils import EmailType
 from sqlalchemy import event
+from sqlalchemy.dialects import postgresql as psql
+from sqlalchemy.orm import relationship
+from sqlalchemy_utils import EmailType
 
-from baselayer.app.models import Base, AccessibleIfUserMatches
 from baselayer.app.env import load_env
+from baselayer.app.models import AccessibleIfUserMatches, Base
 
-from ..email_utils import send_email
 from ..app_utils import get_app_base_url
-
-# instead of overwritint the __init__.py file, we can import the function
-# in this model that we are overwriting anyway (and that never changes on skyportal/main)
-from .source_events import source_after_insert
+from ..email_utils import send_email
 
 _, cfg = load_env()
 
 
 class Invitation(Base):
-    read = update = delete = AccessibleIfUserMatches('invited_by')
+    read = update = delete = AccessibleIfUserMatches("invited_by")
 
     token = sa.Column(sa.String(), nullable=False, unique=True)
     role_id = sa.Column(
-        sa.ForeignKey('roles.id'),
+        sa.ForeignKey("roles.id"),
         nullable=False,
     )
     role = relationship(
@@ -54,13 +50,13 @@ class Invitation(Base):
         cascade="save-update, merge, refresh-expire, expunge",
         passive_deletes=True,
         uselist=False,
-        overlaps='users',
+        overlaps="users",
     )
     used = sa.Column(sa.Boolean, nullable=False, default=False)
     user_expiration_date = sa.Column(sa.DateTime, nullable=True)
 
 
-@event.listens_for(Invitation, 'after_insert')
+@event.listens_for(Invitation, "after_insert")
 def send_user_invite_email(mapper, connection, target):
     app_base_url = get_app_base_url()
     link_location = f'{app_base_url}/login/iam-oauth2/?invite_token={target.token}'
@@ -68,7 +64,7 @@ def send_user_invite_email(mapper, connection, target):
         recipients=[target.user_email],
         subject=cfg["invitations.email_subject"],
         body=(
-            f'{cfg["invitations.email_body_preamble"]}<br /><br />'
+            f"{cfg['invitations.email_body_preamble']}<br /><br />"
             f'Please click <a href="{link_location}">here</a> to join.'
         ),
     )
