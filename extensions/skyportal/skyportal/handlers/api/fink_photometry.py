@@ -36,7 +36,7 @@ class FinkPhotometryHandler(BaseHandler):
                     return self.error("Object not found")
 
                 r = requests.post(
-                    'https://fink-portal.org/api/v1/objects',
+                    'https://api.fink-portal.org/api/v1/objects',
                     json={'objectId': object_id, 'output-format': 'json', 'withupperlim': True},
                 )
                 if r.status_code != 200:
