@@ -185,8 +185,8 @@ how to install them on MacOS and Debian-based systems below.
 - Python 3.8 or later
 - Supervisor (v>=3.0b2)
 - NGINX (v>=1.7)
-- PostgreSQL (v>=14)
-- Node.JS/npm (v>=5.8.0)
+- PostgreSQL (v>=16)
+- Node.JS (v>=20.19.0) / npm (v>=10.8.2)
 
 When installing SkyPortal on Debian-based systems, 2 additional packages are required to be able to install pycurl later on:
 
@@ -220,7 +220,7 @@ sudo apt install nginx supervisor libpq-dev npm python3-pip libcurl4-gnutls-dev 
 
 2. Installing PostgreSQL
 
-The version of PostgreSQL that is shipped with most Debian-based Linux distributions is not up to date (usually 12 instead of 14). If you already have an older version installed, you first need to remove it:
+The version of PostgreSQL that is shipped with most Debian-based Linux distributions is not up to date (usually 12 or 14 instead of 16). If you already have an older version installed, you first need to remove it:
 ```
 sudo systemctl stop postgresql
 sudo pg_dropcluster --stop <older_version> main
@@ -228,13 +228,13 @@ sudo apt-get --purge remove postgresql postgresql-*
 sudo rm -r /var/lib/postgresql/<older_version>
 sudo rm -r /etc/postgresql/<older_version>
 ```
-Here are the steps to install version 14:
+Here are the steps to install version 16:
 ```
 sudo apt update && sudo apt upgrade
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt -y update
-sudo apt -y install postgresql-14
+sudo apt -y install postgresql-16
 ```
 
 To verify if the installation was successful, run the following command:
@@ -382,7 +382,7 @@ This will update the version of SkyPortal that is pinned in the app. When doing 
 
 After updating the version that is pinned, and fixing potential merge conflict, rerun the app with:
 ```
-./grandma.sh run
+./icare.sh run
 ```
 
 If everything seems to be working fine, commit your changes to your branch (don't forget to `git add` all the modified files, including skyportal itself using `git add skyportal`), open a PR and wait for the GitHUb actions to finish running. If everything is green, ask for a review and merge the changes to the main branch **ONLY** when all reviewers approved your changes.
@@ -407,7 +407,7 @@ When the app runs, as the database's state has been stamped, a migration server 
 
 To load data from the grandma_data repo, we can use the `load_grandma_data` command as such:
 ```
-./grandma.sh load_grandma_data
+./icare.sh load_grandma_data
 ```
 
 ### Set user roles
@@ -416,12 +416,12 @@ In SkyPortal, there is a script that an admin can use to set user roles manually
 Here, we just added a command to call that script with the same syntax as other command from grandma_skyportal.
 You can use it as such:
 ```
-./grandma.sh set_user_role --user=<user_name> --role=<role_with_underscores_instead_of_spaces>
+./icare.sh set_user_role --user=<user_name> --role=<role_with_underscores_instead_of_spaces>
 ```
 
 To see the list of user and roles, run:
 ```
-./grandma.sh set_user_role --list
+./icare.sh set_user_role --list
 ```
 
 ## Access the Production VM (at IJCLAB)
@@ -477,7 +477,7 @@ For now, starting the app is not done automatically when the VM reboots. You can
 
 After starting the app remotely from your computer, you will very likely close the SSH connection, effectively closing the terminal in which you ran the app. This is fine, and won't close the app. However, if you want to stop the app, you won't be able to go back to that terminal to close it using the `Ctrl+C` key as you would normally do. Instead, you need to reboot the VM, connect to it, and repeat the steps detailed above.
 
-If you have trouble starting or accessing the app, maybe that Nginx or PostgreSQL did not start correctly. First stop the app, and use `systemctl` to see the status of a service (they should be named `nginx` and `postgresql-14`):
+If you have trouble starting or accessing the app, maybe that Nginx or PostgreSQL did not start correctly. First stop the app, and use `systemctl` to see the status of a service (they should be named `nginx` and `postgresql-16`):
 ```
 systemctl status <service_name>
 ```

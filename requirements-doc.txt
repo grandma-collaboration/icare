@@ -1,4 +1,4 @@
 mkdocs
-jinja2==3.0.3
+jinja2
 mkdocstrings
 mkdocs-material
