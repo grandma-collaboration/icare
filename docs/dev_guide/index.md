@@ -185,7 +185,7 @@ how to install them on MacOS and Debian-based systems below.
 - Python 3.8 or later
 - Supervisor (v>=3.0b2)
 - NGINX (v>=1.7)
-- PostgreSQL (v>=16)
+- PostgreSQL (v>=17)
 - Node.JS (v>=20.19.0) / npm (v>=10.8.2)
 
 When installing SkyPortal on Debian-based systems, 2 additional packages are required to be able to install pycurl later on:
@@ -220,7 +220,7 @@ sudo apt install nginx supervisor libpq-dev npm python3-pip libcurl4-gnutls-dev 
 
 2. Installing PostgreSQL
 
-The version of PostgreSQL that is shipped with most Debian-based Linux distributions is not up to date (usually 12 or 14 instead of 16). If you already have an older version installed, you first need to remove it:
+The version of PostgreSQL that is shipped with most Debian-based Linux distributions is not up to date. If you already have an older version installed, you first need to remove it:
 ```
 sudo systemctl stop postgresql
 sudo pg_dropcluster --stop <older_version> main
@@ -228,13 +228,13 @@ sudo apt-get --purge remove postgresql postgresql-*
 sudo rm -r /var/lib/postgresql/<older_version>
 sudo rm -r /etc/postgresql/<older_version>
 ```
-Here are the steps to install version 16:
+Here are the steps to install version 17:
 ```
 sudo apt update && sudo apt upgrade
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt -y update
-sudo apt -y install postgresql-16
+sudo apt -y install postgresql-17
 ```
 
 To verify if the installation was successful, run the following command:
@@ -477,7 +477,7 @@ For now, starting the app is not done automatically when the VM reboots. You can
 
 After starting the app remotely from your computer, you will very likely close the SSH connection, effectively closing the terminal in which you ran the app. This is fine, and won't close the app. However, if you want to stop the app, you won't be able to go back to that terminal to close it using the `Ctrl+C` key as you would normally do. Instead, you need to reboot the VM, connect to it, and repeat the steps detailed above.
 
-If you have trouble starting or accessing the app, maybe that Nginx or PostgreSQL did not start correctly. First stop the app, and use `systemctl` to see the status of a service (they should be named `nginx` and `postgresql-16`):
+If you have trouble starting or accessing the app, maybe that Nginx or PostgreSQL did not start correctly. First stop the app, and use `systemctl` to see the status of a service (they should be named `nginx` and `postgresql-17`):
 ```
 systemctl status <service_name>
 ```
