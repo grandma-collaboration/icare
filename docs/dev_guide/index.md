@@ -391,17 +391,58 @@ If everything seems to be working fine, commit your changes to your branch (don'
 
 The commands mentioned above are meant to update the version of skyportal that is pinned in the repo, along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
 
-To do that in production, stop the app, and run
+On your local environment:
 ```
+# 1. Update your repo 
 git pull
+git submodule update --init --recursive
+./icare.sh run --do_update
+
+# 2. Push to Icare the last modifications
+git add skyportal
+git commit -m "Bump to skyportal <commit_hash>"
+git push
 ```
 
-to get the new changes, and then run
+Then, on the production machine :
+1. Reboot the machine to stop Icare and connect as root (`sudo su`)
+2. Go to `/htdocs/skyportal/deployment/grandma_skyportal/`
+2. Update to the last version of ICARE and its submodule :
 ```
-./icare.sh run --update_prod
+git pull
+git submodule update --init --recursive
 ```
-to update the app in production. First, this will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
+3. Run this command. It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
 When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
+```
+./icare_prod.sh run --update_prod
+```
+
+4. If everything is ok in the last step, run the following command :
+```
+./icare_prod.sh run --production
+```
+
+#### Troubleshooting
+
+##### `./icare_prod.sh run --update_prod` failed  
+Make sure that postgres and nginx are running and restart them if their process are dead.
+```
+systemctl status posgresql
+systemctl status nginx
+```
+If needed, run :
+```
+systemctl restart posgresql
+systemctl restart nginx
+```
+
+##### Error 502 after an Icare update  
+
+If after a Icare update you go to Icare portal and you have an error message with a 502 error code, then perform the following steps:
+1. Press Ctrl Z and run `bg` to put Icare in the background without stopping the process.
+
+2. Run `setenforce 0` to set the enforcement mode of the SELinux to permissive.
 
 ### Loading data from the grandma_data repo
 
