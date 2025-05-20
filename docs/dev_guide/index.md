@@ -398,27 +398,27 @@ git pull
 git submodule update --init --recursive
 ./icare.sh run --do_update
 
-# 2. Push to Icare the last modifications
+# 2. Push to icare the last modifications
 git add skyportal
 git commit -m "Bump to skyportal <commit_hash>"
 git push
 ```
 
 Then, on the production machine :
-1. Reboot the machine to stop Icare and connect as root (`sudo su`)
+1. Reboot the machine to stop icare and connect you as root (`sudo su`)
 2. Go to `/htdocs/skyportal/deployment/grandma_skyportal/`
-2. Update to the last version of ICARE and its submodule :
+3. Update to the last version of icare and its submodule :
 ```
 git pull
 git submodule update --init --recursive
 ```
-3. Run this command. It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
+4. Run this command. It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
 When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
 ```
 ./icare_prod.sh run --update_prod
 ```
 
-4. If everything is ok in the last step, run the following command :
+5. If everything is ok in the last step, run the following command :
 ```
 ./icare_prod.sh run --production
 ```
@@ -437,10 +437,10 @@ systemctl restart posgresql
 systemctl restart nginx
 ```
 
-##### Error 502 after an Icare update  
+##### Error 502 after an icare update  
 
-If after a Icare update you go to Icare portal and you have an error message with a 502 error code, then perform the following steps:
-1. Press Ctrl Z and run `bg` to put Icare in the background without stopping the process.
+If after a icare update you go to icare portal and you have an error message with a 502 error code, then perform the following steps:
+1. Press Ctrl Z and run `bg` to put icare in the background without stopping the process.
 
 2. Run `setenforce 0` to set the enforcement mode of the SELinux to permissive.
 
