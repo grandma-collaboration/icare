@@ -185,8 +185,8 @@ how to install them on MacOS and Debian-based systems below.
 - Python 3.8 or later
 - Supervisor (v>=3.0b2)
 - NGINX (v>=1.7)
-- PostgreSQL (v>=14)
-- Node.JS/npm (v>=5.8.0)
+- PostgreSQL (v>=17)
+- Node.JS (v>=20.19.0) / npm (v>=10.8.2)
 
 When installing SkyPortal on Debian-based systems, 2 additional packages are required to be able to install pycurl later on:
 
@@ -220,7 +220,7 @@ sudo apt install nginx supervisor libpq-dev npm python3-pip libcurl4-gnutls-dev 
 
 2. Installing PostgreSQL
 
-The version of PostgreSQL that is shipped with most Debian-based Linux distributions is not up to date (usually 12 instead of 14). If you already have an older version installed, you first need to remove it:
+The version of PostgreSQL that is shipped with most Debian-based Linux distributions is not up to date. If you already have an older version installed, you first need to remove it:
 ```
 sudo systemctl stop postgresql
 sudo pg_dropcluster --stop <older_version> main
@@ -228,13 +228,13 @@ sudo apt-get --purge remove postgresql postgresql-*
 sudo rm -r /var/lib/postgresql/<older_version>
 sudo rm -r /etc/postgresql/<older_version>
 ```
-Here are the steps to install version 14:
+Here are the steps to install version 17:
 ```
 sudo apt update && sudo apt upgrade
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt -y update
-sudo apt -y install postgresql-14
+sudo apt -y install postgresql-17
 ```
 
 To verify if the installation was successful, run the following command:
@@ -382,7 +382,7 @@ This will update the version of SkyPortal that is pinned in the app. When doing 
 
 After updating the version that is pinned, and fixing potential merge conflict, rerun the app with:
 ```
-./grandma.sh run
+./icare.sh run
 ```
 
 If everything seems to be working fine, commit your changes to your branch (don't forget to `git add` all the modified files, including skyportal itself using `git add skyportal`), open a PR and wait for the GitHUb actions to finish running. If everything is green, ask for a review and merge the changes to the main branch **ONLY** when all reviewers approved your changes.
@@ -391,23 +391,64 @@ If everything seems to be working fine, commit your changes to your branch (don'
 
 The commands mentioned above are meant to update the version of skyportal that is pinned in the repo, along with the extensions. Once that is done, the developer has to commit new changes to the branch that is used in production.
 
-To do that in production, stop the app, and run
+On your local environment:
 ```
+# 1. Update your repo 
 git pull
+git submodule update --init --recursive
+./icare.sh run --do_update
+
+# 2. Push to icare the last modifications
+git add skyportal
+git commit -m "Bump to skyportal <commit_hash>"
+git push
 ```
 
-to get the new changes, and then run
+Then, on the production machine :
+1. Reboot the machine to stop icare and connect you as root (`sudo su`)
+2. Go to `/htdocs/skyportal/deployment/grandma_skyportal/`
+3. Update to the last version of icare and its submodule :
 ```
-./icare.sh run --update_prod
+git pull
+git submodule update --init --recursive
 ```
-to update the app in production. First, this will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
+4. Run this command. It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
 When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
+```
+./icare_prod.sh run --update_prod
+```
+
+5. If everything is ok in the last step, run the following command :
+```
+./icare_prod.sh run --production
+```
+
+#### Troubleshooting
+
+##### `./icare_prod.sh run --update_prod` failed  
+Make sure that postgres and nginx are running and restart them if their process are dead.
+```
+systemctl status posgresql
+systemctl status nginx
+```
+If needed, run :
+```
+systemctl restart posgresql
+systemctl restart nginx
+```
+
+##### Error 502 after an icare update  
+
+If after a icare update you go to icare portal and you have an error message with a 502 error code, then perform the following steps:
+1. Press Ctrl Z and run `bg` to put icare in the background without stopping the process.
+
+2. Run `setenforce 0` to set the enforcement mode of the SELinux to permissive.
 
 ### Loading data from the grandma_data repo
 
 To load data from the grandma_data repo, we can use the `load_grandma_data` command as such:
 ```
-./grandma.sh load_grandma_data
+./icare.sh load_grandma_data
 ```
 
 ### Set user roles
@@ -416,12 +457,12 @@ In SkyPortal, there is a script that an admin can use to set user roles manually
 Here, we just added a command to call that script with the same syntax as other command from grandma_skyportal.
 You can use it as such:
 ```
-./grandma.sh set_user_role --user=<user_name> --role=<role_with_underscores_instead_of_spaces>
+./icare.sh set_user_role --user=<user_name> --role=<role_with_underscores_instead_of_spaces>
 ```
 
 To see the list of user and roles, run:
 ```
-./grandma.sh set_user_role --list
+./icare.sh set_user_role --list
 ```
 
 ## Access the Production VM (at IJCLAB)
@@ -477,7 +518,7 @@ For now, starting the app is not done automatically when the VM reboots. You can
 
 After starting the app remotely from your computer, you will very likely close the SSH connection, effectively closing the terminal in which you ran the app. This is fine, and won't close the app. However, if you want to stop the app, you won't be able to go back to that terminal to close it using the `Ctrl+C` key as you would normally do. Instead, you need to reboot the VM, connect to it, and repeat the steps detailed above.
 
-If you have trouble starting or accessing the app, maybe that Nginx or PostgreSQL did not start correctly. First stop the app, and use `systemctl` to see the status of a service (they should be named `nginx` and `postgresql-14`):
+If you have trouble starting or accessing the app, maybe that Nginx or PostgreSQL did not start correctly. First stop the app, and use `systemctl` to see the status of a service (they should be named `nginx` and `postgresql-17`):
 ```
 systemctl status <service_name>
 ```
