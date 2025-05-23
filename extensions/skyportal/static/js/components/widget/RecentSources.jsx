@@ -552,7 +552,7 @@ const RecentSources = ({ classes }) => {
       <div className={classes.widgetPaperDiv}>
         <div>
           <Typography variant="h6" display="inline">
-            Recent Sources (ZTF Kilonova/Swift)
+            Recent Sources
           </Typography>
           <DragHandleIcon className={`${classes.widgetIcon} dragHandle`} />
           <div className={classes.widgetIcon}>
