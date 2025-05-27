@@ -131,4 +131,5 @@ analysis_services:
   spectral_cube_analysis_service:
     port: 7003
 
-default_groups: []
+user:
+  default_groups: []
