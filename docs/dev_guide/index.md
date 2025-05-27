@@ -393,7 +393,7 @@ The commands mentioned above are meant to update the version of skyportal that i
 
 On your local environment:
 ```
-# 1. Update your repo 
+# 1. Update your repo
 git pull
 git submodule update --init --recursive
 ./icare.sh run --do_update
@@ -405,9 +405,13 @@ git push
 ```
 
 Then, on the production machine :
+
 1. Reboot the machine to stop icare and connect you as root (`sudo su`)
+
 2. Go to `/htdocs/skyportal/deployment/grandma_skyportal/`
+
 3. Update to the last version of icare and its submodule :
+
 ```
 git pull
 git submodule update --init --recursive
@@ -425,7 +429,8 @@ When the app runs, as the database's state has been stamped, a migration server 
 
 #### Troubleshooting
 
-##### `./icare_prod.sh run --update_prod` failed  
+##### `./icare_prod.sh run --update_prod` failed
+
 Make sure that postgres and nginx are running and restart them if their process are dead.
 ```
 systemctl status posgresql
@@ -437,7 +442,7 @@ systemctl restart posgresql
 systemctl restart nginx
 ```
 
-##### Error 502 after an icare update  
+##### Error 502 after an icare update
 
 If after a icare update you go to icare portal and you have an error message with a 502 error code, then perform the following steps:
 1. Press Ctrl Z and run `bg` to put icare in the background without stopping the process.

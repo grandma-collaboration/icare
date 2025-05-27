@@ -1,9 +1,70 @@
-__pycache__
-node_modules
-env
-venv
+.#*
+log/
+.log
+.cache
+cache/
+static/build
+doc/_build
+doc/openapi.html
+run/
 geckodriver.log
+\#*
+*~
+*.swp
+*.swo
+.DS_Store
+__pycache__/
+.pytest_cache/
+node_modules/
+*.pyc
+config.yaml
+static/thumbnails
+*.lock
+*.dirlock
+package-lock.json
+.jobs_timestamps.yaml
+skyportal_image_cache
+.tokens.yaml
+.vscode
+
+# Templated files
+static/js/components/templates/Main.jsx
+static/js/components/templates/SidebarAndHeader.jsx
+static/js/components/templates/HeaderContent.jsx
+static/js/components/templates/HomePage.jsx
+static/js/components/templates/HoursBelowAirmassPlot.jsx
+static/login.html
+static/loginerror.html
+static/index.html
+.tokens.yaml
+# Auto-generated data files
+data/taxonomy_sitewide.yaml
+data/taxonomy_demo.yaml
+.idea
+doc/images/erd.png
+
+# gitlog info
+data/gitlog.txt
+
+# test results
+test-results/
+webdriver-console/
+
+# persistent data (e.g. analysis, localizations, comment attachements, etc.)
+persistentdata/
+
+# python virtual environments
+skyportal_env/
+env/
+venv/
+
+# distribution files (for releases)
+dists/
+
+# postgres persistent volume
+data/dbdata/
+
+# Icare specific files/dir to ignore
 patched_skyportal
 previous_skyportal
 icare.yaml
-.DS_Store
