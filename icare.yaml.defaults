@@ -239,15 +239,15 @@ app:
         sm: [0, 2, 3, 3]
         xs: [0, 3, 4, 3]
 
-    # FollowUpAdvocates:
-    #   resizeable: true
-    #   minW: 2
-    #   layouts:
-    #     xlg: [6, 3, 5, 2]
-    #     lg: [5, 2, 4, 3]
-    #     md: [0, 3, 5, 3]
-    #     sm: [0, 9, 3, 3]
-    #     xs: [0, 12, 4, 2]
+    TopSources:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [6, 3, 5, 2]
+        lg: [5, 2, 4, 3]
+        md: [0, 3, 5, 3]
+        sm: [0, 9, 3, 3]
+        xs: [0, 12, 4, 2]
 
     NewsFeed:
       resizeable: true
@@ -313,9 +313,6 @@ gcn:
     voevent:
       - gcn.notices.svom.voevent.grm
       - gcn.notices.svom.voevent.eclairs
-      - gcn.classic.voevent.FERMI_GBM_FLT_POS
-      - gcn.classic.voevent.FERMI_GBM_GND_POS
-      - gcn.classic.voevent.FERMI_GBM_FIN_POS
       - gcn.classic.voevent.SWIFT_BAT_GRB_LC
       - gcn.classic.voevent.SWIFT_BAT_GRB_POS_ACK
       - gcn.classic.voevent.SWIFT_XRT_POSITION
