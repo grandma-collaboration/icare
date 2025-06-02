@@ -133,3 +133,8 @@ analysis_services:
 
 user:
   default_groups: []
+
+gcn:
+  notice_types:
+    voevent:
+      - gcn.classic.voevent.FERMI_GBM_GND_POS
