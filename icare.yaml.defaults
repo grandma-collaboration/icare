@@ -1,3 +1,6 @@
+ports:
+  tarot_proxy: 64910
+
 app:
   title: Icare
   factory: skyportal.app_server_icare.make_app_icare
@@ -6,7 +9,7 @@ app:
     use_skyportal_fields: False
 
   # Tarot API endpoints
-  tarot_proxy_endpoint: http://127.0.0.1/api/tarot_proxy
+  tarot_proxy_endpoint: http://localhost:64910/
   tarot_endpoint: http://cador.tarotnet.org/ros
   calern_endpoint: http://tca4.tarotnet.org/ros/klotz
   chili_endpoint: http://tch4.tarotnet.org/ros/klotz
@@ -291,9 +294,6 @@ server:
 
 services:
   dask: False
-
-ports:
-  tarot_proxy: 64910
 
 notifications:
   enabled: True
