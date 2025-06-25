@@ -448,6 +448,7 @@ systemctl restart nginx
 ##### Error 502 after an icare update
 
 If after a icare update you go to icare portal and you have an error message with a 502 error code, then perform the following steps:
+
 1. Press Ctrl Z and run `bg` to put icare in the background without stopping the process.
 
 2. Run `setenforce 0` to set the enforcement mode of the SELinux to permissive.
