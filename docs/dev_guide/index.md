@@ -416,11 +416,14 @@ Then, on the production machine :
 git pull
 git submodule update --init --recursive
 ```
-4. Run this command. It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
-When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
+
+4. Run this command:
 ```
 ./icare_prod.sh run --update_prod
 ```
+
+It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
+When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
 
 5. If everything is ok in the last step, run the following command :
 ```
@@ -433,12 +436,12 @@ When the app runs, as the database's state has been stamped, a migration server 
 
 Make sure that postgres and nginx are running and restart them if their process are dead.
 ```
-systemctl status posgresql
+systemctl status postgresql
 systemctl status nginx
 ```
 If needed, run :
 ```
-systemctl restart posgresql
+systemctl restart postgresql
 systemctl restart nginx
 ```
 
