@@ -393,7 +393,7 @@ The commands mentioned above are meant to update the version of skyportal that i
 
 On your local environment:
 ```
-# 1. Update your repo 
+# 1. Update your repo
 git pull
 git submodule update --init --recursive
 ./icare.sh run --do_update
@@ -405,18 +405,25 @@ git push
 ```
 
 Then, on the production machine :
+
 1. Reboot the machine to stop icare and connect you as root (`sudo su`)
+
 2. Go to `/htdocs/skyportal/deployment/grandma_skyportal/`
+
 3. Update to the last version of icare and its submodule :
+
 ```
 git pull
 git submodule update --init --recursive
 ```
-4. Run this command. It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
-When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
+
+4. Run this command:
 ```
 ./icare_prod.sh run --update_prod
 ```
+
+It will stamp the current database state using alembic. This is done so that when updating the app, if the models of some tables has been modified, or if new tables have been added, alembic is able to apply the changes to the database. Then skyportal will be updated, and changes from the extensions directory will be applied.
+When the app runs, as the database's state has been stamped, a migration server should start automatically and update the database.
 
 5. If everything is ok in the last step, run the following command :
 ```
@@ -425,21 +432,23 @@ When the app runs, as the database's state has been stamped, a migration server 
 
 #### Troubleshooting
 
-##### `./icare_prod.sh run --update_prod` failed  
+##### `./icare_prod.sh run --update_prod` failed
+
 Make sure that postgres and nginx are running and restart them if their process are dead.
 ```
-systemctl status posgresql
+systemctl status postgresql
 systemctl status nginx
 ```
 If needed, run :
 ```
-systemctl restart posgresql
+systemctl restart postgresql
 systemctl restart nginx
 ```
 
-##### Error 502 after an icare update  
+##### Error 502 after an icare update
 
 If after a icare update you go to icare portal and you have an error message with a 502 error code, then perform the following steps:
+
 1. Press Ctrl Z and run `bg` to put icare in the background without stopping the process.
 
 2. Run `setenforce 0` to set the enforcement mode of the SELinux to permissive.

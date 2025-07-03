@@ -130,3 +130,11 @@ analysis_services:
     port: 6802
   spectral_cube_analysis_service:
     port: 7003
+
+user:
+  default_groups: []
+
+gcn:
+  notice_types:
+    voevent:
+      - gcn.classic.voevent.FERMI_GBM_GND_POS

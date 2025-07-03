@@ -1,9 +1,19 @@
+ports:
+  tarot_proxy: 64910
+
 app:
   title: Icare
   factory: skyportal.app_server_icare.make_app_icare
   observation_plan:
     default_filters: ['ztfg', 'ztfr', 'ztfi']
     use_skyportal_fields: False
+
+  # Tarot API endpoints
+  tarot_proxy_endpoint: http://localhost:64910/
+  tarot_endpoint: http://cador.tarotnet.org/ros
+  calern_endpoint: http://tca4.tarotnet.org/ros/klotz
+  chili_endpoint: http://tch4.tarotnet.org/ros/klotz
+  reunion_endpoint: http://tre4.tarotnet.org/ros/klotz
 
   routes:
     - path: "/"
@@ -239,15 +249,15 @@ app:
         sm: [0, 2, 3, 3]
         xs: [0, 3, 4, 3]
 
-    # FollowUpAdvocates:
-    #   resizeable: true
-    #   minW: 2
-    #   layouts:
-    #     xlg: [6, 3, 5, 2]
-    #     lg: [5, 2, 4, 3]
-    #     md: [0, 3, 5, 3]
-    #     sm: [0, 9, 3, 3]
-    #     xs: [0, 12, 4, 2]
+    TopSources:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [6, 3, 5, 2]
+        lg: [5, 2, 4, 3]
+        md: [0, 3, 5, 3]
+        sm: [0, 9, 3, 3]
+        xs: [0, 12, 4, 2]
 
     NewsFeed:
       resizeable: true
