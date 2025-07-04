@@ -67,13 +67,15 @@ class TarotProxyHandler(BaseHandler):
             data=self.request.body,
             allow_redirects=True,
             timeout=5,
+            stream=True,
         )
+        resp.raw.decode_content = False
         self.set_status(resp.status_code)
         for key, value in resp.headers.items():
             # Exclude headers that should not be set in the response
             if key.lower() not in {"content-length", "transfer-encoding", "connection"}:
                 self.set_header(key, value)
-        self.finish(resp.content)
+        self.finish(resp.raw.read())
 
     @auth_or_token
     def get(self):
