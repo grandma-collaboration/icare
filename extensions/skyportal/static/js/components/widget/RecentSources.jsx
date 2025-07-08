@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import dayjs from "dayjs";
@@ -17,21 +17,36 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
+import DynamicTagDisplay from "./DynamicTagDisplay";
 
 import { showNotification } from "baselayer/components/Notifications";
 import { dec_to_dms, ra_to_hours } from "../../units";
 import * as profileActions from "../../ducks/profile";
 import WidgetPrefsDialog from "./WidgetPrefsDialog";
 
-import SourceStatus from "./SourceStatus";
-
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
-const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
-const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
-const not_confirmed_classes = ["I-care", "Not I-care"]
-const obs_classes = ['GO GRANDMA', 'STOP GRANDMA', 'GO GRANDMA (HIGH PRIORITY)']
+const confirmed_classes = [
+  "Kilonova",
+  "GRB",
+  "GW Counterpart",
+  "GW Candidate",
+  "Supernova",
+];
+const rejected_classes = [
+  "Not Kilonova",
+  "Not GRB",
+  "Not GW Counterpart",
+  "Not GW Candidate",
+  "Not Supernova",
+];
+const not_confirmed_classes = ["I-care", "Not I-care"];
+const obs_classes = [
+  "GO GRANDMA",
+  "STOP GRANDMA",
+  "GO GRANDMA (HIGH PRIORITY)",
+];
 
 export const useSourceListStyles = makeStyles((theme) => ({
   stampContainer: {
@@ -39,13 +54,14 @@ export const useSourceListStyles = makeStyles((theme) => ({
   },
   stamp: () => ({
     transition: "transform 0.1s",
-    width: "5em",
-    height: "auto",
+    width: "6.6em",
+    height: "6.6em",
     display: "block",
     "&:hover": {
       color: "rgba(255, 255, 255, 1)",
       boxShadow: "0 5px 15px rgba(51, 52, 92, 0.6)",
     },
+    borderRadius: "4px",
   }),
   inverted: ({ invertThumbnails }) => ({
     filter: invertThumbnails ? "invert(1)" : "unset",
@@ -64,21 +80,14 @@ export const useSourceListStyles = makeStyles((theme) => ({
   },
   sourceItem: {
     display: "flex",
-    flexFlow: "row nowrap",
-    alignItems: "center",
-    padding: "0 0.325rem",
+    padding: "0.4rem",
+    height: "100%",
   },
-  sourceInfo: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    margin: "10px",
-    marginRight: 0,
-    width: "100%",
-  },
-  sourceNameContainer: {
+  sourceInfoContainer: {
     display: "flex",
     flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   },
   sourceName: {
     fontSize: "1rem",
@@ -91,8 +100,35 @@ export const useSourceListStyles = makeStyles((theme) => ({
         ? theme.palette.secondary.main
         : theme.palette.primary.main,
   },
+  sourceContainer: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    marginLeft: "8px",
+    minHeight: "100%",
+    alignItems: "flex-start",
+  },
+  sourceHeaderContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    width: "100%",
+  },
+  sourceChipContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    marginTop: "auto",
+    width: "100%",
+  },
+  sourceSavedSince: {
+    display: "flex",
+    justifyContent: "flex-end",
+    flexDirection: "column",
+    marginRight: "0.5rem",
+  },
   classification: {
-    fontSize: "0.95rem",
+    fontSize: "0.90rem",
     color:
       theme.palette.mode === "dark"
         ? theme.palette.secondary.main
@@ -100,7 +136,7 @@ export const useSourceListStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     fontStyle: "italic",
     marginLeft: "-0.09rem",
-    marginTop: "-0.4rem",
+    marginTop: "-0.3rem",
   },
   sourceCoordinates: {
     marginTop: "0.1rem",
@@ -110,26 +146,17 @@ export const useSourceListStyles = makeStyles((theme) => ({
       marginTop: "-0.2rem",
     },
   },
-  link: {
-    color: theme.palette.warning.main,
-  },
-  bottomContainer: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-  },
   sourceItemWithButton: {
     display: "flex",
     flexFlow: "column nowrap",
     justifyContent: "center",
-    // marginBottom: "1rem",
     transition: "all 0.3s ease",
     "&:hover": {
       backgroundColor:
         theme.palette.mode === "light" ? theme.palette.secondary.light : null,
     },
+    marginBottom: "0.4rem",
+    borderRadius: "8px",
   },
   root: {
     "& .MuiOutlinedInput-root": {
@@ -153,30 +180,49 @@ export const useSourceListStyles = makeStyles((theme) => ({
   paper: {
     backgroundColor: "#F0F8FF",
   },
-  // These rules help keep the progress wheel centered. Taken from the first example: https://material-ui.com/components/progress/
   progress: {
     display: "flex",
-    // The below color rule is not for the progress container, but for CircularProgress. This component only accepts 'primary', 'secondary', or 'inherit'.
     color: theme.palette.info.main,
     "& > * + *": {
       marginLeft: theme.spacing(2),
     },
   },
+  tagsContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "0.25rem",
+    justifyContent: "flex-start",
+    width: "100%",
+  },
+  tagChip: {
+    padding: "0",
+    margin: "0",
+    "& > div": {
+      marginTop: 0,
+      marginBottom: 0,
+      marginLeft: "0.05rem",
+      marginRight: "0.05rem",
+    },
+  },
   confirmed: {
     background: "#03c04a!important",
+    color: "white!important",
   },
   rejected: {
     background: "#ff0000!important",
+    color: "white!important",
   },
   not_confirmed: {
-    // grey background
     background: "#e0e0e0!important",
+    color: "black!important",
   },
   go: {
     background: "#03c04a!important",
+    color: "white!important",
   },
   stop: {
     background: "#ff0000!important",
+    color: "white!important",
   },
 }));
 
@@ -288,10 +334,7 @@ const RecentSourcesList = ({
   displayTNS = true,
 }) => {
   const [thumbnailIdxs, setThumbnailIdxs] = useState({});
-
   const { taxonomyList } = useSelector((state) => state.taxonomies);
-  const source_status_taxonomy = taxonomyList?.filter((t) => t.name === "Grandma Campaign Source Classification")[0];
-  const source_obs_taxonomy = taxonomyList?.filter((t) => t.name === "Grandma Campaign Source Observation")[0];
 
   useEffect(() => {
     sources?.forEach((source) => {
@@ -320,50 +363,35 @@ const RecentSourcesList = ({
         {sources.map((source) => {
           let recentSourceName = `${source.obj_id}`;
           let classification = null;
-          let grandma_source_classification = "I-care";
-          let confirmed_or_rejected = 'not_confirmed';
-          let grandma_obs_classification = null;
-          let obs_status = null;
+
           if (source.classifications.length > 0) {
-            // Display the most recent non-zero probability class
-            const filteredClasses = source.classifications?.filter(
-              (i) => i.probability > 0,
+            // Display the most recent non-zero probability class, and that isn't a ml classifier
+            // if there are no results, then consider ML classifications too
+            let filteredClasses = source.classifications?.filter(
+              (i) => i.probability > 0 && i.ml === false,
             );
+            if (filteredClasses.length === 0) {
+              filteredClasses = source.classifications?.filter(
+                (i) => i.probability > 0,
+              );
+            }
             const sortedClasses = filteredClasses.sort((a, b) =>
               a.modified < b.modified ? 1 : -1,
             );
 
             if (sortedClasses.length > 0) {
-              const classification = sortedClasses[0].classification;
-              if (!rejected_classes.includes(classification) && !confirmed_classes.includes(classification) && !not_confirmed_classes.includes(classification) && !obs_classes.includes(classification)) {
-                recentSourceName += ` (${classification})`;
+              const grandmaClassifications = [
+                ...confirmed_classes,
+                ...rejected_classes,
+                ...not_confirmed_classes,
+                ...obs_classes,
+              ];
+
+              const classificationName = sortedClasses[0].classification;
+              if (!grandmaClassifications.includes(classificationName)) {
+                classification = `(${classificationName})`;
               }
             }
-            if (source_status_taxonomy) {
-
-              grandma_source_classification = sortedClasses.filter((c) => c.taxonomy_id === source_status_taxonomy.id)[0]?.classification || "I-care";
-
-              if (grandma_source_classification) {
-                if (rejected_classes.includes(grandma_source_classification)) {
-                  confirmed_or_rejected = "rejected";
-                } else if (confirmed_classes.includes(grandma_source_classification)) {
-                  confirmed_or_rejected = "confirmed";
-                } else if (not_confirmed_classes.includes(grandma_source_classification)) {
-                  confirmed_or_rejected = "not_confirmed";
-                }
-              }
-
-            }
-
-            if (source_obs_taxonomy) {
-              grandma_obs_classification = sortedClasses.filter((c) => c.taxonomy_id === source_obs_taxonomy.id)[0]?.classification;
-              if (grandma_obs_classification == 'GO GRANDMA' || grandma_obs_classification == 'GO GRANDMA (HIGH PRIORITY)') {
-                obs_status = 'go';
-              } else if (grandma_obs_classification == 'STOP GRANDMA') {
-                obs_status = 'stop';
-              }
-            }
-
           }
 
           const imgClasses = source.thumbnails[thumbnailIdxs[source.obj_id]]
@@ -372,7 +400,9 @@ const RecentSourcesList = ({
             : `${styles.stamp}`;
           return (
             <li key={`recentSources_${source.obj_id}_${source.created_at}`}>
-              <div
+              <Paper
+                variant="outlined"
+                square={false}
                 data-testid={`recentSourceItem_${source.obj_id}_${source.created_at}`}
                 className={styles.sourceItemWithButton}
               >
@@ -405,51 +435,74 @@ const RecentSourcesList = ({
                       }}
                     />
                   </Link>
-                  <div className={styles.sourceInfo}>
-                    <div className={styles.sourceNameContainer}>
-                      <span className={styles.sourceName}>
-                        <Link to={`/source/${source.obj_id}`}>
+                  <div className={styles.sourceContainer}>
+                    <div className={styles.sourceHeaderContainer}>
+                      <div className={styles.sourceInfoContainer}>
+                        <Link
+                          to={`/source/${source.obj_id}`}
+                          className={styles.sourceName}
+                        >
                           <span className={styles.sourceNameLink}>
                             {recentSourceName}
                           </span>
                         </Link>
-                        <br/>
-                        {confirmed_or_rejected !== null && (
-                        <Chip className={styles[confirmed_or_rejected]} size="small" label={grandma_source_classification} key={grandma_source_classification}/>
+                        {classification && (
+                          <span className={styles.classification}>
+                            {classification}
+                          </span>
                         )}
-                        {obs_status !== null && (
-                        <Chip className={styles[obs_status]} size="small" label={grandma_obs_classification} key={grandma_obs_classification}/>
-                        )}
-                      </span>
-                      {classification && (
-                        <span className={styles.classification}>
-                          {classification}
-                        </span>
-                      )}
-                      <div className={styles.sourceCoordinates}>
+                        <div className={styles.sourceCoordinates}>
+                          <span
+                            style={{ fontSize: "0.95rem", whiteSpace: "pre" }}
+                          >
+                            {`\u03B1: ${ra_to_hours(source.ra)}`}
+                          </span>
+                          <span
+                            style={{ fontSize: "0.95rem", whiteSpace: "pre" }}
+                          >
+                            {`\u03B4: ${dec_to_dms(source.dec)}`}
+                          </span>
+                        </div>
+                      </div>
+                      <div className={styles.sourceSavedSince}>
                         <span
-                          style={{ fontSize: "0.95rem", whiteSpace: "pre" }}
+                          style={{
+                            textAlign: "right",
+                            fontSize: "0.95rem",
+                            fontStyle: "italic",
+                            padding: 0,
+                            margin: 0,
+                          }}
                         >
-                          {`\u03B1: ${ra_to_hours(source.ra)}`}
+                          {`${dayjs().to(dayjs.utc(`${source.created_at}Z`))}`
+                            .replace("ago", "")
+                            .replace("minutes", "min")
+                            .replace("minute", "min")
+                            .replace("a few", "few")}
                         </span>
                         <span
-                          style={{ fontSize: "0.95rem", whiteSpace: "pre" }}
+                          style={{
+                            textAlign: "right",
+                            fontSize: "0.95rem",
+                            fontStyle: "italic",
+                            padding: 0,
+                            margin: 0,
+                            marginTop: "-0.3rem",
+                          }}
                         >
-                          {`\u03B4: ${dec_to_dms(source.dec)}`}
+                          {` ago`}
                         </span>
                       </div>
-                      {source.resaved && <span>(Source was re-saved)</span>}
                     </div>
-                    <div className={styles.bottomContainer}>
-                      <span style={{ textAlign: "right" }}>
-                        {dayjs().to(dayjs.utc(`${source.created_at}Z`))}
-                      </span>
+                    <div className={styles.sourceChipContainer}>
                       {displayTNS && source?.tns_name?.length > 0 && (
                         <div
                           style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "flex-end",
+                            marginTop:
+                              source?.tags?.length > 0 ||
+                              source?.classifications?.length > 0
+                                ? "-3rem"
+                                : "0",
                           }}
                         >
                           <Chip
@@ -476,14 +529,18 @@ const RecentSourcesList = ({
                           />
                         </div>
                       )}
-                      <SourceStatus source={source} />
+                      <div style={{ width: "100%" }}>
+                        <DynamicTagDisplay
+                          source={source}
+                          styles={styles}
+                          taxonomyList={taxonomyList}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Paper>
             </li>
-
-
           );
         })}
       </ul>
@@ -517,6 +574,12 @@ RecentSourcesList.propTypes = {
           author_id: PropTypes.number,
           taxonomy_id: PropTypes.number,
           created_at: PropTypes.string,
+        }),
+      ),
+      tags: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          name: PropTypes.string.isRequired,
         }),
       ),
     }),
