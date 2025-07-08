@@ -2,12 +2,33 @@ import React, { useEffect, useState, useRef } from "react";
 import { Chip, Tooltip } from "@mui/material";
 import PropTypes from "prop-types";
 
-const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova'];
-const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova'];
+const confirmed_classes = [
+  "Kilonova",
+  "GRB",
+  "GW Counterpart",
+  "GW Candidate",
+  "Supernova",
+];
+const rejected_classes = [
+  "Not Kilonova",
+  "Not GRB",
+  "Not GW Counterpart",
+  "Not GW Candidate",
+  "Not Supernova",
+];
 const not_confirmed_classes = ["I-care", "Not I-care"];
-const obs_classes = ['GO GRANDMA', 'STOP GRANDMA', 'GO GRANDMA (HIGH PRIORITY)'];
+const obs_classes = [
+  "GO GRANDMA",
+  "STOP GRANDMA",
+  "GO GRANDMA (HIGH PRIORITY)",
+];
 
-const DynamicTagDisplay = ({ source, styles, displayTags = true, taxonomyList = [] }) => {
+const DynamicTagDisplay = ({
+  source,
+  styles,
+  displayTags = true,
+  taxonomyList = [],
+}) => {
   const [visibleTagsCount, setVisibleTagsCount] = useState(2);
   const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef(null);
@@ -19,48 +40,65 @@ const DynamicTagDisplay = ({ source, styles, displayTags = true, taxonomyList = 
     }
 
     const classifications = [];
-    const source_status_taxonomy = taxonomyList?.find(t => t.name === "Grandma Campaign Source Classification");
-    const source_obs_taxonomy = taxonomyList?.find(t => t.name === "Grandma Campaign Source Observation");
+    const source_status_taxonomy = taxonomyList?.find(
+      (t) => t.name === "Grandma Campaign Source Classification",
+    );
+    const source_obs_taxonomy = taxonomyList?.find(
+      (t) => t.name === "Grandma Campaign Source Observation",
+    );
 
-    const filteredClasses = source.classifications.filter(i => i && i.probability > 0);
-    const sortedClasses = filteredClasses.sort((a, b) => a.modified < b.modified ? 1 : -1);
+    const filteredClasses = source.classifications.filter(
+      (i) => i && i.probability > 0,
+    );
+    const sortedClasses = filteredClasses.sort((a, b) =>
+      a.modified < b.modified ? 1 : -1,
+    );
 
     if (sortedClasses.length > 0) {
       if (source_status_taxonomy) {
-        const grandmaStatusClass = sortedClasses.find(c => c && c.taxonomy_id === source_status_taxonomy.id);
+        const grandmaStatusClass = sortedClasses.find(
+          (c) => c && c.taxonomy_id === source_status_taxonomy.id,
+        );
         if (grandmaStatusClass && grandmaStatusClass.classification) {
-          let chipClass = 'not_confirmed';
+          let chipClass = "not_confirmed";
           if (rejected_classes.includes(grandmaStatusClass.classification)) {
-            chipClass = 'rejected';
-          } else if (confirmed_classes.includes(grandmaStatusClass.classification)) {
-            chipClass = 'confirmed';
+            chipClass = "rejected";
+          } else if (
+            confirmed_classes.includes(grandmaStatusClass.classification)
+          ) {
+            chipClass = "confirmed";
           }
-          
+
           classifications.push({
             id: `status_${grandmaStatusClass.id}`,
             name: grandmaStatusClass.classification,
             chipClass,
-            priority: 1
+            priority: 1,
           });
         }
       }
 
       if (source_obs_taxonomy) {
-        const grandmaObsClass = sortedClasses.find(c => c && c.taxonomy_id === source_obs_taxonomy.id);
+        const grandmaObsClass = sortedClasses.find(
+          (c) => c && c.taxonomy_id === source_obs_taxonomy.id,
+        );
         if (grandmaObsClass && grandmaObsClass.classification) {
           let chipClass = null;
-          if (grandmaObsClass.classification === 'GO GRANDMA' || grandmaObsClass.classification === 'GO GRANDMA (HIGH PRIORITY)') {
-            chipClass = 'go';
-          } else if (grandmaObsClass.classification === 'STOP GRANDMA') {
-            chipClass = 'stop';
+          if (
+            grandmaObsClass.classification === "GO GRANDMA" ||
+            grandmaObsClass.classification === "GO GRANDMA (HIGH PRIORITY)"
+          ) {
+            chipClass = "go";
+          } else if (grandmaObsClass.classification === "STOP GRANDMA") {
+            chipClass = "stop";
           }
-          
+
           if (chipClass) {
             classifications.push({
               id: `obs_${grandmaObsClass.id}`,
               name: grandmaObsClass.classification,
               chipClass,
-              priority: 2
+              priority: 2,
             });
           }
         }
@@ -95,11 +133,11 @@ const DynamicTagDisplay = ({ source, styles, displayTags = true, taxonomyList = 
   // Calculate how many tags we can put on the container
   const calculateVisibleTags = () => {
     const grandmaClassifications = getGrandmaClassifications();
-    const tags = (source.tags || []).map(tag => ({
+    const tags = (source.tags || []).map((tag) => ({
       id: tag.id,
       name: tag.name,
-      chipClass: 'default',
-      priority: 3
+      chipClass: "default",
+      priority: 3,
     }));
 
     const allTags = [...grandmaClassifications, ...tags];
@@ -107,7 +145,7 @@ const DynamicTagDisplay = ({ source, styles, displayTags = true, taxonomyList = 
     const seenNames = new Set();
 
     allTags.sort((a, b) => a.priority - b.priority);
-    allTags.forEach(tag => {
+    allTags.forEach((tag) => {
       if (!seenNames.has(tag.name.toLowerCase())) {
         seenNames.add(tag.name.toLowerCase());
         uniqueTags.push(tag);
@@ -175,11 +213,11 @@ const DynamicTagDisplay = ({ source, styles, displayTags = true, taxonomyList = 
   }, []);
 
   const grandmaClassifications = getGrandmaClassifications();
-  const tags = (source.tags || []).map(tag => ({
+  const tags = (source.tags || []).map((tag) => ({
     id: tag.id,
     name: tag.name,
-    chipClass: 'default',
-    priority: 3
+    chipClass: "default",
+    priority: 3,
   }));
 
   const allTags = [...grandmaClassifications, ...tags];
@@ -187,7 +225,7 @@ const DynamicTagDisplay = ({ source, styles, displayTags = true, taxonomyList = 
   const seenNames = new Set();
 
   allTags.sort((a, b) => a.priority - b.priority);
-  allTags.forEach(tag => {
+  allTags.forEach((tag) => {
     if (!seenNames.has(tag.name.toLowerCase())) {
       seenNames.add(tag.name.toLowerCase());
       uniqueTags.push(tag);
@@ -204,15 +242,15 @@ const DynamicTagDisplay = ({ source, styles, displayTags = true, taxonomyList = 
 
   const getChipClassName = (chipClass) => {
     switch (chipClass) {
-      case 'confirmed':
+      case "confirmed":
         return styles.confirmed;
-      case 'rejected':
+      case "rejected":
         return styles.rejected;
-      case 'not_confirmed':
+      case "not_confirmed":
         return styles.not_confirmed;
-      case 'go':
+      case "go":
         return styles.go;
-      case 'stop':
+      case "stop":
         return styles.stop;
       default:
         return styles.tagChip;

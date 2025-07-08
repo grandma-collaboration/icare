@@ -27,10 +27,26 @@ import WidgetPrefsDialog from "./WidgetPrefsDialog";
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
-const confirmed_classes = ['Kilonova', 'GRB', 'GW Counterpart', 'GW Candidate', 'Supernova']
-const rejected_classes = ['Not Kilonova', 'Not GRB', 'Not GW Counterpart', 'Not GW Candidate', 'Not Supernova']
-const not_confirmed_classes = ["I-care", "Not I-care"]
-const obs_classes = ['GO GRANDMA', 'STOP GRANDMA', 'GO GRANDMA (HIGH PRIORITY)']
+const confirmed_classes = [
+  "Kilonova",
+  "GRB",
+  "GW Counterpart",
+  "GW Candidate",
+  "Supernova",
+];
+const rejected_classes = [
+  "Not Kilonova",
+  "Not GRB",
+  "Not GW Counterpart",
+  "Not GW Candidate",
+  "Not Supernova",
+];
+const not_confirmed_classes = ["I-care", "Not I-care"];
+const obs_classes = [
+  "GO GRANDMA",
+  "STOP GRANDMA",
+  "GO GRANDMA (HIGH PRIORITY)",
+];
 
 export const useSourceListStyles = makeStyles((theme) => ({
   stampContainer: {
@@ -347,7 +363,7 @@ const RecentSourcesList = ({
         {sources.map((source) => {
           let recentSourceName = `${source.obj_id}`;
           let classification = null;
-          
+
           if (source.classifications.length > 0) {
             // Display the most recent non-zero probability class, and that isn't a ml classifier
             // if there are no results, then consider ML classifications too
@@ -368,9 +384,9 @@ const RecentSourcesList = ({
                 ...confirmed_classes,
                 ...rejected_classes,
                 ...not_confirmed_classes,
-                ...obs_classes
+                ...obs_classes,
               ];
-              
+
               const classificationName = sortedClasses[0].classification;
               if (!grandmaClassifications.includes(classificationName)) {
                 classification = `(${classificationName})`;
@@ -482,7 +498,11 @@ const RecentSourcesList = ({
                       {displayTNS && source?.tns_name?.length > 0 && (
                         <div
                           style={{
-                            marginTop: (source?.tags?.length > 0 || source?.classifications?.length > 0) ? "-3rem" : "0",
+                            marginTop:
+                              source?.tags?.length > 0 ||
+                              source?.classifications?.length > 0
+                                ? "-3rem"
+                                : "0",
                           }}
                         >
                           <Chip
@@ -510,9 +530,9 @@ const RecentSourcesList = ({
                         </div>
                       )}
                       <div style={{ width: "100%" }}>
-                        <DynamicTagDisplay 
-                          source={source} 
-                          styles={styles} 
+                        <DynamicTagDisplay
+                          source={source}
+                          styles={styles}
                           taxonomyList={taxonomyList}
                         />
                       </div>
