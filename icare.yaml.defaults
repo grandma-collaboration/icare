@@ -307,8 +307,6 @@ notifications:
 
 user:
   default_role: 'Full user'
-  default_groups: ['GRANDMA']
-  default_acls: ['Manage shifts']
 
 fink:
   fink_topics:
