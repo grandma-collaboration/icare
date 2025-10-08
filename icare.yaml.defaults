@@ -348,6 +348,12 @@ gcn:
     - ECLAIRs-Catalog
   source_radius_threshold: 12.0 # max skymap cone radius to create a source, in arcmin
 
+hermes:
+  endpoint: https://hermes.lco.global/api/v0
+  topic: skyportal.skyportal
+  test_topic: skyportal.skyportal_test
+  token:
+
 external_logging:
   sentry:
     endpoint:
