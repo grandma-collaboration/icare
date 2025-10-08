@@ -352,7 +352,7 @@ hermes:
   endpoint: https://hermes.lco.global/api/v0
   topic: skyportal.skyportal
   test_topic: skyportal.skyportal_test
-  token:  
+  token:
 
 external_logging:
   sentry:
