@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-
 from baselayer.app.env import load_env
 from baselayer.app.psa import TornadoStorage
 from skyportal.enum_types import LISTENER_CLASSES, sqla_enum_types
@@ -11,6 +10,7 @@ all_acl_ids = [
     "Annotate",
     "Manage users",
     "Manage sources",
+    "Manage photometry",
     "Manage groups",
     "Manage sharing services",
     "Manage shifts",
