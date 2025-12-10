@@ -305,6 +305,23 @@ services:
 notifications:
   enabled: True
 
+additional_bandpasses:
+  - name: 'swiftxrt'
+    filterset: 'xrt'
+    wavelength: [0.1, 1, 62, 100]
+    transmission: [0, 1, 1, 0]
+    description: "basic XRT filter - tophat transmission"
+  - name: 'nicerxti'
+    filterset: 'xti'
+    wavelength: [0.1, 1.2, 41, 100]
+    transmission: [0, 1, 1, 0]
+    description: "basic XTI filter - tophat transmission"
+  - name: 'epfxt'
+    filterset: 'fxt'
+    wavelength: [1.24, 24.82]
+    transmission: [1, 1]
+    description: "basic fxt filter - 0.5-10keV"
+
 user:
   default_role: 'Full user'
 
@@ -347,12 +364,6 @@ gcn:
     - StarTrack_Lost_Lock
     - ECLAIRs-Catalog
   source_radius_threshold: 12.0 # max skymap cone radius to create a source, in arcmin
-
-hermes:
-  endpoint: https://hermes.lco.global/api/v0
-  topic: skyportal.skyportal
-  test_topic: skyportal.skyportal_test
-  token:
 
 external_logging:
   sentry:
