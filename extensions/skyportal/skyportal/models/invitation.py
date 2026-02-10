@@ -1,18 +1,21 @@
 __all__ = ["Invitation"]
 
 import sqlalchemy as sa
+from baselayer.app.env import load_env
+from baselayer.app.flow import Flow
+from baselayer.app.models import AccessibleIfUserMatches, Base
+from baselayer.log import make_log
 from sqlalchemy import event
 from sqlalchemy.dialects import postgresql as psql
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import EmailType
 
-from baselayer.app.env import load_env
-from baselayer.app.models import AccessibleIfUserMatches, Base
-
 from ..app_utils import get_app_base_url
 from ..email_utils import send_email
 
 _, cfg = load_env()
+
+log = make_log("invitations")
 
 
 class Invitation(Base):
@@ -59,12 +62,31 @@ class Invitation(Base):
 @event.listens_for(Invitation, "after_insert")
 def send_user_invite_email(mapper, connection, target):
     app_base_url = get_app_base_url()
-    link_location = f'{app_base_url}/login/iam-oauth2/?invite_token={target.token}'
-    send_email(
-        recipients=[target.user_email],
-        subject=cfg["invitations.email_subject"],
-        body=(
-            f"{cfg['invitations.email_body_preamble']}<br /><br />"
-            f'Please click <a href="{link_location}">here</a> to join.'
-        ),
-    )
+    link_location = f"{app_base_url}/login/google-oauth2/?invite_token={target.token}"
+    if cfg.get("invitations.disable_emailing", False) is True:
+        # If email sending is disabled, log the invite link for testing purposes
+        log(
+            f"Invitation created with token {target.token}; invite link: {link_location}"
+        )
+        if target.invited_by:
+            try:
+                flow = Flow()
+                flow.push(
+                    target.invited_by.id,
+                    "baselayer/SHOW_NOTIFICATION",
+                    payload={
+                        "note": "Email sending is disabled, invitation email not sent.",
+                        "type": "warning",
+                    },
+                )
+            except Exception as e:
+                log(f"Failed to send notification: {e}")
+    else:
+        send_email(
+            recipients=[target.user_email],
+            subject=cfg["invitations.email_subject"],
+            body=(
+                f"{cfg['invitations.email_body_preamble']}<br /><br />"
+                f'Please click <a href="{link_location}">here</a> to join.'
+            ),
+        )
