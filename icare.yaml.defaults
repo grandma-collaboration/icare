@@ -321,6 +321,11 @@ additional_bandpasses:
     wavelength: [1.24, 24.82]
     transmission: [1, 1]
     description: "basic fxt filter - 0.5-10keV"
+  - name: 'svommxt'
+    filterset: 'mxt'
+    wavelength: [0.1, 1.2, 25, 100]
+    transmission: [0, 1, 1, 0]
+    description: "basic MXT filter - tophat transmission"
 
 user:
   default_role: 'Full user'
