@@ -338,6 +338,7 @@ fink:
   fink_username: null
   fink_password: null
   fink_group_id: null
+  survey: lsst
   fink_servers: null
   skyportal_group: Fink
   skyportal_token: null

@@ -1,11 +1,10 @@
-import time
-import os
-
-from baselayer.log import make_log
-from baselayer.app.models import init_db
-from baselayer.app.env import load_env
-
 import importlib
+import os
+import time
+
+from baselayer.app.env import load_env
+from baselayer.app.models import init_db
+from baselayer.log import make_log
 
 skyportalfinkclient = importlib.import_module(
     "skyportal-fink-client.skyportal_fink_client.skyportal_fink_client"
@@ -17,7 +16,6 @@ skyportalapi = importlib.import_module(
     "skyportal-fink-client.skyportal_fink_client.utils.skyportal_api"
 )
 
-from skyportal.models import DBSession, Instrument
 
 env, cfg = load_env()
 
@@ -26,7 +24,7 @@ log = make_log("fink")
 
 
 def skyportal_fink_client():
-    instruments = ["CFH12k", "ZTF"]
+    instruments = ["CFH12k", "ZTF", "LSST"]
     skyportal_url = "http://localhost:5000"
     started = False
     skyportal_token = None
@@ -48,7 +46,7 @@ def skyportal_fink_client():
                 + "/../../.tokens.yaml"
             )
             skyportal_token = token["INITIAL_ADMIN"]
-        except Exception as e:
+        except Exception:
             log("Can't retrieve skyportal token")
             skyportal_token = ""
             time.sleep(15)
@@ -57,22 +55,22 @@ def skyportal_fink_client():
         status, skyportal_instruments = skyportalapi.get_all_instruments(
             skyportal_url, skyportal_token
         )
-        if status is not 200 and status is not 400:
+        if status != 200 and status != 400:
             log("App not started yet. Waiting for skyportal to start...")
             time.sleep(15)
-        elif status is 400:
+        elif status == 400:
             started = True
             fink_config["skyportal_token"] = skyportal_token
             log(
                 "Can't retrieve instruments from skyportal using initial admin token. Retrying..."
             )
             time.sleep(15)
-        elif status is 200 and not any(
+        elif status == 200 and not any(
             [instrument in skyportal_instruments.keys() for instrument in instruments]
         ):
             started = True
             fink_config["skyportal_token"] = skyportal_token
-            log(f"Waiting for instruments to be added to skyportal")
+            log("Waiting for instruments to be added to skyportal")
             time.sleep(15)
         else:
             started = True
