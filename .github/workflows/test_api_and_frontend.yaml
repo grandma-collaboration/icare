@@ -69,6 +69,10 @@ jobs:
         run: |
           git submodule update --init --recursive
 
+      - uses: browser-actions/setup-geckodriver@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -90,16 +94,7 @@ jobs:
           sudo add-apt-repository ppa:mozillateam/ppa
           printf 'Package: *\nPin: release o=LP-PPA-mozillateam\nPin-Priority: 1001' | sudo tee /etc/apt/preferences.d/mozilla-firefox
 
-          sudo apt install -y wget unzip firefox libcurl4-gnutls-dev libgnutls28-dev
-
-          # if nginx is already installed, remove it
-          sudo apt remove -y nginx nginx-common nginx-core nginx-full
-          sudo apt purge -y nginx nginx-common nginx-core nginx-full
-
-          # add the PPA repository with brotli support for nginx
-          sudo add-apt-repository ppa:ondrej/nginx -y
-          sudo apt update -y
-          sudo apt install nginx libnginx-mod-http-brotli-static libnginx-mod-http-brotli-filter -y
+          sudo apt install -y wget unzip firefox libcurl4-gnutls-dev libgnutls28-dev nginx
 
           pip install pip==24.0
           pip install wheel numpy
@@ -181,23 +176,10 @@ jobs:
           pip list --format=columns
           npm ls --depth 0 || true
 
-      - name: Install Geckodriver / Selenium
+      - name: Verify Geckodriver / Selenium
         run: |
-          GECKO_VER=0.34.0
-          CACHED_DOWNLOAD_DIR=~/.local/downloads
-          FILENAME=geckodriver-v${GECKO_VER}-linux64.tar.gz
-
-          if [[ ! -f ${CACHED_DOWNLOAD_DIR=}/${FILENAME} ]]; then
-            wget https://github.com/mozilla/geckodriver/releases/download/v${GECKO_VER}/${FILENAME} --directory-prefix=${CACHED_DOWNLOAD_DIR} --no-clobber
-          fi
-          sudo tar -xzf ${CACHED_DOWNLOAD_DIR}/geckodriver-v${GECKO_VER}-linux64.tar.gz -C /usr/local/bin
           geckodriver --version
           python -c "import selenium; print(f'Selenium {selenium.__version__}')"
-
-      - name: Patch test_frontend.py for a longer timeout
-        run: |
-          cd patched_skyportal
-          sed -i 's/timeout=60/timeout=180/g' baselayer/tools/test_frontend.py
 
       - name: Patch Notifications.jsx for a longer display
         run: |
