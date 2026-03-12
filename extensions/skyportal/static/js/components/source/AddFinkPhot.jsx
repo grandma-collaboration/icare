@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { showNotification } from "baselayer/components/Notifications";
 import postFinkPhot from "../../ducks/fink_phot";
 
 const AddPhotFink = ({ id }) => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const currentUser = useSelector((state) => state.profile);
   const photometry = useSelector((state) => state.photometry[id]);
   const permission =
@@ -24,23 +26,45 @@ const AddPhotFink = ({ id }) => {
   };
 
   const handleAddPhotFink = (source_id) => {
+    setLoading(true);
     dispatch(postFinkPhot(source_id, current_magsys(photometry)))
       .then((result) => {
         if (result.status === "success") {
-          dispatch(showNotification("Fink photometry added"));
+          const n = result.data?.total_points ?? 0;
+          if (n === 0) {
+            dispatch(
+              showNotification(
+                `No photometry found in Fink for ${source_id}`,
+                "warning"
+              )
+            );
+          } else {
+            dispatch(
+              showNotification(
+                `Added ${n} point${n !== 1 ? "s" : ""} to ${source_id}`
+              )
+            );
+          }
         } else {
+          const message = result.message || "unknown error";
           dispatch(
-            showNotification("Fink photometry could not be added", "error")
+            showNotification(
+              `Could not retrieve Fink photometry: ${message}`,
+              "error"
+            )
           );
         }
       })
       .catch((error) => {
         dispatch(
           showNotification(
-            `Fink photometry could not be added: ${error}`,
+            `Could not retrieve Fink photometry: ${error?.message || error}`,
             "error"
           )
         );
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -52,9 +76,11 @@ const AddPhotFink = ({ id }) => {
         onClick={() => {
           handleAddPhotFink(id);
         }}
+        disabled={loading}
+        startIcon={loading ? <CircularProgress size={14} color="inherit" /> : null}
         data-testid="add-phot-fink"
       >
-        Fink Photometry
+        {loading ? "Fetching..." : "Fink Photometry"}
       </Button>
     )
   );
