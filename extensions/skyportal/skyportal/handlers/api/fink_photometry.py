@@ -3,11 +3,12 @@ import io
 import pandas as pd
 import requests
 from astropy.time import Time
+from sqlalchemy.orm import selectinload
 from baselayer.app.access import auth_or_token
 from baselayer.log import make_log
 from skyportal.models.obj import Obj
 
-from ...models import Instrument
+from ...models import Instrument, User
 from ..base import BaseHandler
 from .photometry import add_external_photometry
 
@@ -75,7 +76,9 @@ def _resolve_fink_objects(tns_name):
     return results
 
 
-def _fetch_ztf_photometry(fink_object_id, obj_id, instrument_id, group_ids, user):
+async def _fetch_ztf_photometry(
+    fink_object_id, obj_id, instrument_id, group_ids, user, session
+):
     """Fetch ZTF photometry from Fink and post it to SkyPortal."""
     r = requests.post(
         f"{FINK_ZTF_API}/api/v1/objects",
@@ -123,11 +126,13 @@ def _fetch_ztf_photometry(fink_object_id, obj_id, instrument_id, group_ids, user
         "group_ids": group_ids,
         "altdata": FINK_ALTDATA,
     }
-    add_external_photometry(data, user)
+    await add_external_photometry(data, user, session)
     return len(df)
 
 
-def _fetch_lsst_photometry(fink_object_id, obj_id, instrument_id, group_ids, user):
+async def _fetch_lsst_photometry(
+    fink_object_id, obj_id, instrument_id, group_ids, user, session
+):
     """Fetch LSST photometry from Fink (flux-space, nJy, zp=31.4) and post it to SkyPortal."""
     r = requests.post(
         f"{FINK_LSST_API}/api/v1/sources",
@@ -177,25 +182,25 @@ def _fetch_lsst_photometry(fink_object_id, obj_id, instrument_id, group_ids, use
         "group_ids": group_ids,
         "altdata": FINK_ALTDATA,
     }
-    add_external_photometry(data, user)
+    await add_external_photometry(data, user, session)
     return len(df)
 
 
-def _fetch_photometry_for_survey(
-    survey_name, fink_object_id, obj_id, instrument_id, group_ids, user
+async def _fetch_photometry_for_survey(
+    survey_name, fink_object_id, obj_id, instrument_id, group_ids, user, session
 ):
     """Dispatch photometry fetching to the correct survey handler. Returns row count."""
     if survey_name == "ztf":
         return (
-            _fetch_ztf_photometry(
-                fink_object_id, obj_id, instrument_id, group_ids, user
+            await _fetch_ztf_photometry(
+                fink_object_id, obj_id, instrument_id, group_ids, user, session
             )
             or 0
         )
     elif survey_name == "lsst":
         return (
-            _fetch_lsst_photometry(
-                fink_object_id, obj_id, instrument_id, group_ids, user
+            await _fetch_lsst_photometry(
+                fink_object_id, obj_id, instrument_id, group_ids, user, session
             )
             or 0
         )
@@ -217,16 +222,26 @@ class FinkPhotometryHandler(BaseHandler):
             return self.error("Invalid magsys, must be either ab or vega")
 
         try:
-            with self.Session() as session:
-                obj = session.scalars(
-                    Obj.select(session.user_or_token).where(Obj.id == object_id)
+            async with self.AsyncSession() as session:
+                obj = (
+                    await session.scalars(
+                        Obj.select(session.user_or_token).where(Obj.id == object_id)
+                    )
                 ).first()
                 if not obj:
                     return self.error("Object not found")
 
+                # eager-load groups: the async auth only loads acls/roles, so
+                # accessing `accessible_groups` (which reads `user.groups`)
+                # would otherwise trigger a lazy load under the async session.
+                user = await session.get(
+                    User,
+                    self.associated_user_object.id,
+                    options=[selectinload(User.groups)],
+                )
                 group_ids = [
                     g.id
-                    for g in self.current_user.accessible_groups
+                    for g in user.accessible_groups
                     if not g.single_user_group
                 ]
 
@@ -247,19 +262,20 @@ class FinkPhotometryHandler(BaseHandler):
                         stmt = Instrument.select(session.user_or_token).where(
                             Instrument.name == survey["instrument_name"]
                         )
-                        instrument = session.scalars(stmt).first()
+                        instrument = (await session.scalars(stmt)).first()
                         if not instrument:
                             return self.error(
                                 f"Could not find any instrument named {survey['instrument_name']}, "
                                 f"cannot post {survey_name.upper()} photometry from Fink"
                             )
-                        total_points += _fetch_photometry_for_survey(
+                        total_points += await _fetch_photometry_for_survey(
                             survey_name,
                             fink_object_id,
                             object_id,
                             instrument.id,
                             group_ids,
                             self.associated_user_object,
+                            session,
                         )
                 else:
                     # No TNS resolver match (or no TNS name) — try the object ID
@@ -272,17 +288,18 @@ class FinkPhotometryHandler(BaseHandler):
                             stmt = Instrument.select(session.user_or_token).where(
                                 Instrument.name == survey["instrument_name"]
                             )
-                            instrument = session.scalars(stmt).first()
+                            instrument = (await session.scalars(stmt)).first()
                             if not instrument:
                                 continue
                             try:
-                                total_points += _fetch_photometry_for_survey(
+                                total_points += await _fetch_photometry_for_survey(
                                     survey["name"],
                                     name,
                                     object_id,
                                     instrument.id,
                                     group_ids,
                                     self.associated_user_object,
+                                    session,
                                 )
                             except Exception as e:
                                 log(
