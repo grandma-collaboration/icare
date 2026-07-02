@@ -312,21 +312,24 @@ const RecentSourcesSearchbar = ({ styles }: RecentSourcesSearchbarProps) => {
             {...params}
             variant="outlined"
             placeholder="Source"
-            InputProps={{
-              ...params.InputProps,
-              className: classes.textField,
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" className={classes.icon} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <div className={classes.progress}>
-                  {loading ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : null}
-                </div>
-              ),
+            slotProps={{
+              ...params.slotProps,
+              input: {
+                ...params.slotProps.input,
+                className: classes.textField,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" className={classes.icon} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <div className={classes.progress}>
+                    {loading ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : null}
+                  </div>
+                ),
+              },
             }}
           />
         )}
@@ -593,7 +596,7 @@ const RecentSources = ({ classes }: RecentSourcesProps) => {
     <Paper elevation={1} className={classes["widgetPaperFillSpace"]}>
       <div className={classes["widgetPaperDiv"]}>
         <div>
-          <Typography variant="h6" display="inline">
+          <Typography variant="h6" sx={{ display: "inline" }}>
             Recent Sources
           </Typography>
           <DragHandleIcon
