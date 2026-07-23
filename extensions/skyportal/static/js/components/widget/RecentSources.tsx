@@ -11,17 +11,15 @@ import { makeStyles } from "tss-react/mui";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import SearchIcon from "@mui/icons-material/Search";
-import InputAdornment from "@mui/material/InputAdornment";
 import DynamicTagDisplay from "./DynamicTagDisplay";
 
-import { showNotification } from "baselayer/components/Notifications";
-import { useAppDispatch, useAppSelector } from "../../types/hooks";
+import {
+  useGetProfileQuery,
+  useUpdateUserPreferencesMutation,
+} from "../../ducks/profile";
+import { useGetRecentSourcesQuery } from "../../ducks/recentSources";
+import { useGetTaxonomiesQuery } from "../../ducks/taxonomies";
 import { dec_to_dms, ra_to_hours } from "../../units";
-import * as profileActions from "../../ducks/profile";
-import * as objectTagsActions from "../../ducks/objectTags";
 import WidgetPrefsDialog from "./WidgetPrefsDialog";
 
 dayjs.extend(relativeTime);
@@ -237,107 +235,6 @@ const defaultPrefs: any = {
   displayTNS: true,
 };
 
-function containsSpecialCharacters(str: string) {
-  const regex = /[ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g;
-  return regex.test(str);
-}
-
-interface RecentSourcesSearchbarProps {
-  styles: any;
-}
-
-const RecentSourcesSearchbar = ({ styles }: RecentSourcesSearchbarProps) => {
-  const [inputValue, setInputValue] = useState<string>("");
-  const [options] = useState<any[]>([]);
-  const [value] = useState<any>(null);
-  const [loading] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  const classes = styles;
-
-  const dispatch = useAppDispatch();
-  const sourcesState = useAppSelector(
-    (state) => (state as any).sources.latest,
-  );
-
-  let results: any[] = [];
-  const handleChange = (e: any) => {
-    e.preventDefault();
-    const spec_char = containsSpecialCharacters(e.target.value);
-    if (!spec_char) {
-      setInputValue(e.target.value);
-    } else {
-      dispatch(showNotification("No special characters allowed", "error"));
-      setInputValue("");
-    }
-  };
-  if (inputValue.length > 0) {
-    results = sourcesState?.sources?.filter((source: any) =>
-      source.id.toLowerCase().match(inputValue.toLowerCase()),
-    );
-  }
-
-  function formatSource(source: any) {
-    if (source.id) {
-      source.obj_id = source.id;
-    }
-  }
-
-  const formattedResults: any[] = [];
-  Object.assign(formattedResults, results);
-
-  formattedResults.map(formatSource);
-
-  return (
-    <div>
-      <Autocomplete
-        id="recent-sources-search-bar"
-        style={{ padding: "0.3rem" }}
-        classes={{ root: classes.root, paper: classes.paper }}
-        isOptionEqualToValue={(option: any, val: any) =>
-          option.name === val.name
-        }
-        getOptionLabel={(option: any) => option}
-        onInputChange={handleChange}
-        onClose={() => setOpen(false)}
-        size="small"
-        noOptionsText="No matching sources."
-        options={options}
-        open={open}
-        limitTags={15}
-        value={value}
-        popupIcon={null}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="outlined"
-            placeholder="Source"
-            InputProps={{
-              ...params.InputProps,
-              className: classes.textField,
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" className={classes.icon} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <div className={classes.progress}>
-                  {loading ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : null}
-                </div>
-              ),
-            }}
-          />
-        )}
-      />
-      {results?.length !== 0 && (
-        <RecentSourcesList sources={formattedResults} styles={styles} search />
-      )}
-    </div>
-  );
-};
-
 interface RecentSourcesListProps {
   sources?: any[];
   styles: any;
@@ -354,7 +251,7 @@ const RecentSourcesList = ({
   const [thumbnailIdxs, setThumbnailIdxs] = useState<Record<string, number>>(
     {},
   );
-  const { taxonomyList } = useAppSelector((state) => state.taxonomies);
+  const { data: taxonomyList = [] } = useGetTaxonomiesQuery();
 
   useEffect(() => {
     sources?.forEach((source: any) => {
@@ -568,22 +465,16 @@ interface RecentSourcesProps {
 }
 
 const RecentSources = ({ classes }: RecentSourcesProps) => {
-  const dispatch = useAppDispatch();
-  const invertThumbnails = useAppSelector(
-    (state) => state.profile.preferences?.["invertThumbnails"],
-  ) as boolean | undefined;
+  const { data: profile } = useGetProfileQuery();
+  const [updateUserPreferences] = useUpdateUserPreferencesMutation();
+  const invertThumbnails = profile?.preferences?.["invertThumbnails"] as
+    | boolean
+    | undefined;
   const { classes: styles } = useSourceListStyles({ invertThumbnails });
 
-  const { recentSources } = useAppSelector(
-    (state) => (state as any).recentSources,
-  );
+  const { data: recentSources } = useGetRecentSourcesQuery();
   const prefs =
-    useAppSelector(
-      (state) => state.profile.preferences?.["recentSources"],
-    ) || defaultPrefs;
-  useEffect(() => {
-    dispatch(objectTagsActions.fetchTagOptions());
-  }, [dispatch]);
+    (profile?.preferences?.["recentSources"] as any) || defaultPrefs;
 
   const recentSourcesPrefs = prefs
     ? { ...defaultPrefs, ...prefs }
@@ -596,15 +487,13 @@ const RecentSources = ({ classes }: RecentSourcesProps) => {
           <Typography variant="h6" display="inline">
             Recent Sources
           </Typography>
-          <DragHandleIcon
-            className={`${classes["widgetIcon"]} dragHandle`}
-          />
+          <DragHandleIcon className={`${classes["widgetIcon"]} dragHandle`} />
           <div className={classes["widgetIcon"]}>
             <WidgetPrefsDialog
               initialValues={recentSourcesPrefs}
               stateBranchName="recentSources"
               title="Recent Sources Preferences"
-              onSubmit={profileActions.updateUserPreferences}
+              onSubmit={updateUserPreferences}
             />
           </div>
         </div>
@@ -619,4 +508,3 @@ const RecentSources = ({ classes }: RecentSourcesProps) => {
 };
 
 export default RecentSources;
-export { RecentSourcesSearchbar };

@@ -4,7 +4,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import { showNotification } from "baselayer/components/Notifications";
 import postFinkPhot from "../../ducks/fink_phot";
-import { useAppDispatch, useAppSelector } from "../../types/hooks";
+import { useAppDispatch } from "../../types/hooks";
+import { useGetProfileQuery } from "../../ducks/profile";
+import { useFetchSourcePhotometryQuery } from "../../ducks/photometry";
 
 interface AddPhotFinkProps {
   id: string;
@@ -13,14 +15,13 @@ interface AddPhotFinkProps {
 const AddPhotFink = ({ id }: AddPhotFinkProps) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
-  const currentUser = useAppSelector((state) => state.profile);
-  const photometry = useAppSelector(
-    (state) => (state as any).photometry?.[id],
-  );
+  // RTK Query: read profile/photometry from the query hooks (no more slices).
+  const currentUser = useGetProfileQuery().data;
+  const { data: photometry } = useFetchSourcePhotometryQuery({ id });
   const permission =
-    currentUser.permissions?.includes("System admin") ||
-    currentUser.permissions?.includes("Manage sources") ||
-    currentUser.permissions?.includes("Upload data");
+    currentUser?.permissions?.includes("System admin") ||
+    currentUser?.permissions?.includes("Manage sources") ||
+    currentUser?.permissions?.includes("Upload data");
 
   const current_magsys = (phot: any) => {
     // try to infer the current magsys from the photometry
