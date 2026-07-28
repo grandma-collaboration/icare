@@ -10,10 +10,11 @@ import EditIcon from "@mui/icons-material/Edit";
 
 import Button from "../Button";
 import { showNotification } from "baselayer/components/Notifications";
-import { useAppDispatch, useAppSelector } from "../../types/hooks";
+import { useAppDispatch } from "../../types/hooks";
+import { skyportalApi } from "../../api/skyportalApi";
 
 import * as sourcestatus from "../../ducks/sourcestatus";
-import { fetchRecentSources } from "../../ducks/recentSources";
+import { useGetTaxonomiesQuery } from "../../ducks/taxonomies";
 
 const confirmed_classes = [
   "Kilonova",
@@ -30,11 +31,7 @@ const rejected_classes = [
   "Not Supernova",
 ];
 const not_defined = ["I-care", "Not I-care"];
-const obs_status = [
-  "GO GRANDMA (HIGH PRIORITY)",
-  "GO GRANDMA",
-  "STOP GRANDMA",
-];
+const obs_status = ["GO GRANDMA (HIGH PRIORITY)", "GO GRANDMA", "STOP GRANDMA"];
 
 interface SourceStatusProps {
   source: { obj_id: string; ra: number; dec: number; classifications: any[] };
@@ -44,7 +41,7 @@ const SourceStatus = ({ source }: SourceStatusProps) => {
   const [open, setOpen] = useState(false);
   const dispatch = useAppDispatch();
   const [clicked, setClicked] = useState(false);
-  const { taxonomyList } = useAppSelector((state) => state.taxonomies);
+  const { data: taxonomyList = [] } = useGetTaxonomiesQuery();
   // find the grandma taxonomy, called "Grandma Campaign Source Classification"
 
   const changeSourceClassificationStatus = (status: string) => {
@@ -77,7 +74,7 @@ const SourceStatus = ({ source }: SourceStatusProps) => {
           }),
         ).then((response: any) => {
           if (response.status === "success") {
-            dispatch(fetchRecentSources());
+            dispatch(skyportalApi.util.invalidateTags(["RecentSource"]));
             setClicked(false);
             setOpen(false);
           } else {
@@ -123,7 +120,10 @@ const SourceStatus = ({ source }: SourceStatusProps) => {
         ).length > 0;
       if (already_has_obs) {
         dispatch(
-          showNotification("Source already has this observation status", "error"),
+          showNotification(
+            "Source already has this observation status",
+            "error",
+          ),
         );
       } else if (clicked === false) {
         setClicked(true);
@@ -136,7 +136,7 @@ const SourceStatus = ({ source }: SourceStatusProps) => {
           }),
         ).then((response: any) => {
           if (response.status === "success") {
-            dispatch(fetchRecentSources());
+            dispatch(skyportalApi.util.invalidateTags(["RecentSource"]));
             setClicked(false);
             setOpen(false);
           } else {

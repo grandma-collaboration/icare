@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -14,7 +13,11 @@ import CachedIcon from "@mui/icons-material/Cached";
 import Tooltip from "@mui/material/Tooltip";
 import convertLength from "convert-css-length";
 
-import * as profileActions from "../../ducks/profile";
+import {
+  useGetProfileQuery,
+  useUpdateUserPreferencesMutation,
+} from "../../ducks/profile";
+import { useGetGroupsQuery } from "../../ducks/groups";
 
 import RecentSources from "../widget/RecentSources";
 import GroupList from "../group/GroupList";
@@ -74,22 +77,20 @@ const HomePage = () => {
   const convert = convertLength(rootFont);
   const gridRowHeight = parseFloat(convert(rem, "px"));
 
-  const groups = useSelector((state) => state.groups.user);
-
-  const profile = useSelector((state) => state.profile);
+  const [updateUserPreferences] = useUpdateUserPreferencesMutation();
+  const groups = useGetGroupsQuery().data?.user ?? [];
+  const { data: profile } = useGetProfileQuery();
 
   let currentLayouts =
     profile?.preferences.layoutsGrandmaDashboard == null
       ? defaultLayouts
       : profile.preferences.layoutsGrandmaDashboard;
 
-  const dispatch = useDispatch();
-
   const LayoutChangeHandler = (currentLayout, allLayouts) => {
     const prefs = {
       layoutsGrandmaDashboard: allLayouts,
     };
-    dispatch(profileActions.updateUserPreferences(prefs));
+    updateUserPreferences(prefs);
   };
 
   const resetLayouts = () => {
@@ -97,7 +98,7 @@ const HomePage = () => {
     const prefs = {
       layoutsGrandmaDashboard: defaultLayouts,
     };
-    dispatch(profileActions.updateUserPreferences(prefs));
+    updateUserPreferences(prefs);
   };
 
   return (

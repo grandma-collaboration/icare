@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Chip, Tooltip } from "@mui/material";
 import { getContrastColor } from "../ObjectTags";
-import { useAppSelector } from "../../types/hooks";
+import { useGetTagOptionsQuery } from "../../ducks/objectTags";
 
 interface DynamicTagDisplayProps {
   source: { tags?: any[]; classifications?: any[] };
@@ -116,9 +116,7 @@ const DynamicTagDisplay = ({
 
     return classifications;
   };
-  const tagOptions = useAppSelector(
-    (state) => (state as any).objectTags || [],
-  );
+  const { data: tagOptions = [] } = useGetTagOptionsQuery();
 
   const measureTextWidth = (text: string) => {
     if (!measureRef.current) return 0;

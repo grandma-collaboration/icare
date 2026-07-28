@@ -122,8 +122,14 @@ jobs:
         # The frontend `page` fixture launches Playwright's bundled Firefox
         # (p.firefox.launch()), which is separate from the apt-installed system
         # Firefox — it must be fetched via `playwright install`.
+        #
+        # Use `uv run --group dev` rather than the bare `.venv/bin/playwright`:
+        # it re-ensures the dev group (which provides playwright) is synced into
+        # the venv before invoking it, so an intermittent miss in the separate
+        # `uv sync` step above self-heals here instead of failing with
+        # "no such file or directory".
         run: |
-          cd patched_skyportal && .venv/bin/playwright install --with-deps firefox
+          cd patched_skyportal && uv run --group dev playwright install --with-deps firefox
 
       - name: Write SkyPortal configs
         run: |
