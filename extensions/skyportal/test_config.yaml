@@ -10,6 +10,14 @@ ports:
 
 server:
   port: 5000 # external facing port, edit this if you want to expose the app on a different port
+  # Tests run serially (no xdist), so extra app processes buy no concurrency and
+  # just contend for the 2 vCPUs of the CI runner alongside Postgres, the
+  # microservices and Firefox. Keep the process count small to reduce CPU/memory
+  # starvation (which otherwise shows up as nginx 504s and 30s+ UI timeouts).
+  processes: 2
+  # both workers serve the API, else one 504 makes nginx fall back to the status server (405s) for all tests
+  dedicated_frontend_processes: 0
+  fail_timeout: 1 # keep that fallback window short
   auth:
     debug_login: True
     google_oauth2_key:
