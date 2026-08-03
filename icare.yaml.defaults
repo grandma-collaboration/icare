@@ -60,13 +60,13 @@ app:
     - path: "/runs"
       component: observing_run/ObservingRunPage
     - path: "/allocations"
-      component: allocation/AllocationPage
+      component: allocation/AllocationList
     - path: "/allocation/:id"
-      component: allocation/AllocationSummary
+      component: allocation/Allocation
     - path: "/instrument/:id"
-      component: instrument/InstrumentSummary
+      component: instrument/Instrument
     - path: "/telescope/:id"
-      component: telescope/TelescopeSummary
+      component: telescope/Telescope
     - path: "/observations"
       component: observation/ObservationPage
     - path: "/galaxies"
@@ -92,9 +92,9 @@ app:
     - path: "/gcn_events"
       component: gcn/GcnEvents
     - path: "/telescopes"
-      component: telescope/TelescopePage
+      component: telescope/TelescopeList
     - path: "/instruments"
-      component: instrument/InstrumentPage
+      component: instrument/InstrumentList
     - path: "/mmadetectors"
       component: mma_detector/MMADetectorPage
     - path: "/earthquakes"
@@ -114,7 +114,7 @@ app:
     - path: "/tag_management"
       component: TagManagement
     - path: "/taxonomies"
-      component: taxonomy/TaxonomyPage
+      component: taxonomy/TaxonomyList
     - path: "/sharing_services"
       component: sharing_service/SharingServicesPage
     - path: "/sharing_service/:id/submissions"
