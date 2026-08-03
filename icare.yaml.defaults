@@ -29,6 +29,14 @@ app:
       component: group/Groups
     - path: "/group/:id"
       component: group/Group
+    - path: "/teams"
+      component: team/Teams
+    - path: "/brokers"
+      component: broker/BrokerAlerts
+    - path: "/brokers/:brokerId/filter/:fid"
+      component: broker/BrokerFilterPage
+    - path: "/broker_admin"
+      component: broker/BrokerAdmin
     - path: "/profile"
       component: user/Profile
     - path: "/candidates"
@@ -136,6 +144,10 @@ app:
           icon: Star
           url: /favorites
 
+        - name: Alerts
+          icon: Explore
+          url: /brokers
+
         - name: Shifts
           icon: SubwayRounded
           url: /shifts
@@ -143,6 +155,10 @@ app:
         - name: Groups
           icon: GroupWork
           url: /groups
+
+        - name: Teams
+          icon: Diversity3
+          url: /teams
 
         - name: Telescopes
           icon: MyLocation
@@ -224,6 +240,10 @@ app:
           icon: Group
           permissions: ["Manage users", "System admin"]
           url: /user_management
+        - name: Brokers
+          icon: Hub
+          permissions: ["System admin"]
+          url: /broker_admin
 
   homepage_widgets:
     TelescopeMapWidget:
