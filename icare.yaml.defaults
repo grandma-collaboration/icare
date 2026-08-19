@@ -4,6 +4,11 @@ ports:
 app:
   title: Icare
   factory: skyportal.app_server_icare.make_app_icare
+  # Sign in through IAM rather than SkyPortal's default Google button.
+  login_buttons:
+    - url: /login/iam-oauth2
+      image: /static/images/btn_iam_signin.png
+      alt_text: Click this image to log in
   observation_plan:
     default_filters: ['ztfg', 'ztfr', 'ztfi']
     use_skyportal_fields: False
