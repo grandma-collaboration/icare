@@ -49,7 +49,7 @@ app:
     - path: "/sources"
       component: source/SourceList
     - path: "/user/:id"
-      component: user/UserInfo
+      component: user/PublicProfile
     - path: "/upload_photometry/:id"
       component: photometry/UploadPhotometry
     - path: "/about"
