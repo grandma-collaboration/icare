@@ -12,6 +12,7 @@ import uuid
 import warnings
 from datetime import datetime, timedelta
 
+from baselayer.app.models import Base, DBSession, User
 from openid.association import Association as OpenIdAssociation
 from social_core.backends.google import GoogleOAuth2
 from social_core.exceptions import MissingBackend
@@ -26,8 +27,7 @@ from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.types import PickleType, Text
 from tornado.template import Loader, Template
 
-from baselayer.app.models import Base, DBSession, User
-
+from .auth_backends import configured_backends
 from .env import load_env
 
 NO_ASCII_REGEX = re.compile(r"[^\x00-\x7F]+")
@@ -724,8 +724,10 @@ def init_social():
     TornadoStorage.partial = Partial
 
 
-class FakeGoogleOAuth2(GoogleOAuth2):
-    name = "iam-oauth2"
+class FakeOAuth2(GoogleOAuth2):
+    # Impersonates whichever backend is configured first, so that /login/<name>
+    # and the login button are the same under debug_login as in production.
+    name = configured_backends()[0]["name"]
 
     @property
     def AUTHORIZATION_URL(self):
@@ -758,6 +760,9 @@ class FakeGoogleOAuth2(GoogleOAuth2):
 
     def get_user_id(self, *args, **kwargs):
         return "testuser@cesium-ml.org"
+
+
+FakeGoogleOAuth2 = FakeOAuth2  # pre-rename alias
 
 
 # Set up TornadoStorage
