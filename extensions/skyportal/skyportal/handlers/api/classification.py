@@ -1,12 +1,14 @@
+from typing import ClassVar
+
 import arrow
 import sqlalchemy as sa
-from marshmallow.exceptions import ValidationError
-from sqlalchemy import func
-from sqlalchemy.orm import selectinload
-
 from baselayer.app.access import auth_or_token, permissions
 from baselayer.app.env import load_env
 from baselayer.app.flow import Flow
+from marshmallow.exceptions import ValidationError
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import func
+from sqlalchemy.orm import selectinload
 
 from ...models import (
     Classification,
@@ -39,9 +41,7 @@ async def post_classification(data, user_id, session):
     obj_id = data["obj_id"]
 
     obj = (
-        await session.scalars(
-            Obj.select(session.user_or_token).where(Obj.id == obj_id)
-        )
+        await session.scalars(Obj.select(session.user_or_token).where(Obj.id == obj_id))
     ).first()
     if obj is None:
         raise ValueError(f"Cannot find object with ID {obj_id}.")
@@ -120,20 +120,23 @@ async def post_classification(data, user_id, session):
         groups=groups,
     )
     # verify that the same classification does not already exist
-    if taxonomy.name in ['Grandma Campaign Source Classification', 'Grandma Campaign Source Observation']:
-      existing = (
-          await session.scalars(
-              Classification.select(user)
-              .where(Classification.obj_id == obj_id)
-              .where(Classification.classification == data['classification'])
-              .where(Classification.taxonomy_id == data["taxonomy_id"])
-          )
-      ).first()
-      if existing is not None:
-          raise ValueError(
-              f'The classification {data["classification"]} '
-              f'for object {obj_id} already exists.'
-          )
+    if taxonomy.name in [
+        "Grandma Campaign Source Classification",
+        "Grandma Campaign Source Observation",
+    ]:
+        existing = (
+            await session.scalars(
+                Classification.select(user)
+                .where(Classification.obj_id == obj_id)
+                .where(Classification.classification == data["classification"])
+                .where(Classification.taxonomy_id == data["taxonomy_id"])
+            )
+        ).first()
+        if existing is not None:
+            raise ValueError(
+                f"The classification {data['classification']} "
+                f"for object {obj_id} already exists."
+            )
 
     session.add(classification)
 
@@ -187,9 +190,49 @@ async def post_classification(data, user_id, session):
     return classification.id
 
 
+class ClassificationGetQuery(BaseModel):
+    """Query parameters for retrieving classifications."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    single_fields: ClassVar[frozenset[str]] = frozenset({"includeTaxonomy"})
+
+    startDate: str | None = Field(
+        default=None,
+        description=(
+            "Arrow-parseable date string (e.g. 2020-01-01). If provided, "
+            "filter by created_at >= startDate"
+        ),
+    )
+    endDate: str | None = Field(
+        default=None,
+        description=(
+            "Arrow-parseable date string (e.g. 2020-01-01). If provided, "
+            "filter by created_at <= endDate"
+        ),
+    )
+    includeTaxonomy: bool = Field(
+        default=False,
+        description="Return associated taxonomy.",
+    )
+    numPerPage: int = Field(
+        default=DEFAULT_CLASSIFICATIONS_PER_PAGE,
+        description="Number of sources to return per paginated request. Defaults to 100. Max 500.",
+    )
+    pageNumber: int = Field(
+        default=1,
+        description="Page number for paginated query results. Defaults to 1",
+    )
+
+
 class ClassificationHandler(BaseHandler):
     @auth_or_token
-    async def get(self, classification_id=None):
+    async def get(
+        self,
+        classification_id: int | None = None,
+        *,
+        query: ClassificationGetQuery = None,
+    ):
         """
         ---
         single:
@@ -197,19 +240,6 @@ class ClassificationHandler(BaseHandler):
           description: Retrieve a classification
           tags:
             - classifications
-          parameters:
-            - in: path
-              name: classification_id
-              required: true
-              schema:
-                type: integer
-            - in: query
-              name: includeTaxonomy
-              nullable: true
-              schema:
-                type: boolean
-              description: |
-                Return associated taxonomy.
           responses:
             200:
               content:
@@ -224,43 +254,6 @@ class ClassificationHandler(BaseHandler):
           description: Retrieve all classifications
           tags:
             - classifications
-          parameters:
-          - in: query
-            name: startDate
-            nullable: true
-            schema:
-              type: string
-            description: |
-              Arrow-parseable date string (e.g. 2020-01-01). If provided, filter by
-              created_at >= startDate
-          - in: query
-            name: endDate
-            nullable: true
-            schema:
-              type: string
-            description: |
-              Arrow-parseable date string (e.g. 2020-01-01). If provided, filter by
-              created_at <= endDate
-          - in: query
-            name: includeTaxonomy
-            nullable: true
-            schema:
-              type: boolean
-            description: |
-              Return associated taxonomy.
-          - in: query
-            name: numPerPage
-            nullable: true
-            schema:
-              type: integer
-            description: |
-              Number of sources to return per paginated request. Defaults to 100. Max 500.
-          - in: query
-            name: pageNumber
-            nullable: true
-            schema:
-              type: integer
-            description: Page number for paginated query results. Defaults to 1
           responses:
             200:
               content:
@@ -285,26 +278,13 @@ class ClassificationHandler(BaseHandler):
                   schema: Error
 
         """
+        query = self.parse_query(ClassificationGetQuery)
+        page_number = query.pageNumber
+        n_per_page = min(query.numPerPage, MAX_CLASSIFICATIONS_PER_PAGE)
 
-        try:
-            page_number = int(self.get_query_argument("pageNumber", 1))
-            n_per_page = min(
-                int(
-                    self.get_query_argument(
-                        "numPerPage", DEFAULT_CLASSIFICATIONS_PER_PAGE
-                    )
-                ),
-                MAX_CLASSIFICATIONS_PER_PAGE,
-            )
-        except ValueError:
-            return self.error(
-                f"Cannot parse inputs pageNumber ({page_number}) "
-                f"or numPerPage ({n_per_page}) as an integers."
-            )
-
-        start_date = self.get_query_argument("startDate", None)
-        end_date = self.get_query_argument("endDate", None)
-        include_taxonomy = self.get_query_argument("includeTaxonomy", False)
+        start_date = query.startDate
+        end_date = query.endDate
+        include_taxonomy = query.includeTaxonomy
 
         async with self.AsyncSession() as session:
             if classification_id is not None:
@@ -346,9 +326,7 @@ class ClassificationHandler(BaseHandler):
                 classifications = classifications.options(
                     selectinload(Classification.taxonomy)
                 )
-            classifications = (
-                (await session.scalars(classifications)).unique().all()
-            )
+            classifications = (await session.scalars(classifications)).unique().all()
 
             data_out = []
             for classification in classifications:
@@ -501,9 +479,7 @@ class ClassificationHandler(BaseHandler):
         async with self.AsyncSession() as session:
             c = (
                 await session.scalars(
-                    Classification.select(
-                        session.user_or_token, mode="update"
-                    )
+                    Classification.select(session.user_or_token, mode="update")
                     .where(Classification.id == classification_id)
                     .options(
                         selectinload(Classification.obj),
@@ -545,9 +521,7 @@ class ClassificationHandler(BaseHandler):
             if group_ids is not None:
                 groups = (
                     await session.scalars(
-                        Group.select(self.current_user).where(
-                            Group.id.in_(group_ids)
-                        )
+                        Group.select(self.current_user).where(Group.id.in_(group_ids))
                     )
                 ).all()
                 if {g.id for g in groups} != set(group_ids):
@@ -603,9 +577,7 @@ class ClassificationHandler(BaseHandler):
         async with self.AsyncSession() as session:
             c = (
                 await session.scalars(
-                    Classification.select(
-                        session.user_or_token, mode="delete"
-                    )
+                    Classification.select(session.user_or_token, mode="delete")
                     .where(Classification.id == classification_id)
                     .options(
                         selectinload(Classification.obj),
@@ -661,9 +633,24 @@ class ClassificationHandler(BaseHandler):
             return self.success()
 
 
+class ObjClassificationGetQuery(BaseModel):
+    """Query parameters for retrieving an object's classifications."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    includeSuperObjs: bool = Field(
+        default=False,
+        description=(
+            "If true and the obj is linked to other objs via a SuperObj "
+            "(meta-object), return the union of classifications across all "
+            "linked objs. Each entry carries its obj_id for provenance."
+        ),
+    )
+
+
 class ObjClassificationHandler(BaseHandler):
     @auth_or_token
-    async def get(self, obj_id):
+    async def get(self, obj_id: str, *, query: ObjClassificationGetQuery = None):
         """
         ---
         summary: Get an object's classifications
@@ -671,12 +658,6 @@ class ObjClassificationHandler(BaseHandler):
         tags:
           - classifications
           - sources
-        parameters:
-          - in: path
-            name: obj_id
-            required: true
-            schema:
-              type: string
         responses:
           200:
             content:
@@ -687,6 +668,8 @@ class ObjClassificationHandler(BaseHandler):
               application/json:
                 schema: Error
         """
+        query = self.parse_query(ObjClassificationGetQuery)
+        include_super_objs = query.includeSuperObjs
 
         async with self.AsyncSession() as session:
             classifications = (
@@ -748,9 +731,7 @@ class ObjClassificationHandler(BaseHandler):
             classifications = (
                 (
                     await session.scalars(
-                        Classification.select(
-                            session.user_or_token, mode="delete"
-                        )
+                        Classification.select(session.user_or_token, mode="delete")
                         .where(Classification.obj_id == obj_id)
                         .options(
                             selectinload(Classification.obj),
@@ -806,32 +787,36 @@ class ObjClassificationHandler(BaseHandler):
             return self.success()
 
 
+class ObjClassificationQueryGetQuery(BaseModel):
+    """Query parameters for finding sources with classifications."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    startDate: str | None = Field(
+        default=None,
+        description=(
+            "Arrow-parseable date string (e.g. 2020-01-01) for when the "
+            "classification was made. If provided, filter by created_at >= startDate"
+        ),
+    )
+    endDate: str | None = Field(
+        default=None,
+        description=(
+            "Arrow-parseable date string (e.g. 2020-01-01) for when the "
+            "classification was made. If provided, filter by created_at <= endDate"
+        ),
+    )
+
+
 class ObjClassificationQueryHandler(BaseHandler):
     @auth_or_token
-    async def get(self):
+    async def get(self, *, query: ObjClassificationQueryGetQuery = None):
         """
         ---
         summary: Find sources with classifications
         description: find the sources with classifications
         tags:
           - sources
-        parameters:
-        - in: query
-          name: startDate
-          nullable: true
-          schema:
-            type: string
-          description: |
-            Arrow-parseable date string (e.g. 2020-01-01) for when the classification was made. If provided, filter by
-            created_at >= startDate
-        - in: query
-          name: endDate
-          nullable: true
-          schema:
-            type: string
-          description: |
-            Arrow-parseable date string (e.g. 2020-01-01) for when the classification was made. If provided, filter by
-            created_at <= endDate
         responses:
             200:
               content:
@@ -852,9 +837,10 @@ class ObjClassificationQueryHandler(BaseHandler):
                 application/json:
                   schema: Error
         """
+        query = self.parse_query(ObjClassificationQueryGetQuery)
 
-        start_date = self.get_query_argument("startDate", None)
-        end_date = self.get_query_argument("endDate", None)
+        start_date = query.startDate
+        end_date = query.endDate
 
         async with self.AsyncSession() as session:
             # get owned

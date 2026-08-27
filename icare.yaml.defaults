@@ -37,11 +37,11 @@ app:
     - path: "/teams"
       component: team/Teams
     - path: "/brokers"
-      component: broker/BrokerAlerts
+      component: broker/BrokerList
+    - path: "/brokers/:brokerId"
+      component: broker/Broker
     - path: "/brokers/:brokerId/filter/:fid"
       component: broker/BrokerFilterPage
-    - path: "/broker_admin"
-      component: broker/BrokerAdmin
     - path: "/profile"
       component: user/Profile
     - path: "/candidates"
@@ -149,8 +149,9 @@ app:
           icon: Star
           url: /favorites
 
-        - name: Alerts
-          icon: Explore
+
+        - name: Brokers
+          icon: Hub
           url: /brokers
 
         - name: Shifts
@@ -245,10 +246,6 @@ app:
           icon: Group
           permissions: ["Manage users", "System admin"]
           url: /user_management
-        - name: Brokers
-          icon: Hub
-          permissions: ["System admin"]
-          url: /broker_admin
 
   homepage_widgets:
     TelescopeMapWidget:
@@ -331,8 +328,12 @@ server:
 
   auth:
     debug_login: True # UPDATE IN PROD
-    iam_oauth2_key:
-    iam_oauth2_secret:
+    backends:
+      - name: iam-oauth2
+        class: baselayer.app.auth.IAMOAuth2.IAMOAuth2
+        key:
+        secret:
+        label: Sign in with IAM
     iam_oauth2_timeout: 15
 
 services:

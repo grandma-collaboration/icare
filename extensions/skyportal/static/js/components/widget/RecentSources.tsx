@@ -468,8 +468,7 @@ const RecentSources = ({ classes }: RecentSourcesProps) => {
   const { data: profile } = useGetProfileQuery();
   const [updateUserPreferences] = useUpdateUserPreferencesMutation();
   const invertThumbnails = profile?.preferences?.["invertThumbnails"] as
-    | boolean
-    | undefined;
+    boolean | undefined;
   const { classes: styles } = useSourceListStyles({ invertThumbnails });
 
   const { data: recentSources } = useGetRecentSourcesQuery();
