@@ -2,7 +2,7 @@
 
 ## System Architecture
 
-Icare works in a similar way to [Fritz Marshal](), but with some noticeable differences. Let's detail the system's architecture:
+ICARE works in a similar way to [Fritz Marshal](https://fritz.science), but with some noticeable differences. Let's detail the system's architecture:
 
 ``` mermaid
 graph LR
@@ -26,7 +26,7 @@ classDiagram
     app --|> baselayer
     app : app_server.py
     app : psa.py
-    app : test_utils.py
+    app : test_util.py
     auth --|> app
     auth : IAMOAuth2.py
 
@@ -42,23 +42,21 @@ classDiagram
     fink : supervisor.conf
     fink : skyportal_fink_client
 
-    skyportal2 --|> skyportal
-    skyportal2 : app_server.py
-    skyportal2 : initial_setup.py
-    skyportal2 : model_util.py
+    icare --|> skyportal
+    icare : app_server_icare.py
+    icare : initial_setup.py
+    icare : model_util.py
 
-    models --|> skyportal2
+    models --|> icare
     models : invitation.py
-    tests --|> skyportal2
+    tests --|> icare
     tests : frontend/test_patch_grandma.py
 
     static --|> skyportal
     static : images/btn_iam_signin.png
-    static : index.html.template
-    static : login.html.template
 
     skyportal : Makefile
-    skyportal : package.grandma.json
+    skyportal : package.icare.json
 ```
 
 Let's break it down.
@@ -72,31 +70,29 @@ classDiagram
     app --|> baselayer
     app : app_server.py
     app : psa.py
-    app : test_utils.py
+    app : test_util.py
     auth --|> app
     auth : IAMOAuth2.py
 
     baselayer --|> skyportal
 
-    skyportal2 --|> skyportal
-    skyportal2 : app_server.py
-    skyportal2 : initial_setup.py
-    skyportal2 : model_util.py
+    icare --|> skyportal
+    icare : app_server_icare.py
+    icare : initial_setup.py
+    icare : model_util.py
 
-    models --|> skyportal2
+    models --|> icare
     models : invitation.py
 
     static --|> skyportal
     static : images/btn_iam_signin.png
-    static : index.html.template
-    static : login.html.template
 ```
 
 In baselayer, everything related to the authentication is located in the baselayer/app directory. In there, we have the following files:
 
 - app_server.py
 - psa.py
-- test_utils.py
+- test_util.py
 
 app_server.py is the main file for the app. It is the bridge between API routes and handlers, serving the requests coming from the frontend or simple API calls. But also, it happens to be the file that handles the authentication with python social auth.
 
@@ -114,10 +110,10 @@ settings = {
 
 if cfg["server.auth.debug_login"]:
     settings["SOCIAL_AUTH_AUTHENTICATION_BACKENDS"] = (
-        "baselayer.app.psa.FakeGoogleOAuth2",
+        "baselayer.app.psa.FakeOAuth2",
     )
 ```
-* In this code snippet, you can see everything in app_server.py responsible for the authentication. First, the path to the authentication handler is defined. Here, it is pointing to `social_core.backends.google.GoogleOAuth2` from the pip package `social-core`. This is the authentication handler that is used by the python social auth library. Then, we define the key and secret for the authentication handler, which are stored in the `config.yaml` file of baselayer and/or skyportal. Last but not least, we define a path to an alternative handler used when starting the app in debug mode (no real authentication, to run tests or in development), which is in `baselayer.app.psa.FakeGoogleOAuth2`.
+* In this code snippet, you can see everything in app_server.py responsible for the authentication. First, the path to the authentication handler is defined. Here, it is pointing to `social_core.backends.google.GoogleOAuth2` from the pip package `social-core`. This is the authentication handler that is used by the python social auth library. Then, we define the key and secret for the authentication handler, which are stored in the `config.yaml` file of baselayer and/or skyportal. Last but not least, we define a path to an alternative handler used when starting the app in debug mode (no real authentication, to run tests or in development), which is in `baselayer.app.psa.FakeOAuth2`.
 
 To use IAM instead of Google, we changed those lines to:
 
@@ -133,7 +129,7 @@ settings = {
 
 if cfg["server.auth.debug_login"]:
     settings["SOCIAL_AUTH_AUTHENTICATION_BACKENDS"] = (
-        "baselayer.app.psa.FakeGoogleOAuth2",
+        "baselayer.app.psa.FakeOAuth2",
     )
 ```
 
@@ -143,7 +139,7 @@ Also, as you may notice, the pointer to the debug handler is the same. That is b
 
 Then, we modified some files in skyportal. Those are minor changes, but they are important to know about. Everywhere that the auth route to google is used, we had to change it to the auth route to IAM (iam-oauth). Otherwise, the code is the same. We also added a custom button for the login, with IAM's logo instead of Google's (can be found in `skyportal/static`).
 
-### Grandma Data
+### GRANDMA Data
 
 ``` mermaid
 classDiagram
@@ -175,6 +171,67 @@ To make it easier during deployment (to avoid to configure it and start it manua
 When starting SkyPortal, it will wait for the app to be fully started, verify that the DB contains the telescope(s) and instrument(s) associated to the alerts, and then it will start polling and posting them. Everything is logged in the log folder of skyportal along with the other logs of the app. This is done so you can keep a history of the alerts that were polled, to verify if needed that the alerts are being pushed to SkyPortal correctly.
 
 
+### TAROT Proxy
+
+ICARE includes a second microservice, `tarot_proxy`, that acts as an authenticated HTTP proxy between the ICARE frontend and the TAROT telescope network APIs (Calern, Chili, Réunion).
+
+``` mermaid
+classDiagram
+    services --|> skyportal
+    tarot_proxy --|> services
+    tarot_proxy : tarot_proxy.py
+    tarot_proxy : supervisor.conf
+```
+
+The proxy runs on port `64910` (configured in `icare.yaml.defaults` under `ports.tarot_proxy`) and forwards authenticated requests to the TAROT endpoints. It is started automatically by supervisor alongside the Fink client when the app starts.
+
+The relevant `icare.yaml` fields are:
+
+```yaml
+ports:
+  tarot_proxy: 64910
+
+app:
+  tarot_proxy_endpoint: http://localhost:64910/
+  tarot_endpoint: http://cador.tarotnet.org/ros
+  calern_endpoint: http://tca4.tarotnet.org/ros/klotz
+  chili_endpoint: http://tch4.tarotnet.org/ros/klotz
+  reunion_endpoint: http://tre4.tarotnet.org/ros/klotz
+```
+
+## How to add or modify a file in ICARE
+
+The `extensions/skyportal/` directory mirrors SkyPortal's directory structure. During build, every file in `extensions/skyportal/` is copied into `patched_skyportal/`, overwriting the original SkyPortal file if one exists at the same path.
+
+**To override an existing SkyPortal file**, place your modified version at the same relative path inside `extensions/skyportal/`. For example, to modify `skyportal/handlers/api/foo.py`, create `extensions/skyportal/skyportal/handlers/api/foo.py`.
+
+**To add a new file** that doesn't exist in SkyPortal, place it anywhere in `extensions/skyportal/` and it will be copied into `patched_skyportal/` as-is.
+
+**To add a new Python dependency**, add it to the `ext` group in `pyproject.toml`:
+
+```toml
+[dependency-groups]
+ext = [
+    "your-package>=1.0",
+    ...
+]
+```
+
+**To add a new JavaScript dependency**, add it to `extensions/skyportal/package.icare.json`:
+
+```json
+{
+    "dependencies": {
+        "your-package": "^1.0.0"
+    }
+}
+```
+
+Both dependency files are automatically merged into SkyPortal's own dependency files during `build`.
+
+!!! warning
+    Never edit files directly in `patched_skyportal/` — it is a generated directory and will be overwritten on the next build. Always make changes in `extensions/skyportal/` or `skyportal/`.
+
 ## System Dependencies
 
 ### Dependencies
@@ -182,11 +239,11 @@ When starting SkyPortal, it will wait for the app to be fully started, verify th
 SkyPortal requires the following software to be installed.  We show
 how to install them on MacOS and Debian-based systems below.
 
-- Python 3.8 or later
+- Python (v>=3.12, <3.13)
 - Supervisor (v>=3.0b2)
 - NGINX (v>=1.7)
 - PostgreSQL (v>=17)
-- Node.JS (v>=20.19.0) / npm (v>=10.8.2)
+- Node.JS (v>=24) / bun (v>=1.3.14)
 
 When installing SkyPortal on Debian-based systems, 2 additional packages are required to be able to install pycurl later on:
 
@@ -195,27 +252,32 @@ When installing SkyPortal on Debian-based systems, 2 additional packages are req
 
 ### Source download, Python environment
 
-Clone the [Icare repository](https://github.com/grandma-collaboration/icare) and start a new
-virtual environment.
+Clone the [ICARE repository](https://github.com/grandma-collaboration/icare) and install dependencies.
 
+With `uv` (recommended):
 ```
 git clone https://github.com/grandma-collaboration/icare
 cd icare/
-virtualenv env
-source env/bin/activate
+uv sync
 ```
 
-(You can also use `conda` or `pipenv` to create your environment.)
+With `pip`:
+```
+git clone https://github.com/grandma-collaboration/icare
+cd icare/
+pip install -e .
+```
 
 If you are using Windows Subsystem for Linux (WSL) be sure you clone the repository onto a location on the virtual machine, not the mounted Windows drive. Additionally, we recommend that you use WSL 2, and not WSL 1, in order to avoid complications in interfacing with the Linux image's `localhost` network.
 
 ### Installation: Debian-based Linux and WSL
 
-1. Install nginx and python
+1. Install nginx, python and bun
 
 Run the following commands to install the dependencies:
 ```
-sudo apt install nginx supervisor libpq-dev npm python3-pip libcurl4-gnutls-dev libgnutls28-dev
+sudo apt install nginx supervisor libpq-dev python3-pip libcurl4-gnutls-dev libgnutls28-dev
+curl -fsSL https://bun.sh/install | bash
 ```
 
 2. Installing PostgreSQL
@@ -257,21 +319,14 @@ sudo systemctl restart postgresql
 
 Then, run the same commands mentionned above to verify that the installation was successful.
 
-3. Installing node.js
+3. Verify node.js and bun
 
-In section 1, we installed nginx, python but also the npm in its version shipped with the system. However, that version is not recent enough to run SkyPortal. To update it, run:
-```
-sudo npm i -g n
-sudo n 17
-```
-
-*n is an npm package that allows you to switch between versions of node.js and npm easily.*
-
-Then, open a new terminal and run:
+Bun was already installed in step 1. Open a new terminal and run:
 ```
 node --version
+bun --version
 ```
-to verify that you are running the right version (17 or more).
+to verify the installations. Node.js must be version 24 or higher.
 
 2. Configure your database permissions.
 
@@ -301,15 +356,15 @@ Restart PostgreSQL:
 sudo service postgresql restart
 ```
 
-3. To run the test suite, you'll need Geckodriver:
+3. To run the frontend test suite locally, you'll need geckodriver and Firefox:
 
-- Download the latest version from https://github.com/mozilla/geckodriver/releases/
-- Extract the binary to somewhere on your path
-- Ensure it runs with `geckodriver --version`
-
-In later versions of Ubuntu (16.04+), you can install Geckodriver through apt:
 ```
 sudo apt install firefox-geckodriver
+```
+
+Set `FRONTEND_TEST_HEADLESS=1` to run headless (as CI does):
+```
+FRONTEND_TEST_HEADLESS=1 cd patched_skyportal && python baselayer/tools/test_frontend.py skyportal/tests/frontend/test_patch_grandma.py
 ```
 
 ## System Commands
@@ -318,28 +373,57 @@ Now that we've explored the architecture of icare, let's see how do we actually 
 
 In icare, you'll find a launcher directory, containing different commands. The launcher directory follows the same patterns established in Fritz, for consistency sake.
 
-Here are the different commands, all prefixed with `./icare.sh` to run:
+Here are the different commands, all prefixed with `./icare.sh`:
 
-- run
-- do_update
-- build
-- diff
-- clear
-- set_user_role
-- load_grandma_data
+| Command | Description |
+|---|---|
+| `run` | Main entry point. Builds and starts the app. Accepts flags: `--init` (initialize DB), `--clear` (drop and recreate DB), `--do_update` (pull and update SkyPortal), `--update_prod` (production update with migration stamping), `--production` (build with rspack for production) |
+| `build` | Copies `skyportal/` to `patched_skyportal/` and applies the `extensions/skyportal/` overlay. Called automatically by `run` |
+| `update` | Pulls the latest SkyPortal from the remote and updates submodules recursively |
+| `diff` | Shows which SkyPortal files have changed upstream and overlap with files in `extensions/skyportal/`. Used to detect merge conflicts before updating |
+| `clear` | Drops and recreates the SkyPortal database (`make db_clear`) |
+| `apply_config` | Merges `icare.yaml` on top of SkyPortal's default config and writes the result to `patched_skyportal/config.yaml.defaults` |
+| `copy_token` | Copies the SkyPortal admin token from `patched_skyportal/.tokens.yaml` into the skyportal-fink-client `config.yaml` so Fink can authenticate |
+| `set_user_role` | Sets or lists user roles. Usage: `./icare.sh set_user_role --username=<user> --role=<role>` or `--list` |
+| `load_grandma_data` | Loads GRANDMA telescope and instrument data into SkyPortal (`make load_grandma_data`) |
 
-In this documentation, we'll focus only on the `run` command. Effectively, other commands will we called along with the `run` command as arguments. For example, we can use `./icare.sh run --clear --init` to clear the database, recreate tables and then run the app.
+For example: `./icare.sh run --clear --init` drops the database, recreates it, and starts the app.
+
+### Configuration: icare.yaml
+
+Before running the app, you need to create an `icare.yaml` file at the root of the repository. Copy the defaults as a starting point:
+
+```
+cp icare.yaml.defaults icare.yaml
+```
+
+The key fields to configure before starting are:
+
+| Field | Description |
+|---|---|
+| `server.host` | Public hostname or IP of the server |
+| `server.protocol` | `http` for dev, `https` for production |
+| `server.port` | App port (default: 5000) |
+| `server.auth.debug_login` | Set to `True` for local dev (no real auth), `False` in production |
+| `server.auth.backends[].key` | IAM OAuth2 client key |
+| `server.auth.backends[].secret` | IAM OAuth2 client secret |
+| `fink.fink_username` | Fink broker username |
+| `fink.fink_password` | Fink broker password |
+| `fink.fink_group_id` | Kafka consumer group ID |
+| `fink.fink_servers` | Kafka broker addresses |
+
+The `apply_config` command merges your `icare.yaml` into SkyPortal's config. It is called automatically when you run `./icare.sh run`.
 
 ### Starting the app for the first time
 
-First, you need to install the dependencies required to use the commands mentioned in the previous section. Whether you use the `pip` or `conda` package manager, you need to install the packages from the `requirements.txt` file.
+First, you need to install the dependencies required to use the commands mentioned in the previous section. Install them from `pyproject.toml` using `pip` or `uv`:
 
 ```
-pip install -r requirements.txt
+pip install -e .
 ```
 or
 ```
-conda install --file requirements.txt
+uv sync
 ```
 
 To run the app for the first time, we can use the `run` command as such:
@@ -364,7 +448,7 @@ git submodule update --init --recursive
 Last but not least, remove the `patched_skyportal` and `previous_skyportal` directories if they exist:
 ```
 sudo rm -rf patched_skyportal
-sudo rm -rf precious_skyportal
+sudo rm -rf previous_skyportal
 ```
 
 Now, you can use the `do_update` command as such:
@@ -374,13 +458,13 @@ Now, you can use the `do_update` command as such:
 
 This will update the version of SkyPortal that is pinned in the app. When doing so, we are basically running a `git diff` to see which files have been modified. If some of those files are also the files we have copied and modified in the extensions folder, we need to merge new changes in the extensions folder too. If we don't do this, when replacing skyportal's files by the files in the extensions folder, we'll lose new changes. And besides from missing on new features, it is very likely to break the app. Which is why, when we detect that some changes coming from skyportal are made on same files we have in the extensions folder, we give the user 3 choices:
 
-- Stop running the app, and merge new changes in the extensions folder. The user can then go to the extensions folder and fix potential merge conflict before running the app again.
-- Update SkyPortal and run the app without updating files in the extensions folder. This will likely break the app.
-- Cancel the update and run the app normally.
+- **Option 1 — Fix conflicts first (recommended)**: the launcher exits without starting. Go to `extensions/skyportal/` and manually update the conflicting files to incorporate the upstream changes. Use `git diff skyportal/path/to/file` (from the repo root) to see what changed in SkyPortal. Edit the corresponding file in `extensions/skyportal/path/to/file`, then rerun `./icare.sh run --do_update`.
+- **Option 2 — Force update**: runs with the upstream changes, overwriting your extension files. Will likely break the app.
+- **Option 3 — Cancel update**: keeps the current SkyPortal version and starts normally.
 
 *These features are still in development, you might experience some issues.*
 
-After updating the version that is pinned, and fixing potential merge conflict, rerun the app with:
+After resolving conflicts and verifying the app starts correctly, rerun the app with:
 ```
 ./icare.sh run
 ```
@@ -495,10 +579,7 @@ Now that you are connected, you can use the following commands:
 sudo -i
 ```
 
-- to activate the conda environment with all the dependencies needed to run the app, run:
-```
-conda activate skyportal
-```
+- activate your virtual environment with all the dependencies needed to run the app
 
 - then go to the `icare` folder and run the following command:
 ```
@@ -539,49 +620,138 @@ systemctl restart <service_name>
 
 Verify their status once more, and if everything seems to be working you should be able to start the app again.
 
+## CI/CD
+
+Three GitHub Actions workflows run automatically on every push and pull request:
+
+| Workflow | Trigger | What it checks |
+|---|---|---|
+| `pre-commit-linting.yml` | push / PR | Runs `black` (Python formatting), YAML validity, trailing whitespace |
+| `test_icare_extensions.yaml` | push / PR | Builds the patched SkyPortal, initializes the DB, and runs `skyportal/tests/frontend/test_patch_grandma.py` with headless Firefox |
+| `add_labels.yaml` | PR | Automatically adds labels based on changed files |
+
+Both checks must pass before merging to `main`. To run the linter locally before pushing:
+
+```
+pip install pre-commit
+pre-commit run --all-files
+```
+
 ## Deploy on a new VM
 
-If you are using a new VM, you might have to install the python dependencies first. To do so, run the following command with conda:
+Follow these steps to deploy ICARE on a fresh AlmaLinux VM:
+
+1. Clone the repository and initialize submodules:
 ```
-conda install --file skyportal/requirements.txt
-conda install --file skyportal/baselayer/requirements.txt
+git clone https://github.com/grandma-collaboration/icare
+cd icare
+git submodule update --init --recursive
 ```
 
-or with pip:
+2. Install system dependencies (nginx, supervisor, postgresql, bun — see the [Installation](#installation-debian-based-linux-and-wsl) section for details).
+
+3. Install Python dependencies:
 ```
-pip install -r skyportal/requirements.txt
-pip install -r skyportal/baselayer/requirements.txt
+uv sync
 ```
 
-If you encounter some issues, please refer to the last section of this page for more information. Some packages are not available in conda yet, so if you are using conda, you might need to install them using pip (but with your conda environment still activated).
+4. Create and configure `icare.yaml` (see [Configuration](#configuration-icareyaml)):
+```
+cp icare.yaml.defaults icare.yaml
+# edit icare.yaml with production values
+```
+
+5. Run the app for the first time:
+```
+./icare.sh run --clear --init
+```
+
+If you encounter issues, check that nginx, supervisor, and postgresql are running (`systemctl status <service>`) and refer to the Common issues section below.
 
 ## Common issues
 
-### NPM and Node.js version
+### VM full restart (production)
 
-First, we need to detail how the VM works. The system is based on CentOS 7, which is a Linux distribution. When rebooting it from the terminal, it behaves normally and keeps everything installed. However, the goal is that the system (the OS) is independent of the app, so that it can be reinstalled completely and the app can be started again. This is done so that the same system image can be used to deploy the same app and DB again on a new VM easily for example. This is why the OS is installed on a temporary disk, but the app on a permanent one.
+The production VM runs **AlmaLinux 9.6**. The OS is installed on a temporary disk while the app and database live on a permanent disk. When the VM is fully restarted (e.g. by the "Service d'exploitation"), the OS is reinstalled completely but the app on the permanent disk is preserved.
 
-When the VM is completely restarted, for example by someone from the "Service d'exploitation", the system will be reinstalled completely.
+After a full restart, services that are not configured to start automatically will need to be restarted manually. Make sure nginx, supervisor, and postgresql are running before starting the app:
 
-One issue we encountered is that the version of some packages needed by skyportal shipped with CentOS are outdated. So for some packages, instead of installing them from the system's repo upon restart, they are installed on the permanent disk, where the app and the database are also kept. This is done for Postgres (the database), and for conda (the python environment manager). However, this is not done yet for Node.js and NPM (the package manager for Node.js). Therefore, one problem you can encounter if the VM has been fully restarted, is that SkyPortal won't run because node.js is not up to date.
-
-To fix this issue, (needs to be reran everytime the VM is fully restarted, it is not needed for a simple reboot ran in the terminal), run the following command:
 ```
-npm install -g n
-```
-
-Then, run the following command:
-```
-n 17
+systemctl status nginx
+systemctl status supervisor
+systemctl status postgresql
 ```
 
-This will install an npm package called n, which allows you to switch between different versions of node.js and npm, and then install version 17 of node.js, we is conveniently shipped with the right version of npm.
+If any are not active, restart them:
+```
+systemctl restart <service_name>
+```
 
 ### Installing Python dependencies
 
-To manage python dependencies in production, we use conda. Conda is a python package manager that is used to manage the dependencies of the app. It is a bit more complicated than pip, but all packages are pre-compiled, and you can also switch between versions of python very easily.
+Dependencies are managed via `pyproject.toml`. Install them with `pip install -e .` or `uv sync`.
 
-However, some dependencies of SkyPortal are not available in conda, as they haven't been published there yet.
-What we recommend when running skyportal for the first time is to try to install as many packages as possible with conda, and then install the remaining dependencies with pip (with the conda environment activated).
+## Contributing
+
+### Workflow
+
+1. Fork the repository and create a branch from `main`:
+```
+git checkout -b my-feature
+```
+
+2. Make your changes in `extensions/skyportal/` (never in `patched_skyportal/`).
+
+3. Run the linter locally before pushing:
+```
+pip install pre-commit
+pre-commit run --all-files
+```
+
+4. Push your branch and open a pull request against `main`. GitHub Actions will automatically run:
+    - `pre-commit` linting (black, YAML validity, trailing whitespace)
+    - The ICARE extension test suite (headless Firefox)
+
+5. Both checks must be green before merging. Request a review and merge only after approval.
+
+### Automatic PR labels
+
+PRs are automatically labelled based on the files changed:
+
+| Label | Triggered by |
+|---|---|
+| `config-change` | Changes to `icare.yaml.defaults` or SkyPortal config files |
+| `dependencies` | Changes to dependency files |
+| `documentation` | Changes to doc directories |
+| `migration` | New Alembic migration files |
+| `needs-migration?` | Changes to model files without a new migration |
+| `skyportal_updates` | Changes to the `skyportal/` submodule |
+| `workflows` | Changes to `.github/` |
+
+### Commit message style
+
+[Commitizen](https://commitizen-tools.github.io/commitizen/) format is encouraged. The structure is:
+
+```
+<type>: <short description>
+```
+
+Common types:
+
+| Type | When to use |
+|---|---|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation only |
+| `refactor` | Code change that is neither a fix nor a feature |
+| `chore` | Build, deps, CI changes |
+
+Examples:
+```
+feat: add leave confirmation dialog
+fix: handle missing skyportal token
+docs: update installation steps
+chore: bump skyportal to 999a955
+```
 
 Good luck!

@@ -1,25 +1,27 @@
-# Icare
+# ICARE
+
+**Interface and Communication for Addicts of the Rapid follow-up in multi-messenger Era**
 
 ## What is it ?
-Icare is a custom "layer" of both frontend and backend, added on top of [SkyPortal](https://skyportal.io/) to provide the features required only by Grandma.
+ICARE is a custom "layer" of both frontend and backend, added on top of [SkyPortal](https://skyportal.io/) to provide the features required only by GRANDMA.
 
 Besides from building on top of SkyPortal, it also provides 2 extensions:
 
 - [SkyPortal-Fink-Client](https://github.com/skyportal-contrib/skyportal-fink-client): A tool to pull alerts from Fink and add them to SkyPortal.
 
-- [Grandma data](https://github.com/grandma-collaboration/grandma_data): a set of data needed by Grandma to populate SkyPortal's database, such as telescopes data, instruments data, etc.
+- [GRANDMA data](https://github.com/grandma-collaboration/grandma_data): a set of data needed by GRANDMA to populate SkyPortal's database, such as telescopes data, instruments data, etc.
 
 ## Authentication
 
 ##### Full Account Creation Tutorial: [User Guide](./user_guide/index.md)
 
-Users can login to Icare using either their Slack account (for GRANDMA people), ORCID or eduGAIN account. The service used for
+Users can login to ICARE using either their Slack account (for GRANDMA people), ORCID or eduGAIN account. The service used for
 authentication is called IAM. One benefit of this service is that you will be able to use your
-standard account, without the need to remember a username and a password specific to Icare.
-Also you will be able to use any of the authentication methods proposed and still remain the same user in Icare.
+standard account, without the need to remember a username and a password specific to ICARE.
+Also you will be able to use any of the authentication methods proposed and still remain the same user in ICARE.
 
 Your IAM account will be automatically created the first time you connect to
-[Icare](https://skyportal-icare.ijclab.in2p3.fr).
+[ICARE](https://skyportal-icare.ijclab.in2p3.fr).
 
 **Important : Do not try to connect to SkyPortal until your account is verified. If you still did that,
 you will need to delete your cache/cookies before logging in.**
@@ -48,4 +50,4 @@ permissions (like the permission to add a source, ...), you can always ask them.
 
 ## User Guide
 
-You will find a more in depth guide to use Icare on the [User Guide](./user_guide/index.md) page.
+You will find a more in depth guide to use ICARE on the [User Guide](./user_guide/index.md) page.
