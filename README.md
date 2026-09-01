@@ -1,12 +1,24 @@
-# ICARE
+<h1 align="center">
+  <br>
+  <img
+    src="docs/skyportal_logo.png"
+    alt="ICARE Logo"
+    width="100px"
+  />
+  <br>
+  ICARE
+  <br>
+</h1>
 
-**Interface and Communication for Addicts of the Rapid follow-up in multi-messenger Era**
+<h2 align="center">
+Interface and Communication for Addicts of the Rapid follow-up in multi-messenger Era
+</h2>
 
 [![Documentation Status](https://readthedocs.org/projects/grandma-skyportal/badge/?version=latest)](https://grandma-skyportal.readthedocs.io)
 [![pre-commit](https://github.com/grandma-collaboration/icare/actions/workflows/pre-commit-linting.yml/badge.svg)](https://github.com/grandma-collaboration/icare/actions/workflows/pre-commit-linting.yml)
 [![tests](https://github.com/grandma-collaboration/icare/actions/workflows/test_icare_extensions.yaml/badge.svg)](https://github.com/grandma-collaboration/icare/actions/workflows/test_icare_extensions.yaml)
 
-ICARE is a platform for the coordination and follow-up of multi-messenger astronomical events. Originally developed in 2020 for the [GRANDMA](https://grandma.ijclab.in2p3.fr/) collaboration, it is now open to the broader European astronomical community thanks to [ACME](https://www.acme-astro.eu/) funding.
+ICARE is a custom instance of [SkyPortal](https://skyportal.io) ([docs](https://skyportal.io/docs/)) tailored for the coordination and follow-up of multi-messenger astronomical events. Originally developed in 2020 for the [GRANDMA](https://grandma.ijclab.in2p3.fr/) collaboration, it is now open to the broader European astronomical community thanks to [ACME](https://www.acme-astro.eu/) funding.
 
 ## Links
 
@@ -37,4 +49,4 @@ See the [Developer Guide](https://grandma-skyportal.readthedocs.io/dev_guide/ins
 
 ## License
 
-Copyright (C) 2021-2026, the GRANDMA collaboration team. All rights reserved.
+Copyright (C) 2020-2026, the GRANDMA collaboration team. All rights reserved.
