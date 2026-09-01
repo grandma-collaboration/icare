@@ -8,7 +8,6 @@ repo_url = "https://github.com/grandma-collaboration/icare"
 repo_name = "grandma-collaboration/icare"
 edit_uri = "edit/main/docs/"
 extra_css = ["stylesheets/extra.css"]
-extra_javascript = ["javascripts/external_nav.js"]
 
 nav = [
   { "Home" = "index.md" },
