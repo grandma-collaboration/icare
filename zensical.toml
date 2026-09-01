@@ -8,11 +8,17 @@ repo_url = "https://github.com/grandma-collaboration/icare"
 repo_name = "grandma-collaboration/icare"
 edit_uri = "edit/main/docs/"
 extra_css = ["stylesheets/extra.css"]
+extra_javascript = ["javascripts/external_nav.js"]
 
 nav = [
   { "Home" = "index.md" },
   { "User Guide" = "user_guide/index.md" },
-  { "Dev Guide" = "dev_guide/index.md" },
+  { "Dev Guide" = [
+    { "Architecture" = "dev_guide/architecture.md" },
+    { "Installation" = "dev_guide/installation.md" },
+    { "Commands" = "dev_guide/commands.md" },
+    { "Contributing" = "dev_guide/contributing.md" },
+  ] },
   { "Workshop Exercices" = "workshop/index.md" },
   { "↗ Go to ICARE Service" = "https://skyportal-icare.ijclab.in2p3.fr" },
 ]
@@ -23,7 +29,6 @@ favicon = "skyportal_logo.png"
 features = [
   "navigation.instant",
   "navigation.tracking",
-  "navigation.tabs",
   "navigation.top",
   "navigation.footer",
   "content.action.edit",

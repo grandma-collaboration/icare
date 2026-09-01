@@ -45,10 +45,8 @@ Account Creation Form             |  Submittion message
 
 You will receive an email, asking you to validate your email, with a confirmation link.
 Please click the link: accounts will not be validated until you confirmed your email.
-**Your account won't be verified by an administrator until you do it.** Once it is done, wait
-for your account to be validated by an administrator: once it is done you'll receive a new email
-that also contains a link to set your IAM password: **just ignore it** as you will not need it
-to access ICARE with Slack, ORCID or eduGAIN.
+!!! warning
+    Your account won't be verified by an administrator until you confirm your email. Once confirmed, wait for administrator validation, you'll receive a new email with a link to set your IAM password: **just ignore it**, as you will not need it to access ICARE with Slack, ORCID or eduGAIN.
 
 Account Creation Confirmation email             |  Setting your password
 :-------------------------:|:-------------------------:
@@ -67,13 +65,14 @@ ICARE login with IAM             |  Choose the same option as Before
 If you want to enable other authentication methods for your account, look at the
 [dedicated section](#how-to-create-and-configure-your-iam-account) of the documentation.
 
-Done! You will be redirected to your ICARE profile. By default, you will have the role of `Full user` and be a member of the `Sitewide` group. The `Full user` role gives access to most features — you can create sources, groups, leave comments, and more — but some actions require additional permissions that an administrator can grant.
+Done! You will be redirected to your ICARE profile. By default, you will have the role of `Full user` and be a member of the `Sitewide` group. The `Full user` role gives access to most features: you can create sources, groups, leave comments, and more. Some actions require additional permissions that an administrator can grant.
 
 ICARE Profile Created             |
 :-------------------------:|
 ![](./img/7.png)  |
 
-*Note: You can turn on email or Slack notification on your profile in case of mentions.*
+!!! tip
+    You can turn on email or Slack notifications on your profile in case of mentions.
 
 You can create a new group or request access to a specific group in the `Groups` page :
 
@@ -82,7 +81,7 @@ Group management             |
 ![](./img/8.png)  |
 
 !!! important
-    To access science data, you must join a group. Go to the `Groups` page and request access to the group(s) relevant to you (e.g. `GRANDMA`, `Fink`). An administrator will receive your request and approve it — you will get a notification once added.
+    To access science data, you must join a group. Go to the `Groups` page and request access to the group(s) relevant to you (e.g. `GRANDMA`, `Fink`). An administrator will receive your request and approve it, you will get a notification once added.
 
 
 ## How to create and configure your IAM account.
@@ -95,8 +94,8 @@ profile. The email you specifiy don't need to be the same as the email associate
 Slack or eduGAIN account you used to authenticate and will be used as your ICARE
 identifier (username).
 
-**Note: one of the mandatory information to create your IAM account is the `Note` field: we request you to put your
-affiliation in this note, as well as other information you may find useful.**
+!!! note
+    One of the mandatory fields when creating your IAM account is the `Note` field. Please put your affiliation there, as well as any other information you find useful.
 
 Once your account has been created and verified, you can login again to
 [ICARE](https://skyportal-icare.ijclab.in2p3.fr) using your IAM account
