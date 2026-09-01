@@ -1,0 +1,7 @@
+[data-md-color-scheme="default"],
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #1A88B8;
+  --md-primary-fg-color--light: #29ABE2;
+  --md-primary-fg-color--dark: #126690;
+  --md-accent-fg-color: #1A88B8;
+}

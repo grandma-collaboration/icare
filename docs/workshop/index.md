@@ -1,10 +1,10 @@
-# WORKSHOP EXERCISES
+# Workshop exercises
 
-### **Here, you will find a series of short and concise exercises to help you get started with Icare. Also, this will help us verify that everyone created their account and participated in the exercises. Additionally, it will help you find potential bugs so we can fix them!**
-### At the end of the exercises, you will find a short Google Form to give us feedback about your experience. This step is mandatory and will help us a lot to make the platform better for everyone.
-### **Thank you for your participation!**
+Here, you will find a series of short and concise exercises to help you get started with ICARE. This will also help us verify that everyone created their account and participated, and help you find potential bugs so we can fix them!
 
-### Exercises:
+**Thank you for your participation!**
+
+## Exercises
 
 **Step 1**. Go to the Shift page: [https://grandma-v2.ijclab.in2p3.fr/shifts/](https://grandma-v2.ijclab.in2p3.fr/shifts/), and on the calendar click on the **Test Shift** (hint: it's second one on Tuesday). Now, on the right part of the screen, you should see the menu of the shift.
 
@@ -77,16 +77,14 @@ Shift Menu - leave the shift             |  Updated Shift Page
 :-------------------------:|:-------------------------:
 ![](./img/17.png)  |  ![](./img/18.png)
 
-**Step 11 (Telescope teams only)**. Please go to the Telescopes Page by clicking on "Other" in the navbar, then click on **Telescopes**. There, please look for your respective telescope(s). When you find it on the map, please click on it (click on the marker right below its name. As some telescopes are really close to each other, feel free to zoom slightly to be sure to click on the correct marker) and some informations should appear on the right part of the page, in the Telescope List menu. Please verify that the data is correct. If you don't find your telescope on the map or if the data is incorrect, please contact us directly and send us the right information. You can reach out to us on [Slack GRANDMA](https://app.slack.com/client/TFRQJA3CJ) (@Thomas Culino @Theophile Jegou du Laz).
+**Step 11 (Telescope teams only)**. Please go to the Telescopes Page by clicking on "Other" in the navbar, then click on **Telescopes**. There, please look for your respective telescope(s). When you find it on the map, please click on it (click on the marker right below its name. As some telescopes are really close to each other, feel free to zoom slightly to be sure to click on the correct marker) and some informations should appear on the right part of the page, in the Telescope List menu. Please verify that the data is correct. If you don't find your telescope on the map or if the data is incorrect, please contact us directly and send us the right information. You can reach out to us on [Slack GRANDMA](https://app.slack.com/client/TFRQJA3CJ) (@Camille Douzet).
 
-You can do the same for the Instruments Page by clicking on "Other" in the navbar, then click on Instruments. You will see the list of all instruments on the left part of the screen. If you don't find the instrument(s) of your telescope(s) or if the data is incorrect, please contact us directly and send us the right information. You can reach out to us on [Slack GRANDMA](https://app.slack.com/client/TFRQJA3CJ) (@Thomas Culino @Theophile Jegou du Laz).
+You can do the same for the Instruments Page by clicking on "Other" in the navbar, then click on Instruments. You will see the list of all instruments on the left part of the screen. If you don't find the instrument(s) of your telescope(s) or if the data is incorrect, please contact us directly and send us the right information. You can reach out to us on [Slack GRANDMA](https://app.slack.com/client/TFRQJA3CJ) (@Camille Douzet).
 
 Telescopes Page            | Instruments Page |
 :-------------------------:|:-------------------------:|
 ![](./img/19.png)  | ![](./img/20.png) |
 
-#### Congratulations ! You completed all of the exercises ! You are now an expert of SkyPortal :) Don't hesitate to explore the platform some more, there are many other features we did not explore yet. For the comfort of other users that did not complete their exercises yet, please do not make further edits on any of the shifts, gcn events, sources, telescopes and instruments you explored during the exercises. But feel free to have fun on any other gcn events and sources ! :) Also, we strongly encourage you to try the Candidate Page.
+*Congratulations ! You completed all of the exercises ! You are now an expert of SkyPortal :) Don't hesitate to explore the platform some more, there are many other features we did not explore yet. For the comfort of other users that did not complete their exercises yet, please do not make further edits on any of the shifts, gcn events, sources, telescopes and instruments you explored during the exercises. But feel free to have fun on any other gcn events and sources ! :) Also, we strongly encourage you to try the Candidate Page.*
 
-## MANDATORY: [Feedback form](https://forms.gle/tdK645qVKQG6SNe88)
-
-### Enjoy the rest of the workshop ! Thanks for trying Icare
+**Thanks for trying ICARE**

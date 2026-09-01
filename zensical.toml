@@ -1,0 +1,72 @@
+[project]
+site_name = "ICARE"
+site_url = "https://grandma-skyportal.readthedocs.io/"
+site_description = "Interface and Communication for Addicts of the Rapid follow-up in multi-messenger Era"
+copyright = "Copyright &copy; 2020 - 2026 GRANDMA Collaboration"
+
+repo_url = "https://github.com/grandma-collaboration/icare"
+repo_name = "grandma-collaboration/icare"
+edit_uri = "edit/main/docs/"
+extra_css = ["stylesheets/extra.css"]
+
+nav = [
+  { "Home" = "index.md" },
+  { "User Guide" = "user_guide/index.md" },
+  { "Dev Guide" = [
+    { "Architecture" = "dev_guide/architecture.md" },
+    { "Installation" = "dev_guide/installation.md" },
+    { "Commands" = "dev_guide/commands.md" },
+    { "Contributing" = "dev_guide/contributing.md" },
+  ] },
+  { "Workshop Exercices" = "workshop/index.md" },
+  { "↗ Go to ICARE Service" = "https://skyportal-icare.ijclab.in2p3.fr" },
+]
+
+[project.theme]
+logo = "skyportal_logo.png"
+favicon = "skyportal_logo.png"
+features = [
+  "navigation.instant",
+  "navigation.tracking",
+  "navigation.top",
+  "navigation.footer",
+  "content.action.edit",
+  "content.action.view",
+  "search.highlight",
+  "search.suggest",
+]
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+# Light mode
+[[project.theme.palette]]
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+# Dark mode
+[[project.theme.palette]]
+scheme = "slate"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+# Footer social links
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/grandma-collaboration/icare"
+name = "ICARE on GitHub"
+
+[[project.extra.social]]
+icon = "fontawesome/solid/globe"
+link = "https://skyportal-icare.ijclab.in2p3.fr"
+name = "ICARE service"
+
+[[project.extra.social]]
+icon = "fontawesome/solid/book"
+link = "https://skyportal.io/docs/"
+name = "SkyPortal documentation"
