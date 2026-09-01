@@ -22,7 +22,7 @@ app:
 
   routes:
     - path: "/"
-      component: templates/DashboardGrandma
+      component: templates/HomePage
       exact: True
     - path: "/source/:id"
       component: source/Source
@@ -248,66 +248,89 @@ app:
           url: /user_management
 
   homepage_widgets:
-    TelescopeMapWidget:
+    # Hide unwanted skyportal defaults
+    WeatherWidget:
       show: false
-      resizeable: false
-      layouts:
-        xlg: [0, 0, 0, 0]
-        lg: [0, 0, 0, 0]
-        md: [0, 0, 0, 0]
-        sm: [0, 0, 0, 0]
-        xs: [0, 0, 0, 0]
+    SourceCounts:
+      show: false
+    TopSavers:
+      show: false
 
-  dashboard_grandma_widgets:
+    # xlg=16cols  lg=12cols  md=10cols  sm=6cols  xs=4cols
+    # layout: [x, y, width, height]
+    GroupList:
+      props:
+        title: My Groups
+        linkToGroupSources: true
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [0, 0, 2, 3]
+        lg: [0, 0, 2, 3]
+        md: [0, 0, 3, 2]
+        sm: [0, 0, 3, 2]
+        xs: [0, 0, 4, 2]
+
     RecentGcnEvents:
       resizeable: true
       minW: 2
       layouts:
-        xlg: [0, 0, 6, 2]
-        lg: [0, 0, 6, 2]
-        md: [0, 0, 5, 3]
-        sm: [0, 0, 6, 2]
-        xs: [0, 0, 4, 3]
-
-    TelescopeMapWidget:
-      resizeable: true
-      minW: 2
-      layouts:
-        xlg: [0, 2, 6, 2]
-        lg: [0, 2, 5, 3]
-        md: [0, 6, 6, 2]
-        sm: [0, 5, 6, 4]
-        xs: [0, 9, 4, 3]
+        xlg: [2, 0, 4, 3]
+        lg: [2, 0, 4, 3]
+        md: [3, 0, 7, 2]
+        sm: [3, 0, 3, 2]
+        xs: [0, 2, 4, 3]
 
     RecentSources:
       resizeable: true
       minW: 2
       layouts:
         xlg: [6, 0, 5, 3]
-        lg: [6, 0, 6, 2]
-        md: [5, 0, 5, 3]
+        lg: [6, 0, 6, 3]
+        md: [0, 2, 5, 3]
         sm: [0, 2, 3, 3]
-        xs: [0, 3, 4, 3]
-
-    TopSources:
-      resizeable: true
-      minW: 2
-      layouts:
-        xlg: [6, 3, 5, 2]
-        lg: [5, 2, 4, 3]
-        md: [0, 3, 5, 3]
-        sm: [0, 9, 3, 3]
-        xs: [0, 12, 4, 2]
+        xs: [0, 5, 4, 3]
 
     NewsFeed:
       resizeable: true
       minW: 2
       layouts:
-        xlg: [11, 0, 5, 5]
-        lg: [9, 2, 3, 3]
-        md: [5, 3, 5, 3]
+        xlg: [11, 0, 5, 4]
+        lg: [0, 5, 6, 3]
+        md: [5, 2, 5, 3]
         sm: [3, 2, 3, 3]
-        xs: [0, 6, 4, 3]
+        xs: [0, 8, 4, 3]
+
+    TelescopeMapWidget:
+      show: true
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [0, 2, 6, 3]
+        lg: [0, 2, 6, 3]
+        md: [0, 5, 5, 3]
+        sm: [0, 5, 6, 3]
+        xs: [0, 11, 4, 3]
+
+    TopSources:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [6, 3, 5, 3]
+        lg: [6, 3, 6, 3]
+        md: [5, 5, 5, 3]
+        sm: [0, 8, 6, 3]
+        xs: [0, 14, 4, 2]
+
+    GettingStarted:
+      resizeable: true
+      minW: 2
+      layouts:
+        xlg: [11, 4, 5, 2]
+        lg: [6, 5, 6, 3]
+        md: [0, 8, 10, 2]
+        sm: [0, 11, 6, 2]
+        xs: [0, 16, 4, 2]
 
   database:
     database: skyportal
