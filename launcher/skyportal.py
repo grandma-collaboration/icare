@@ -24,6 +24,11 @@ def patch(source="extensions/skyportal/", destination="patched_skyportal/"):
         **skyportal_pkg["dependencies"],
         **icare_pkg["dependencies"],
     }
+    if "engines" in icare_pkg:
+        skyportal_pkg["engines"] = {
+            **skyportal_pkg.get("engines", {}),
+            **icare_pkg["engines"],
+        }
     with open(destination + "package.json", "w") as f:
         json.dump(skyportal_pkg, f, indent=2)
 
