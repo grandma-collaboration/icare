@@ -3,7 +3,8 @@ from baselayer.app.auth_backends import default_auth_backend
 from baselayer.app.env import load_env
 from baselayer.app.psa import TornadoStorage
 from baselayer.log import make_log
-from skyportal.enum_types import LISTENER_CLASSES, sqla_enum_types
+from skyportal.enum_types import sqla_enum_types
+from skyportal.facility_apis import LISTENERS
 from skyportal.models import ACL, DBSession, Group, Role, Token, User
 
 log = make_log("model_util")
@@ -13,6 +14,7 @@ all_acl_ids = [
     "Comment",
     "Annotate",
     "Manage users",
+    "Endorse users",
     "Manage sources",
     "Manage photometry",
     "Manage groups",
@@ -35,7 +37,7 @@ all_acl_ids = [
     "Delete telescope",
     "Delete bulk photometry",
     "Classify",
-] + [c.get_acl_id() for c in LISTENER_CLASSES]
+] + [c.get_acl_id() for c in LISTENERS]
 
 
 role_acls = {
@@ -52,6 +54,7 @@ role_acls = {
         "Run Analyses",
         "Post taxonomy",
         "Manage users",
+        "Endorse users",
         "Classify",
         "Manage observing runs",
     ],
@@ -62,6 +65,7 @@ role_acls = {
         "Classify",
         "Run Analyses",
         "Manage observing runs",
+        "Endorse users",
     ],
     "View only": [],
 }
@@ -194,6 +198,37 @@ def setup_permissions():
         role.acls = [DBSession().get(ACL, a) for a in acl_ids]
         DBSession().add(role)
     DBSession().commit()
+
+    provision_anonymous_user()
+    provision_skybot()
+
+
+def provision_anonymous_user():
+    """Create the anonymous read-only user when ``app.anonymous_access`` is set.
+
+    The account uses the "View only" role (no write ACLs) and is added to the
+    public group, so unauthenticated visitors get read-only access to public
+    data (see ``BaseHandler.get_current_user``). No-op when the flag is off."""
+    if not cfg.get("app.anonymous_access", False):
+        return
+    username = cfg.get("app.anonymous_user") or "anonymous"
+    add_user(username, roles=["View only"])
+
+
+def provision_skybot():
+    """Create the ``skybot`` bot user when autonomous analysis triage is enabled.
+
+    It authors the triage assistant runs and the loop executes with its
+    permissions, so it is a "Full user" in the public group; add it to the groups
+    a task notifies. No-op when the feature is off."""
+    triage = (cfg.get("app.assistant") or {}).get("analysis_triage") or {}
+    if not triage.get("enabled"):
+        return
+    user = add_user("skybot", roles=["Full user"], first_name="Sky", last_name="Bot")
+    if not user.is_bot:
+        user.is_bot = True
+        DBSession().add(user)
+        DBSession().commit()
 
 
 def create_token(ACLs, user_id, name):
