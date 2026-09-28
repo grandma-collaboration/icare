@@ -14,10 +14,7 @@ dependencies = [
 
 [dependency-groups]
 docs = [
-    "mkdocs",
-    "jinja2",
-    "mkdocstrings",
-    "mkdocs-material",
+    "zensical",
 ]
 ext = [
     "fink-client>=10.0",

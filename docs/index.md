@@ -1,51 +1,61 @@
-# Icare
+# ICARE
 
-## What is it ?
-Icare is a custom "layer" of both frontend and backend, added on top of [SkyPortal](https://skyportal.io/) to provide the features required only by Grandma.
+**Interface and Communication for Addicts of the Rapid follow-up in multi-messenger Era**
 
-Besides from building on top of SkyPortal, it also provides 2 extensions:
+## What is ICARE?
 
-- [SkyPortal-Fink-Client](https://github.com/skyportal-contrib/skyportal-fink-client): A tool to pull alerts from Fink and add them to SkyPortal.
+ICARE is a platform designed for the coordination and follow-up of multi-messenger astronomical events: gravitational wave alerts, gamma-ray bursts, and other transient phenomena requiring rapid telescope scheduling and data sharing.
 
-- [Grandma data](https://github.com/grandma-collaboration/grandma_data): a set of data needed by Grandma to populate SkyPortal's database, such as telescopes data, instruments data, etc.
+Development started in 2020 as a custom layer built on top of [SkyPortal](https://skyportal.io/), originally created for the [GRANDMA](https://grandma.ijclab.in2p3.fr/) collaboration. GRANDMA (Global Rapid Advanced Network Devoted to the Multi-messenger Addicts) is an international network of telescopes founded in 2018 by Sarah Antier that coordinates observations of transient events, in particular kilonovae associated with gravitational wave sources detected by LIGO/Virgo/KAGRA.
+
+In 2025, thanks to the [ACME](https://www.acme-astro.eu/) funding, ICARE opened its doors to the broader European astronomical community, becoming a shared infrastructure accessible to any research group interested in multi-messenger follow-up.
+
+## How does it work?
+
+ICARE is a custom frontend and backend layer added on top of [SkyPortal](https://skyportal.io/), and provides 2 extensions:
+
+- [SkyPortal-Fink-Client](https://github.com/skyportal-contrib/skyportal-fink-client): a tool to pull alerts from the Fink broker and add them to SkyPortal.
+- [GRANDMA data](https://github.com/grandma-collaboration/grandma_data): a set of data needed by GRANDMA to populate SkyPortal's database, such as telescopes and instruments.
 
 ## Authentication
 
 ##### Full Account Creation Tutorial: [User Guide](./user_guide/index.md)
 
-Users can login to Icare using either their Slack account (for GRANDMA people), ORCID or eduGAIN account. The service used for
+Users can login to ICARE using either their Slack account (for GRANDMA people), ORCID or eduGAIN account. The service used for
 authentication is called IAM. One benefit of this service is that you will be able to use your
-standard account, without the need to remember a username and a password specific to Icare.
-Also you will be able to use any of the authentication methods proposed and still remain the same user in Icare.
+standard account, without the need to remember a username and a password specific to ICARE.
+Also you will be able to use any of the authentication methods proposed and still remain the same user in ICARE.
 
 Your IAM account will be automatically created the first time you connect to
-[Icare](https://skyportal-icare.ijclab.in2p3.fr).
+[ICARE](https://skyportal-icare.ijclab.in2p3.fr).
 
-**Important : Do not try to connect to SkyPortal until your account is verified. If you still did that,
-you will need to delete your cache/cookies before logging in.**
+!!! warning
+    Do not try to connect to ICARE until your account is verified. If you already did, delete your browser cache/cookies before logging in again.
 
-## First steps to follow after login in for the first time
+## First steps after logging in
 
-First, you will need to head to the `Groups` page. There, you can request to be added to the groups you are interested in.
-Exemple: You are a member of GRANDMA, you can ask to be added to the group `GRANDMA`. You are also interested
-in seeing alerts from Fink, you can ask to be added to the group `Fink`.
+First, head to the `Groups` page. There, you can request to be added to the groups you are interested in.
+Example: if you are a member of GRANDMA, you can ask to be added to the `GRANDMA` group. If you are interested
+in seeing alerts from Fink, you can ask to be added to the `Fink` group.
 
 An administrator of the group will be notified of your request. After accepting it, you will receive
-a notification (you can see it on the top right hand corner of the screen, it is a bell icon) to tell
-you that you have been added to the group.
+a notification (bell icon, top right corner) confirming you have been added.
 
 Now, you can explore the rest of the platform.
 
 ## User permissions and roles
 
-As a new user of SkyPortal, you won't be able to do much at first. Users can have different roles,
-that come with a predeterminated set of permissions. A user can also be granted a permission without a specific role.
-To use certain (most) features of the platform, you will need certain permissions.
-Exemple: You can see the list of telescopes, but you can't add a new one. You can see the shifts, but you can't add or join one.
-To access those different features, administrators of the platform can provide it to you. You can ask
-them, but they should take care of it for every user without having to ask them. If you need additional
-permissions (like the permission to add a source, ...), you can always ask them.
+Users can have different roles that come with a predetermined set of permissions. A user can also be granted individual permissions without a specific role.
+
+By default, new users receive the `Full user` role, which gives access to most features: creating sources, groups, leaving comments, and more. Some actions require additional permissions that an administrator can grant. If you need access to a specific feature, reach out to an administrator.
 
 ## User Guide
 
-You will find a more in depth guide to use Icare on the [User Guide](./user_guide/index.md) page.
+You will find a more in depth guide to use ICARE on the [User Guide](./user_guide/index.md) page.
+
+## Contact
+
+For any question about ICARE, you can reach out to:
+
+- **Camille Douzet** — [camille.douzet@ijclab.in2p3.fr](mailto:camille.douzet@ijclab.in2p3.fr)
+- **Sarah Antier** — [antier@ijclab.in2p3.fr](mailto:antier@ijclab.in2p3.fr)
