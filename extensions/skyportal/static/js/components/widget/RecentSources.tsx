@@ -236,10 +236,10 @@ const defaultPrefs: any = {
 };
 
 interface RecentSourcesListProps {
-  sources?: any[];
+  sources?: any[] | undefined;
   styles: any;
-  search?: boolean;
-  displayTNS?: boolean;
+  search?: boolean | undefined;
+  displayTNS?: boolean | undefined;
 }
 
 const RecentSourcesList = ({

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Responsive, WidthProvider } from "react-grid-layout";
+import { ResponsiveGridLayout, useContainerWidth } from "react-grid-layout";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import "reactgridlayoutcss/styles.css";
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -29,7 +29,6 @@ import SourceCounts from "../widget/SourceCounts";
 import WeatherWidget from "../widget/WeatherWidget";
 import TelescopeMapWidget from "../widget/TelescopeMapWidget";
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const useStyles = makeStyles()(() => ({
   widgetIcon: {
@@ -77,6 +76,7 @@ const HomePage = () => {
   const convert = convertLength(rootFont);
   const gridRowHeight = parseFloat(convert(rem, "px"));
 
+  const { width, containerRef } = useContainerWidth();
   const [updateUserPreferences] = useUpdateUserPreferencesMutation();
   const groups = useGetGroupsQuery().data?.user ?? [];
   const { data: profile } = useGetProfileQuery();
@@ -104,7 +104,7 @@ const HomePage = () => {
   return (
     profile &&
     profile.username !== "" &&  (
-      <div>
+      <div ref={containerRef}>
         <ResponsiveGridLayout
           className="layout"
           layouts={currentLayouts}
@@ -114,6 +114,7 @@ const HomePage = () => {
           onLayoutChange={LayoutChangeHandler}
           draggableHandle=".dragHandle"
           rowHeight={gridRowHeight}
+          width={width}
         >
           {%- for widgetName, widgetProps in app.dashboard_grandma_widgets.items() %}
             {%- if not (widgetProps.show is defined and not widgetProps.show) %}
