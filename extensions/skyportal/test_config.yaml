@@ -44,6 +44,10 @@ twilio:
   sms_account_sid:
   sms_auth_token:
 
+user_applications:
+  enabled: True
+  peer_endorsement: True
+
 invitations:
   enabled: True
   days_until_expiry: 3
@@ -79,8 +83,8 @@ services:
     - fink
     - spectral_cube_analysis_service
     - tns_retrieval_queue
+    - jpl_sbident_queue
     - external_publishing_submission_queue
-    - watch_list
     - ngsf_analysis_service
 test_server:
   port: 64502
@@ -98,7 +102,6 @@ test_server:
     /api/triggers/ztf: http://skipper.caltech.edu:4000 # ZTF
     /cgi-bin/internal/process_kait_ztf_request.py: http://herculesii.astro.berkeley.edu # KAIT
     /api/v0/pointings: https://treasuremap.space
-    /toop/submit_json.php: https://www.swift.psu.edu # Swift
     /api/v0.1/panstarrs/dr2/: https://catalogs.mast.stsci.edu # PS1
 
 app:
