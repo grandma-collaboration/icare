@@ -10,7 +10,7 @@ Here are the different commands, all prefixed with `./icare.sh`:
 
 | Command | Description |
 |---|---|
-| `run` | Main entry point. Builds and starts the app. Accepts flags: `--init` (initialize DB), `--clear` (drop and recreate DB), `--do_update` (pull and update SkyPortal), `--update_prod` (production update with migration stamping), `--production` (build with rspack for production) |
+| `run` | Main entry point. Builds and starts the app. Accepts flags: `--init` (initialize DB), `--clear` (drop and recreate DB), `--do_update` (pull and update SkyPortal), `--commit=<hash>` (pin SkyPortal to a specific commit; when set, `--branch` is ignored), `--update_prod` (production update with migration stamping), `--production` (build with rspack for production) |
 | `build` | Copies `skyportal/` to `patched_skyportal/` and applies the `extensions/skyportal/` overlay. Called automatically by `run` |
 | `update` | Pulls the latest SkyPortal from the remote and updates submodules recursively |
 | `diff` | Shows which SkyPortal files have changed upstream and overlap with files in `extensions/skyportal/`. Used to detect merge conflicts before updating |
@@ -88,6 +88,12 @@ Now, you can use the `do_update` command as such:
 ```
 ./icare.sh run --do_update
 ```
+
+To pin SkyPortal to a specific commit instead of the latest `main`, pass `--commit`:
+```
+./icare.sh run --do_update --commit=<commit_hash>
+```
+When `--commit` is provided, `--branch` is ignored and no `git pull` is performed — the submodule is checked out directly to that hash.
 
 This will update the version of SkyPortal that is pinned in the app. When doing so, we are basically running a `git diff` to see which files have been modified. If some of those files are also the files we have copied and modified in the extensions folder, we need to merge new changes in the extensions folder too. If we don't do this, when replacing skyportal's files by the files in the extensions folder, we'll lose new changes. And besides from missing on new features, it is very likely to break the app. Which is why, when we detect that some changes coming from skyportal are made on same files we have in the extensions folder, we give the user 3 choices:
 

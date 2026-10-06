@@ -4,6 +4,7 @@ from pathlib import Path
 
 def diff(
     init: bool = False,
+    commit: str = None,
 ):
     # function that checks what changes have been made to a submodule since the last time we pulled it
     # if there are changes, we display them and ask the user if they want to apply them
@@ -11,9 +12,10 @@ def diff(
 
     cmd = subprocess.Popen(["git", "fetch"], stdout=subprocess.PIPE, cwd="skyportal")
     output = cmd.wait()
+    target = commit if commit is not None else "origin/main"
     # run a git diff ignoring fits or fit files
     cmd = subprocess.Popen(
-        ["git", "diff", "origin/main", "--", ":!*.fits", ":!*.fit"],
+        ["git", "diff", target, "--", ":!*.fits", ":!*.fit"],
         stdout=subprocess.PIPE,
         cwd="skyportal",
     )

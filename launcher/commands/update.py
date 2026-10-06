@@ -8,17 +8,20 @@ from launcher.commands.diff import diff
 def update(
     repo: Optional[str] = None,
     branch: Optional[str] = None,
+    commit: Optional[str] = None,
 ):
     """Update Icare
-    :param init: Initialize before updating Icare
     :param repo: Remote repository to pull from
     :param branch: Branch on the remote repository
+    :param commit: Specific SkyPortal commit hash to pin to (overrides branch tip)
     """
 
     p = subprocess.run(["git", "submodule", "update", "--init", "--recursive"])
     if p.returncode != 0:
         raise RuntimeError("Failed to update all submodules recursively")
-    skyportal_update, extensions_update, skyportal_start, exists_in_extensions = diff()
+    skyportal_update, extensions_update, skyportal_start, exists_in_extensions = diff(
+        commit=commit
+    )
     if extensions_update:
         previous_skyportal_dir = Path("previous_skyportal")
         if not previous_skyportal_dir.exists():
@@ -26,7 +29,19 @@ def update(
         subprocess.run(["cp", "-r", "skyportal", "previous_skyportal"])
         # update submodules
     if skyportal_update:
-        if repo is not None and branch is not None:
+        if commit is not None:
+            p = subprocess.run(["git", "fetch"], cwd="skyportal")
+            if p.returncode != 0:
+                raise RuntimeError("Failed to fetch skyportal")
+            p = subprocess.run(["git", "checkout", commit], cwd="skyportal")
+            if p.returncode != 0:
+                raise RuntimeError(f"Failed to checkout skyportal commit {commit}")
+            p = subprocess.run(
+                ["git", "submodule", "update", "--init", "--recursive"], cwd="skyportal"
+            )
+            if p.returncode != 0:
+                raise RuntimeError("Failed to update all submodules recursively")
+        elif repo is not None and branch is not None:
             p = subprocess.run(["git", "checkout", branch], cwd="skyportal")
             if p.returncode != 0:
                 raise RuntimeError("Failed to update icare's submodules")
