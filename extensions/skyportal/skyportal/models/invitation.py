@@ -11,8 +11,8 @@ from sqlalchemy.dialects import postgresql as psql
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import EmailType
 
-from ..app_utils import get_app_base_url
-from ..email_utils import send_email
+from ..utils.app import get_app_base_url
+from ..utils.email import send_email
 
 _, cfg = load_env()
 
