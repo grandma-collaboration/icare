@@ -24,7 +24,6 @@ from ...models import (
     ClassificationVote,
     Group,
     Obj,
-    SuperObj,
     Taxonomy,
     User,
 )
@@ -34,6 +33,102 @@ from .source_labels import add_source_labels
 _, cfg = load_env()
 
 MAX_CLASSIFICATIONS_PER_PAGE = 500
+
+
+class ClassificationPostItem(BaseModel):
+    """A single classification. Cross-field checks (probability range, allowed
+    classes, ml value) are enforced by the handler with their own messages."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    obj_id: str | None = Field(default=None, description="ID of the object.")
+    classification: str | None = Field(default=None, description="The assigned class.")
+    origin: str | None = Field(
+        default=None, description="String describing the source of this classification."
+    )
+    taxonomy_id: int | None = Field(
+        default=None, description="ID of the taxonomy the classification is from."
+    )
+    probability: float | None = Field(
+        default=None,
+        description="User-assigned probability of this classification on this "
+        "taxonomy. If multiple classifications are given for the same source by "
+        "the same user, the sum of the classifications ought to equal unity. Only "
+        "individual probabilities are checked.",
+    )
+    group_ids: list[int] | None = Field(
+        default=None,
+        description="List of group IDs corresponding to which groups should be "
+        "able to view classification. Defaults to the public group.",
+    )
+    vote: bool | None = Field(
+        default=None, description="Add vote associated with classification."
+    )
+    label: bool | None = Field(
+        default=None, description="Add label associated with classification."
+    )
+    ml: bool | str | None = Field(
+        default=None, description="Whether this is a machine-learning classification."
+    )
+
+
+class ClassificationPostBody(ClassificationPostItem):
+    """Request body for posting a classification. Either a single classification
+    (top-level fields) or a batch (a list under `classifications`)."""
+
+    classifications: list[ClassificationPostItem] | None = Field(
+        default=None,
+        description="List of classifications to post in a single request. If "
+        "provided, the top-level single-classification fields are ignored.",
+    )
+
+
+class ClassificationPutBody(BaseModel):
+    """Request body for updating a classification."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    obj_id: str | None = Field(default=None, description="ID of the object.")
+    classification: str | None = Field(default=None, description="The assigned class.")
+    origin: str | None = Field(
+        default=None, description="String describing the source of this classification."
+    )
+    taxonomy_id: int | None = Field(
+        default=None, description="ID of the taxonomy the classification is from."
+    )
+    probability: float | None = Field(
+        default=None,
+        description="User-assigned probability of this classification on this "
+        "taxonomy.",
+    )
+    ml: bool | str | None = Field(
+        default=None, description="Whether this is a machine-learning classification."
+    )
+    group_ids: list[int] | None = Field(
+        default=None,
+        description="List of group IDs corresponding to which groups should be "
+        "able to view classification.",
+    )
+
+
+class ClassificationDeleteBody(BaseModel):
+    """Request body for deleting classification(s)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    label: bool = Field(
+        default=True, description="Add label associated with classification."
+    )
+
+
+class ClassificationVotePostBody(BaseModel):
+    """Request body for voting on a classification."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    vote: int | None = Field(
+        default=None, description="Upvote or downvote a classification."
+    )
 
 
 async def post_classification(data, user_id, session):
@@ -822,7 +917,8 @@ class ClassificationVotesHandler(BaseHandler):
                     )
                 )
             ).first()
-            await session.delete(classification_vote)
+            if classification_vote is not None:
+                await session.delete(classification_vote)
 
             await add_source_labels(
                 session,

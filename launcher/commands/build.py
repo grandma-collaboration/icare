@@ -11,6 +11,7 @@ def build(
     init: bool = False,
     repo: str = "origin",
     branch: str = "main",
+    commit: str = None,
     do_update: bool = False,
     clear: bool = False,
     update_prod: bool = False,
@@ -19,6 +20,7 @@ def build(
     """Build Icare
     :param init: Initialize Icare
     :param repo: Remote repository to pull from
+    :param commit: Specific SkyPortal commit hash to pin to (overrides branch tip)
     :param do_update: pull <repo>/<branch>, autostash SP and update submodules
     :param clear: Clear the database
     """
@@ -32,7 +34,7 @@ def build(
     new_changes = False
     skyportal_start = True
     if do_update:
-        new_changes, skyportal_start = update(repo=repo, branch=branch)
+        new_changes, skyportal_start = update(repo=repo, branch=branch, commit=commit)
     if update_prod:
         print("Stamping current database state")
         cmd = subprocess.Popen(
