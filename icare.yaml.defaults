@@ -40,8 +40,6 @@ app:
       component: broker/BrokerList
     - path: "/brokers/:brokerId"
       component: broker/Broker
-    - path: "/brokers/:brokerId/filter/:fid"
-      component: broker/BrokerFilterPage
     - path: "/profile"
       component: user/Profile
     - path: "/candidates"
@@ -360,7 +358,8 @@ server:
     iam_oauth2_timeout: 15
 
 services:
-  dask: False
+  disabled:
+    - dask
 
 notifications:
   enabled: True
