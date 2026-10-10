@@ -48,9 +48,12 @@ docker-images: docker-local
 
 docker-local: ## Build docker images locally
 	cd baselayer && git submodule update --init --remote
+	@# the image has no .git, so sysinfo and deployments read the log from data/
+	PYTHONPATH=. python3 -c "import json; from skyportal.utils.gitlog import get_gitlog; json.dump(get_gitlog(), open('data/gitlog-skyportal.json', 'w'))"
 	docker build -t $(DOCKER_IMAGENAME) \
 		--build-arg SKYPORTAL_UID=$(SKYPORTAL_UID) \
-		--build-arg SKYPORTAL_GID=$(SKYPORTAL_GID) .
+		--build-arg SKYPORTAL_GID=$(SKYPORTAL_GID) . ; \
+		status=$$?; rm -f data/gitlog-skyportal.json; exit $$status
 
 doc_reqs: | baselayer/Makefile
 	uv sync --group docs --inexact
@@ -96,14 +99,21 @@ db_create_tables: ## Create tables in the database
 db_create_tables: | dependencies_no_js
 	@$(PYTHON) skyportal/initial_setup.py $(FLAGS)
 
+db_init: ## Create the databases, and the extensions the schema needs in them.
+db_init: | baselayer/Makefile
+	@$(MAKE) --no-print-directory -C . -f baselayer/Makefile db_init
+	@$(PYTHON) tools/enable_pgvector.py $(FLAGS)
+
 db_clear_test: ## Drop and recreate only the test database.
 db_clear_test: | baselayer/Makefile
 	@$(PYTHON) ./baselayer/tools/db_init.py -f --test-only $(FLAGS)
+	@$(PYTHON) tools/enable_pgvector.py --test-only $(FLAGS)
 
 db_clear: ## Drop and recreate all the databases, and delete the on-disk data tied to them.
 db_clear: | baselayer/Makefile
 	@$(PYTHON) tools/clear_data.py $(FLAGS)
 	@$(MAKE) --no-print-directory -C . -f baselayer/Makefile db_clear
+	@$(PYTHON) tools/enable_pgvector.py $(FLAGS)
 
 db_migrate: ## Migrate database to latest schema
 db_migrate: FLAGS := $(subst --,-x ,$(FLAGS))

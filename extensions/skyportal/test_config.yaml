@@ -84,6 +84,7 @@ services:
     - spectral_cube_analysis_service
     - tns_retrieval_queue
     - jpl_sbident_queue
+    - sharing_service_submission_queue
     - external_publishing_submission_queue
     - ngsf_analysis_service
 test_server:
@@ -135,8 +136,21 @@ app:
     use_parallel: True
     Ncores: 2
 
+  m4opt:
+    enabled: false
+    deployment: local
+    executable: m4opt
+    endpoint:
+
 analysis_services:
   analysis_folder: analysis_data
+  openai_analysis_service:
+    embeddings_store:
+      summary:
+        # The vectors live in the test database, so the summary search is
+        # exercised for real rather than stubbed.
+        location: pgvector
+        model: test-embedding
   sn_analysis_service:
     port: 6802
   spectral_cube_analysis_service:
