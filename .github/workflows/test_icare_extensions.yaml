@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 30
     services:
       postgres:
-        image: postgres
+        image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: skyportal
           POSTGRES_PASSWORD: anything
