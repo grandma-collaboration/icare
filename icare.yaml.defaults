@@ -3,12 +3,40 @@ ports:
 
 app:
   title: Icare
+  acknowledgment: >-
+      This work made use of the ICARE version of SkyPortal (van der Walt et al.
+      2019, Coughlin et al. 2023), jointly developed at Caltech, UC Berkeley, the
+      University of Minnesota, and Université Paris-Saclay.
   factory: skyportal.app_server_icare.make_app_icare
   # Sign in through IAM rather than SkyPortal's default Google button.
   login_buttons:
     - url: /login/iam-oauth2
       image: /static/images/btn_iam_signin.png
       alt_text: Click this image to log in
+    # Copy for the About page, rendered by SkyPortal's AboutPlugins template.
+  about:
+    description: >-
+      ICARE is an open source codebase that serves as a dynamic collaborative
+      platform for time-domain astronomy. It is being jointly developed at
+      Caltech, UC Berkeley, the University of Minnesota, and Université
+      Paris-Saclay.
+    homepage_url: https://skyportal-icare.ijclab.in2p3.fr
+    docs_url: https://grandma-skyportal.readthedocs.io
+    api_docs_url: https://skyportal.io/docs/api.html
+    repository_url: https://github.com/grandma-collaboration/icare
+    changelog_repositories:
+      - name: ICARE
+        url: https://github.com/grandma-collaboration/icare/pulls
+      - name: SkyPortal
+        url: https://github.com/skyportal/skyportal/pulls
+    # Accepted once per version; bump the version to ask everyone again.
+  terms_of_service:
+    enabled: true
+    version: "2026-10-13"
+    title: ICARE Terms of Service
+    text_file: data/icare_terms_of_service.md
+    # A token cannot be shown the dialog; its owner still accepts at next login.
+    exempt_tokens: true
   observation_plan:
     default_filters: ['ztfg', 'ztfr', 'ztfi']
     use_skyportal_fields: False
