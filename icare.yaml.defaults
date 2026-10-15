@@ -3,12 +3,40 @@ ports:
 
 app:
   title: Icare
+  acknowledgment: >-
+      This work made use of the ICARE version of SkyPortal (van der Walt et al.
+      2019, Coughlin et al. 2023), jointly developed at Caltech, UC Berkeley, the
+      University of Minnesota, and Université Paris-Saclay.
   factory: skyportal.app_server_icare.make_app_icare
   # Sign in through IAM rather than SkyPortal's default Google button.
   login_buttons:
     - url: /login/iam-oauth2
       image: /static/images/btn_iam_signin.png
       alt_text: Click this image to log in
+    # Copy for the About page, rendered by SkyPortal's AboutPlugins template.
+  about:
+    description: >-
+      ICARE is an open source codebase that serves as a dynamic collaborative
+      platform for time-domain astronomy. It is being jointly developed at
+      Caltech, UC Berkeley, the University of Minnesota, and Université
+      Paris-Saclay.
+    homepage_url: https://skyportal-icare.ijclab.in2p3.fr
+    docs_url: https://grandma-skyportal.readthedocs.io
+    api_docs_url: https://skyportal.io/docs/api.html
+    repository_url: https://github.com/grandma-collaboration/icare
+    changelog_repositories:
+      - name: ICARE
+        url: https://github.com/grandma-collaboration/icare/pulls
+      - name: SkyPortal
+        url: https://github.com/skyportal/skyportal/pulls
+    # Accepted once per version; bump the version to ask everyone again.
+  terms_of_service:
+    enabled: true
+    version: "2026-10-13"
+    title: ICARE Terms of Service
+    text_file: data/icare_terms_of_service.md
+    # A token cannot be shown the dialog; its owner still accepts at next login.
+    exempt_tokens: true
   observation_plan:
     default_filters: ['ztfg', 'ztfr', 'ztfi']
     use_skyportal_fields: False
@@ -24,50 +52,68 @@ app:
     - path: "/"
       component: templates/HomePage
       exact: True
+    - path: "/sources"
+      component: source/SourceList
     - path: "/source/:id"
       component: source/Source
+    - path: "/source/:id/finder"
+      component: FindingChart
+    - path: "/source/:id/periodogram"
+      component: Periodogram
+    - path: "/source/:obj_id/analysis/:analysis_id"
+      component: source/SourceAnalysisPage
     - path: "/favorites"
       component: listing/FavoritesPage
-    - path: "/gcn_events/:dateobs"
-      component: gcn/GcnEventPage
+    - path: "/discussions"
+      component: discussion/Discussions
+    - path: "/data_access_requests"
+      component: DataAccessRequestsPage
+    - path: "/source_interests"
+      component: source/SourceInterestsPage
     - path: "/groups"
       component: group/Groups
     - path: "/group/:id"
       component: group/Group
     - path: "/teams"
       component: team/Teams
+    - path: "/group_sources/:id"
+      component: group/GroupSources
+    - path: "/candidates"
+      component: candidate/CandidateList
+    - path: "/candidates/scan_reports"
+      component: candidate/scan_reports/ReportsList
+    - path: "/profile"
+      component: user/Profile
     - path: "/brokers"
       component: broker/BrokerList
     - path: "/brokers/:brokerId"
       component: broker/Broker
-    - path: "/profile"
-      component: user/Profile
-    - path: "/candidates"
-      component: candidate/CandidateList
-    - path: "/sources"
-      component: source/SourceList
     - path: "/user/:id"
       component: user/PublicProfile
     - path: "/upload_photometry/:id"
       component: photometry/UploadPhotometry
-    - path: "/about"
-      component: About
-    - path: "/run/:id"
-      component: observing_run/RunSummary
-    - path: "/source/:obj_id/analysis/:analysis_id"
-      component: source/SourceAnalysisPage
     - path: "/share_data/:id"
       component: source/ShareDataForm
     - path: "/filter/:fid"
       component: filter/Filter
+    - path: "/about"
+      component: About
+    - path: "/deployments"
+      component: deployment/Deployments
     - path: "/runs"
       component: observing_run/ObservingRunPage
+    - path: "/run/:id"
+      component: observing_run/RunSummary
     - path: "/allocations"
       component: allocation/AllocationList
     - path: "/allocation/:id"
       component: allocation/Allocation
+    - path: "/instruments"
+      component: instrument/InstrumentList
     - path: "/instrument/:id"
       component: instrument/Instrument
+    - path: "/telescopes"
+      component: telescope/TelescopeList
     - path: "/telescope/:id"
       component: telescope/Telescope
     - path: "/observations"
@@ -78,26 +124,22 @@ app:
       component: spatial_catalog/SpatialCatalogPage
     - path: "/followup_requests"
       component: followup_request/FollowupRequestPage
-    - path: "/group_sources/:id"
-      component: group/GroupSources
     - path: "/user_management"
       component: user/UserManagement
     - path: "/upload_spectrum/:id"
       component: spectrum/UploadSpectrum
     - path: "/observability/:id"
       component: source/Observability
-    - path: "/source/:id/finder"
-      component: FindingChart
-    - path: "/source/:id/periodogram"
-      component: Periodogram
     - path: "/db_stats"
       component: DBStats
+    - path: "/source_statistics"
+      component: SourceStatistics
     - path: "/gcn_events"
       component: gcn/GcnEvents
-    - path: "/telescopes"
-      component: telescope/TelescopeList
-    - path: "/instruments"
-      component: instrument/InstrumentList
+    - path: "/gcn_events/:dateobs"
+      component: gcn/GcnEventPage
+    - path: "/gcn_events/:dateobs/analysis/:analysis_id"
+      component: source/GcnEventAnalysisPage
     - path: "/mmadetectors"
       component: mma_detector/MMADetectorPage
     - path: "/earthquakes"
@@ -106,6 +148,10 @@ app:
       component: earthquake/EarthquakePage
     - path: "/services"
       component: analysis/AnalysisServicePage
+    - path: "/analysis_requests"
+      component: analysis/AnalysisRequestPage
+    - path: "/observation_plan_requests"
+      component: observation_plan/ObservationPlanRequestPage
     - path: "/recurring_apis"
       component: RecurringAPIPage
     - path: "/shifts"
@@ -122,6 +168,8 @@ app:
       component: sharing_service/SharingServicesPage
     - path: "/sharing_service/:id/submissions"
       component: sharing_service/SharingServiceSubmissionsPage
+    - path: "/moving_objects/obsplan"
+      component: moving_object/MovingObjectObsPlanPage
 
   sidebar:
     # See https://material-ui.com/components/material-icons/
@@ -143,18 +191,17 @@ app:
           icon: Search
           url: /candidates
 
-        - name: Favorites
-          icon: Star
-          url: /favorites
-
-
         - name: Brokers
           icon: Hub
           url: /brokers
 
-        - name: Shifts
-          icon: SubwayRounded
-          url: /shifts
+        - name: Favorites
+          icon: Star
+          url: /favorites
+
+        - name: Discussions
+          icon: Forum
+          url: /discussions
 
         - name: Groups
           icon: GroupWork
@@ -164,27 +211,55 @@ app:
           icon: Diversity3
           url: /teams
 
-        - name: Telescopes
-          icon: MyLocation
-          url: /telescopes
-
-        - name: Instruments
-          icon: Wifi
-          url: /instruments
+        - name: Observing Runs
+          icon: NightsStay
+          url: /runs
 
         - name: Followup Requests
           icon: WorkOutlined
           url: /followup_requests
 
-        - name: Observing Runs
-          icon: LocalCafe
-          url: /runs
+        - name: Analysis Requests
+          icon: Analytics
+          url: /analysis_requests
+
+        - name: Observation Plans
+          icon: Assignment
+          url: /observation_plan_requests
+
+        - name: Data Requests
+          icon: LockOpen
+          url: /data_access_requests
+
+        - name: Interests
+          icon: Handshake
+          url: /source_interests
+
+        - name: Shifts
+          icon: CalendarMonth
+          url: /shifts
+
+        - name: Source Statistics
+          icon: ScatterPlot
+          url: /source_statistics
+
+        - name: About
+          icon: Info
+          url: /about
 
     - name: Other
       icon: MoreHoriz
       subitems:
+        - name: Telescopes
+          icon: MyLocation
+          url: /telescopes
+
+        - name: Instruments
+          icon: CameraAlt
+          url: /instruments
+
         - name: MMADetectors
-          icon: Abc
+          icon: Sensors
           url: /mmadetectors
 
         - name: Allocations
@@ -199,28 +274,32 @@ app:
           icon: Share
           url: /sharing_services
 
+        - name: Moving Objects
+          icon: Animation
+          url: /moving_objects/obsplan
+
         - name: Earthquakes
-          icon: PieChart
+          icon: Landslide
           url: /earthquakes
 
         - name: Galaxies
-          icon: TornadoOutlined
+          icon: Cyclone
           url: /galaxies
 
         - name: Spatial Catalogs
-          icon: PhotoSizeSelectLargeOutlined
+          icon: Map
           url: /spatial_catalogs
 
         - name: Analysis Services
-          icon: SentimentSatisfied
+          icon: Science
           url: /services
 
         - name: Recurring API
-          icon: Restore
+          icon: EventRepeat
           url: /recurring_apis
 
         - name: Taxonomies
-          icon: WallpaperOutlined
+          icon: AccountTree
           url: /taxonomies
 
         - name: Tag Management
@@ -228,9 +307,13 @@ app:
           permissions: ["Manage sources", "System admin"]
           url: /tag_management
 
-        - name: About
-          icon: Info
-          url: /about
+        - name: Scanning report
+          icon: Summarize
+          url: /candidates/scan_reports
+
+        - name: Deployments
+          icon: RocketLaunch
+          url: /deployments
 
     - name: Admin
       icon: AdminPanelSettings
@@ -357,9 +440,6 @@ server:
         label: Sign in with IAM
     iam_oauth2_timeout: 15
 
-services:
-  disabled:
-    - dask
 
 notifications:
   enabled: True
