@@ -14,6 +14,16 @@ from playwright.sync_api import expect
 from skyportal.tests import test_util
 
 
+def dismiss_tos_if_present(page, timeout=10_000):
+    """Click 'I Agree' on the ICARE Terms of Service dialog if it is shown."""
+    tos_agree = page.locator('button:has-text("I Agree")').first
+    try:
+        tos_agree.wait_for(state="visible", timeout=timeout)
+        tos_agree.click()
+    except PlaywrightTimeoutError:
+        pass
+
+
 def _icare_playwright_login(page):
     """Log in the shared page via icare's IAM OAuth2 debug-login flow."""
     page.goto("/")
@@ -26,13 +36,7 @@ def _icare_playwright_login(page):
         login_link.click()
     except PlaywrightTimeoutError:
         pass  # no login link -> assume already authenticated
-    # Dismiss the Terms of Service dialog if it appears after login
-    tos_agree = page.locator('button:has-text("I Agree")').first
-    try:
-        tos_agree.wait_for(state="visible", timeout=10_000)
-        tos_agree.click()
-    except PlaywrightTimeoutError:
-        pass
+    dismiss_tos_if_present(page)
     expect(page.locator(test_util.TESTUSER_XPATH).first).to_be_visible(timeout=20_000)
 
 
