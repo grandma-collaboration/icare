@@ -150,6 +150,14 @@ app:
       component: sharing_service/SharingServicesPage
     - path: "/sharing_service/:id/submissions"
       component: sharing_service/SharingServiceSubmissionsPage
+    - path: "/analysis_requests"
+      component: analysis/AnalysisRequestPage
+    - path: "/observation_plan_requests"
+      component: observation_plan/ObservationPlanRequestPage
+    - path: "/candidates/scan_reports"
+      component: candidate/scan_reports/ReportsList
+    - path: "/moving_objects/obsplan"
+      component: moving_object/MovingObjectObsPlanPage
 
   sidebar:
     # See https://material-ui.com/components/material-icons/
@@ -171,18 +179,17 @@ app:
           icon: Search
           url: /candidates
 
-        - name: Favorites
-          icon: Star
-          url: /favorites
-
-
         - name: Brokers
           icon: Hub
           url: /brokers
 
-        - name: Shifts
-          icon: SubwayRounded
-          url: /shifts
+        - name: Favorites
+          icon: Star
+          url: /favorites
+
+        - name: Discussions
+          icon: Forum
+          url: /discussions
 
         - name: Groups
           icon: GroupWork
@@ -192,27 +199,55 @@ app:
           icon: Diversity3
           url: /teams
 
-        - name: Telescopes
-          icon: MyLocation
-          url: /telescopes
-
-        - name: Instruments
-          icon: Wifi
-          url: /instruments
+        - name: Observing Runs
+          icon: NightsStay
+          url: /runs
 
         - name: Followup Requests
           icon: WorkOutlined
           url: /followup_requests
 
-        - name: Observing Runs
-          icon: LocalCafe
-          url: /runs
+        - name: Analysis Requests
+          icon: Analytics
+          url: /analysis_requests
+
+        - name: Observation Plans
+          icon: Assignment
+          url: /observation_plan_requests
+
+        - name: Data Requests
+          icon: LockOpen
+          url: /data_access_requests
+
+        - name: Interests
+          icon: Handshake
+          url: /source_interests
+
+        - name: Shifts
+          icon: CalendarMonth
+          url: /shifts
+
+        - name: Source Statistics
+          icon: ScatterPlot
+          url: /source_statistics
+
+        - name: About
+          icon: Info
+          url: /about
 
     - name: Other
       icon: MoreHoriz
       subitems:
+        - name: Telescopes
+          icon: MyLocation
+          url: /telescopes
+
+        - name: Instruments
+          icon: CameraAlt
+          url: /instruments
+
         - name: MMADetectors
-          icon: Abc
+          icon: Sensors
           url: /mmadetectors
 
         - name: Allocations
@@ -227,28 +262,32 @@ app:
           icon: Share
           url: /sharing_services
 
+        - name: Moving Objects
+          icon: Animation
+          url: /moving_objects/obsplan
+
         - name: Earthquakes
-          icon: PieChart
+          icon: Landslide
           url: /earthquakes
 
         - name: Galaxies
-          icon: TornadoOutlined
+          icon: Cyclone
           url: /galaxies
 
         - name: Spatial Catalogs
-          icon: PhotoSizeSelectLargeOutlined
+          icon: Map
           url: /spatial_catalogs
 
         - name: Analysis Services
-          icon: SentimentSatisfied
+          icon: Science
           url: /services
 
         - name: Recurring API
-          icon: Restore
+          icon: EventRepeat
           url: /recurring_apis
 
         - name: Taxonomies
-          icon: WallpaperOutlined
+          icon: AccountTree
           url: /taxonomies
 
         - name: Tag Management
@@ -256,9 +295,13 @@ app:
           permissions: ["Manage sources", "System admin"]
           url: /tag_management
 
-        - name: About
-          icon: Info
-          url: /about
+        - name: Scanning report
+          icon: Summarize
+          url: /candidates/scan_reports
+
+        - name: Deployments
+          icon: RocketLaunch
+          url: /deployments
 
     - name: Admin
       icon: AdminPanelSettings
@@ -385,9 +428,6 @@ server:
         label: Sign in with IAM
     iam_oauth2_timeout: 15
 
-services:
-  disabled:
-    - dask
 
 notifications:
   enabled: True
