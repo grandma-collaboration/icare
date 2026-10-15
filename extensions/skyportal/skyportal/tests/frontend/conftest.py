@@ -11,7 +11,6 @@ is first instantiated) is enough.
 
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import expect
-
 from skyportal.tests import test_util
 
 
@@ -27,6 +26,13 @@ def _icare_playwright_login(page):
         login_link.click()
     except PlaywrightTimeoutError:
         pass  # no login link -> assume already authenticated
+    # Dismiss the Terms of Service dialog if it appears after login
+    tos_agree = page.locator('button:has-text("I Agree")').first
+    try:
+        tos_agree.wait_for(state="visible", timeout=10_000)
+        tos_agree.click()
+    except PlaywrightTimeoutError:
+        pass
     expect(page.locator(test_util.TESTUSER_XPATH).first).to_be_visible(timeout=20_000)
 
 
