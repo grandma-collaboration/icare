@@ -41,18 +41,18 @@ app:
     default_filters: ['ztfg', 'ztfr', 'ztfi']
     use_skyportal_fields: False
 
-  app:
-    assistant:
-      base_url: "https://ellm.nrp-nautilus.io/v1"
-      api_key:
-      max_tool_calls: 20
-      thinking: false
-      answer_timeout: 300
-      result_budget: 20000
-      max_context_messages: 40
-      request_timeout: 300
-      analysis_triage:
-        enabled: false
+  assistant:
+    base_url: https://ellm.nrp-nautilus.io/v1
+    model: minimax-m2
+    api_key:
+    max_tool_calls: 20
+    thinking: false
+    answer_timeout: 300
+    result_budget: 20000
+    max_context_messages: 40
+    request_timeout: 300
+    analysis_triage:
+      enabled: false
 
   # Tarot API endpoints
   tarot_proxy_endpoint: http://localhost:64910/
@@ -167,6 +167,8 @@ app:
       component: observation_plan/ObservationPlanRequestPage
     - path: "/recurring_apis"
       component: RecurringAPIPage
+    - path: "/assistant_queries"
+      component: AssistantQueriesPage
     - path: "/shifts"
       component: shift/ShiftNoId
     - path: "/shifts/:id"
@@ -310,6 +312,10 @@ app:
         - name: Recurring API
           icon: EventRepeat
           url: /recurring_apis
+
+        - name: Assistant Queries
+          icon: SmartToy
+          url: /assistant_queries
 
         - name: Taxonomies
           icon: AccountTree
