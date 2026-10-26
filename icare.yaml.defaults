@@ -41,6 +41,19 @@ app:
     default_filters: ['ztfg', 'ztfr', 'ztfi']
     use_skyportal_fields: False
 
+  assistant:
+    base_url: https://ellm.nrp-nautilus.io/v1
+    model: minimax-m2
+    api_key:
+    max_tool_calls: 20
+    thinking: false
+    answer_timeout: 300
+    result_budget: 20000
+    max_context_messages: 40
+    request_timeout: 300
+    analysis_triage:
+      enabled: false
+
   # Tarot API endpoints
   tarot_proxy_endpoint: http://localhost:64910/
   tarot_endpoint: http://cador.tarotnet.org/ros
@@ -154,6 +167,8 @@ app:
       component: observation_plan/ObservationPlanRequestPage
     - path: "/recurring_apis"
       component: RecurringAPIPage
+    - path: "/assistant_queries"
+      component: AssistantQueriesPage
     - path: "/shifts"
       component: shift/ShiftNoId
     - path: "/shifts/:id"
@@ -297,6 +312,10 @@ app:
         - name: Recurring API
           icon: EventRepeat
           url: /recurring_apis
+
+        - name: Assistant Queries
+          icon: SmartToy
+          url: /assistant_queries
 
         - name: Taxonomies
           icon: AccountTree
@@ -443,28 +462,6 @@ server:
 
 notifications:
   enabled: True
-
-additional_bandpasses:
-  - name: 'swiftxrt'
-    filterset: 'xrt'
-    wavelength: [0.1, 1, 62, 100]
-    transmission: [0, 1, 1, 0]
-    description: "basic XRT filter - tophat transmission"
-  - name: 'nicerxti'
-    filterset: 'xti'
-    wavelength: [0.1, 1.2, 41, 100]
-    transmission: [0, 1, 1, 0]
-    description: "basic XTI filter - tophat transmission"
-  - name: 'epfxt'
-    filterset: 'fxt'
-    wavelength: [1.24, 24.82]
-    transmission: [1, 1]
-    description: "basic fxt filter - 0.5-10keV"
-  - name: 'svommxt'
-    filterset: 'mxt'
-    wavelength: [0.1, 1.2, 25, 100]
-    transmission: [0, 1, 1, 0]
-    description: "basic MXT filter - tophat transmission"
 
 user:
   default_role: 'Full user'
