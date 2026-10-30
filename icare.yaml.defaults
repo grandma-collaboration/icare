@@ -8,6 +8,9 @@ app:
       2019, Coughlin et al. 2023), jointly developed at Caltech, UC Berkeley, the
       University of Minnesota, and Université Paris-Saclay.
   factory: skyportal.app_server_icare.make_app_icare
+  login_buttons:
+    - url: /login/iam-oauth2
+      icon: /static/images/iam_logo.png
   # Copy for the About page, rendered by SkyPortal's AboutPlugins template.
   about:
     description: >-
