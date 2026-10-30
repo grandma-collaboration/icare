@@ -53,7 +53,6 @@ classDiagram
     tests : frontend/test_patch_grandma.py
 
     static --|> skyportal
-    static : images/btn_iam_signin.png
 
     skyportal : Makefile
     skyportal : package.icare.json
@@ -83,9 +82,6 @@ classDiagram
 
     models --|> icare
     models : invitation.py
-
-    static --|> skyportal
-    static : images/btn_iam_signin.png
 ```
 
 In baselayer, everything related to the authentication is located in the baselayer/app directory. In there, we have the following files:

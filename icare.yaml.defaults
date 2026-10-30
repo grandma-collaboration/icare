@@ -8,12 +8,7 @@ app:
       2019, Coughlin et al. 2023), jointly developed at Caltech, UC Berkeley, the
       University of Minnesota, and Université Paris-Saclay.
   factory: skyportal.app_server_icare.make_app_icare
-  # Sign in through IAM rather than SkyPortal's default Google button.
-  login_buttons:
-    - url: /login/iam-oauth2
-      image: /static/images/btn_iam_signin.png
-      alt_text: Click this image to log in
-    # Copy for the About page, rendered by SkyPortal's AboutPlugins template.
+  # Copy for the About page, rendered by SkyPortal's AboutPlugins template.
   about:
     description: >-
       ICARE is an open source codebase that serves as a dynamic collaborative
