@@ -19,11 +19,6 @@ app:
     docs_url: https://grandma-skyportal.readthedocs.io
     api_docs_url: https://skyportal.io/docs/api.html
     repository_url: https://github.com/grandma-collaboration/icare
-    changelog_repositories:
-      - name: ICARE
-        url: https://github.com/grandma-collaboration/icare/pulls
-      - name: SkyPortal
-        url: https://github.com/skyportal/skyportal/pulls
     # Accepted once per version; bump the version to ask everyone again.
   terms_of_service:
     enabled: true
