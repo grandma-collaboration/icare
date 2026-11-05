@@ -72,6 +72,8 @@ app:
       component: listing/FavoritesPage
     - path: "/discussions"
       component: discussion/Discussions
+    - path: "/topics"
+      component: topic/Topics
     - path: "/data_access_requests"
       component: DataAccessRequestsPage
     - path: "/source_interests"
@@ -210,6 +212,10 @@ app:
         - name: Discussions
           icon: Forum
           url: /discussions
+
+        - name: Topics
+          icon: Tag
+          url: /topics
 
         - name: Groups
           icon: GroupWork
