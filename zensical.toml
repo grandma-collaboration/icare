@@ -68,5 +68,5 @@ name = "ICARE service"
 
 [[project.extra.social]]
 icon = "fontawesome/solid/book"
-link = "https://skyportal.io/docs/"
+link = "https://docs.skyportal.io/"
 name = "SkyPortal documentation"

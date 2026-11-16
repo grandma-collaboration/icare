@@ -18,7 +18,7 @@ Interface and Communication for Addicts of the Rapid follow-up in multi-messenge
 [![pre-commit](https://github.com/grandma-collaboration/icare/actions/workflows/pre-commit-linting.yml/badge.svg)](https://github.com/grandma-collaboration/icare/actions/workflows/pre-commit-linting.yml)
 [![tests](https://github.com/grandma-collaboration/icare/actions/workflows/test_icare_extensions.yaml/badge.svg)](https://github.com/grandma-collaboration/icare/actions/workflows/test_icare_extensions.yaml)
 
-ICARE is a custom instance of [SkyPortal](https://skyportal.io) ([docs](https://skyportal.io/docs/)) tailored for the coordination and follow-up of multi-messenger astronomical events. Originally developed in 2020 for the [GRANDMA](https://grandma.ijclab.in2p3.fr/) collaboration, it is now open to the broader European astronomical community thanks to [ACME](https://www.acme-astro.eu/) funding.
+ICARE is a custom instance of [SkyPortal](https://skyportal.io) ([docs](https://docs.skyportal.io/)) tailored for the coordination and follow-up of multi-messenger astronomical events. Originally developed in 2020 for the [GRANDMA](https://grandma.ijclab.in2p3.fr/) collaboration, it is now open to the broader European astronomical community thanks to [ACME](https://www.acme-astro.eu/) funding.
 
 ## Links
 

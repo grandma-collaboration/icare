@@ -20,7 +20,7 @@ app:
       Paris-Saclay.
     homepage_url: https://skyportal-icare.ijclab.in2p3.fr
     docs_url: https://grandma-skyportal.readthedocs.io
-    api_docs_url: https://skyportal.io/docs/api.html
+    api_docs_url: https://docs.skyportal.io/api.html
     repository_url: https://github.com/grandma-collaboration/icare
     # Accepted once per version; bump the version to ask everyone again.
   terms_of_service:
