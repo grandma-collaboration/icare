@@ -192,7 +192,7 @@ ports:
   tarot_proxy: 64910
 
 app:
-  tarot_proxy_endpoint: http://localhost:64910/
+  tarot_proxy_endpoint: http://localhost:64910
   tarot_endpoint: http://cador.tarotnet.org/ros
   calern_endpoint: http://tca4.tarotnet.org/ros/klotz
   chili_endpoint: http://tch4.tarotnet.org/ros/klotz
