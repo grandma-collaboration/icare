@@ -108,6 +108,8 @@ app:
       component: About
     - path: "/deployments"
       component: deployment/Deployments
+    - path: "/feedback"
+      component: feedback/Feedback
     - path: "/runs"
       component: observing_run/ObservingRunPage
     - path: "/run/:id"
@@ -142,6 +144,8 @@ app:
       component: DBStats
     - path: "/source_statistics"
       component: SourceStatistics
+    - path: "/similarity"
+      component: similarity/SimilarityPage
     - path: "/gcn_events"
       component: gcn/GcnEvents
     - path: "/gcn_events/:dateobs"
@@ -178,6 +182,8 @@ app:
       component: sharing_service/SharingServicesPage
     - path: "/sharing_service/:id/submissions"
       component: sharing_service/SharingServiceSubmissionsPage
+    - path: "/sharing_services/tns_classifications"
+      component: sharing_service/TNSClassificationsPage
     - path: "/moving_objects/obsplan"
       component: moving_object/MovingObjectObsPlanPage
 
@@ -257,6 +263,10 @@ app:
           icon: ScatterPlot
           url: /source_statistics
 
+        - name: Similarity
+          icon: BubbleChart
+          url: /similarity
+
         - name: About
           icon: Info
           url: /about
@@ -315,6 +325,10 @@ app:
         - name: Assistant Queries
           icon: SmartToy
           url: /assistant_queries
+
+        - name: Summary Search
+          icon: Troubleshoot
+          url: /summary_search
 
         - name: Taxonomies
           icon: AccountTree
