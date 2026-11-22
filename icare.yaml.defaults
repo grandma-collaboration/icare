@@ -520,6 +520,11 @@ gcn:
     - ECLAIRs-Catalog
   source_radius_threshold: 12.0 # max skymap cone radius to create a source, in arcmin
 
+boom:
+  filter_modules:
+    mongodb_uri: null
+    database: null
+
 external_logging:
   sentry:
     endpoint:
